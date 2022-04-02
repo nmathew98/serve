@@ -1,0 +1,47 @@
+{
+	"name": "serve",
+	"version": "1.0.0",
+	"description": "A lightweight starting point for Express applications",
+	"main": "dist/index.js",
+	"_moduleAliases": {
+		"$internals": "src/internals",
+		"$entities": "src/entities",
+		"$app": "src/app"
+	},
+	"scripts": {
+		"build": "tsc --outDir dist",
+		"lint": "eslint --ext .ts --ignore-path .gitignore . --fix",
+		"format": "prettier .  --write",
+		"dev": "nodemon -r dotenv/config",
+		"start": "pm2 start dist/index.js",
+		"test": "jest src/ --coverage --verbose",
+		"test.watch": "jest src/ --watch --coverage --verbose"
+	},
+	"author": "Naveen Mathew",
+	"license": "MIT",
+	"devDependencies": {
+		"@types/cors": "^2.8.12",
+		"@types/jest": "^27.0.3",
+		"@typescript-eslint/eslint-plugin": "^5.7.0",
+		"@typescript-eslint/parser": "^5.7.0",
+		"eslint-config-prettier": "^8.3.0",
+		"eslint-plugin-prettier": "^4.0.0",
+		"jest": "^27.4.5",
+		"nodemon": "^2.0.15",
+		"prettier": "^2.5.1",
+		"ts-jest": "^27.1.1"
+	},
+	"dependencies": {
+		"cors": "^2.8.5",
+		"dotenv": "^10.0.0",
+		"graphql": "^16.3.0",
+		"h3": "^0.3.8",
+		"helmet": "^5.0.1",
+		"module-alias": "^2.2.2",
+		"pm2": "^5.2.0",
+		"ts-node": "^10.4.0",
+		"typescript": "^4.5.4",
+		"ufo": "^0.7.11",
+		"winston": "^3.3.3"
+	}
+}
