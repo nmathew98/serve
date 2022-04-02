@@ -1,8 +1,8 @@
-import { ServerResponse } from "http";
+import { ServerResponse } from "h3";
 
 export function sendError(
 	response: ServerResponse,
-	error: string,
+	error: any,
 	statusCode: HttpErrorCodes = 500,
 ) {
 	response.statusCode = statusCode;

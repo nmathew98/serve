@@ -1,10 +1,10 @@
-import { ServeContext } from "$internals/context/context";
-import { IncomingMessage, ServerResponse } from "http";
-import { useBody } from "h3";
+import { IncomingMessage, ServerResponse, useBody, createRouter } from "h3";
 import { graphql, GraphQLSchema } from "graphql";
-import useSchema from "./schema";
-import { Route } from "../route";
-import { sendError, sendSuccess } from "../utilities";
+import { ServeContext } from "$internals/context/context";
+import { Route } from "$routes/route";
+import { sendError, sendSuccess } from "$routes/utilities";
+import useSchema from "./schema/schema";
+import makeSubscriptionListener from "./subscriptions/websocket/websocket";
 
 let schema: GraphQLSchema;
 
@@ -21,14 +21,23 @@ async function api(
 
 		if (!schema) schema = await useSchema(request, response, context);
 
-		return sendSuccess(
-			response,
-			await graphql({
-				schema,
-				source: body.query,
-				variableValues: body.variables,
-			}),
-		);
+		const result = await graphql({
+			schema,
+			source: body.query,
+			variableValues: body.variables,
+		});
+
+		if (context.has("configuration:graphql:subscription"))
+			if (context.get("configuration:graphql:subscription"))
+				if (!context.has("configuration:graphql:ws:listening")) {
+					const ws = makeSubscriptionListener(context);
+
+					await ws.initialize();
+					await ws.listen();
+				}
+
+		if (result.errors) return sendError(response, result.errors);
+		else return sendSuccess(response, result.data);
 	} catch (error: any) {
 		return sendError(response, error.message);
 	}
@@ -36,9 +45,13 @@ async function api(
 
 const API: Route = {
 	useRoute: (app, context) => {
-		app.use("/api", (request: IncomingMessage, response: ServerResponse) =>
-			api(request, response, context),
+		const router = createRouter().post(
+			"/api",
+			(request: IncomingMessage, response: ServerResponse) =>
+				api(request, response, context),
 		);
+
+		app.use(router);
 	},
 };
 

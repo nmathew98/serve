@@ -1,20 +1,16 @@
 import "module-alias/register";
-import Winston, { Logger } from "$internals/logger/logger";
+import Winston from "$internals/logger/logger";
 import dotenv from "dotenv";
-import buildMakeListenerFactory, {
-	ListenerFactory,
-	Listener,
-} from "$internals/listeners/listener-factory";
+import buildMakeListeners, { Listener } from "$internals/listeners/listeners";
 import { makeContext, ServeContext } from "$internals/context/context";
 
-let logger: Logger;
 let context: ServeContext;
 
 initializeConfig()
 	.then(initializeContext)
 	.then(listen)
 	.catch((error: any) => {
-		logger.error(error);
+		Winston.error(error);
 	});
 
 async function initializeConfig(): Promise<void> {
@@ -39,15 +35,17 @@ async function initializeContext(): Promise<void> {
 
 	// Set Helmet configuration here
 	context.set("configuration:helmet", {});
+
+	// If you need GraphQL subscriptions set this to true
+	context.set("configuration:graphql:subscription", true);
+	// If no value is set, it defaults to 4000
+	context.set("configuration:graphql:ws:port", 5000);
 }
 
 async function listen(): Promise<void> {
-	const makeListenerFactory = buildMakeListenerFactory({ Logger: Winston });
-	let listenerFactory: ListenerFactory = makeListenerFactory(context);
-	const listeners: Listener[] = await listenerFactory.getListeners();
+	const makeListeners = buildMakeListeners({ Logger: Winston });
+	const listeners: Listener = makeListeners(context);
 
-	for (let i = 0; i < listeners.length; i++) {
-		await listeners[i]?.initialize();
-		await listeners[i]?.listen();
-	}
+	await listeners.initialize();
+	await listeners.listen();
 }

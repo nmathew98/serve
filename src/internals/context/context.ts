@@ -16,6 +16,7 @@ interface ServeContext {
 
 	/**
 	 * Use a value from the context
+	 * Throws an error if the value is unavailable
 	 *
 	 * @param key the unique identifier for the value
 	 */
@@ -23,22 +24,27 @@ interface ServeContext {
 }
 
 function buildMakeContext() {
-	const context: Record<symbol | string, any> = Object.create(null);
+	const context: Map<symbol | string, any> = new Map();
 
 	return function makeContext(): ServeContext {
 		return Object.freeze({
 			has(key: symbol | string) {
-				return key in context;
+				return context.has(key);
 			},
 			set(key: symbol | string, value: any) {
-				context[key] = value;
+				context.set(key, value);
 
 				return this;
 			},
 			get: (key: symbol | string) => {
-				if (!(key in context)) throw new Error("No such key available!");
+				// The error thrown here is intentional
+				// The context will be used to pass entity objects around
+				// So if an entity is unavailable we'd want to know as soon
+				// as possible
 
-				return context[key];
+				if (!context.has(key)) throw new Error("No such key available!");
+
+				return context.get(key);
 			},
 		});
 	};

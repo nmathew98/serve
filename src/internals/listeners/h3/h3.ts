@@ -1,24 +1,16 @@
 import cors from "cors";
 import helmet from "helmet";
-import { createApp, App as H3, Middleware, useBody } from "h3";
+import { createApp, App as H3, Middleware, IncomingMessage } from "h3";
 import { readdir } from "fs/promises";
-import { Utils } from "$internals/utilities/utilities";
-import listenerBlacklist from "$routes/blacklist.json";
+import routeBlacklist from "$routes/blacklist.json";
 import { createServer } from "http";
 import { resolve } from "path/posix";
-import { Route as H3Route } from "$routes/route";
 import { ServeContext } from "$internals/context/context";
 import { Logger } from "$internals/logger/logger";
-
-export interface H3Listener {
-	initialize: () => Promise<void>;
-	listen: () => Promise<void>;
-	initializeRequestHandlers: () => Promise<void>;
-	initializeRoutes: () => Promise<void>;
-}
+import { Listener } from "../listeners";
 
 export default function buildMakeH3Listener({ Logger }: { Logger: Logger }) {
-	return function makeH3Listener(context: ServeContext): H3Listener {
+	return function makeH3Listener(context: ServeContext): Listener {
 		const h3: H3 = createApp();
 
 		return Object.freeze({
@@ -45,38 +37,43 @@ export default function buildMakeH3Listener({ Logger }: { Logger: Logger }) {
 				h3.use(cors(corsConfiguration));
 				h3.use(helmet(helmetConfiguration) as Middleware);
 
-				h3.use(async (request, _, next) => {
-					Logger.log(`${request.method} ${request.url}`);
-					Logger.log(
-						`Request headers: ${JSON.stringify(request.headers, null, 2)}`,
-					);
-					Logger.log(
-						`Request body: ${JSON.stringify(await useBody(request), null, 2)}`,
-					);
-
-					next();
+				h3.use(async (request: IncomingMessage) => {
+					const information = {
+						method: request.method,
+						url: request.url,
+						ip: request.httpVersion,
+						headers: request.headers,
+					};
+					Logger.log(JSON.stringify(information, null, 2));
 				});
 			},
 			initializeRoutes: async () => {
-				const rootDirectory = resolve(__dirname, "../../../external/routes/");
-				const files = await readdir(rootDirectory, {
-					withFileTypes: true,
-				});
-				const folders = files
-					.filter(file => file.isDirectory())
-					.map(directory => directory.name);
+				try {
+					const rootDirectory = resolve(__dirname, "../../../external/routes/");
+					const files = await readdir(rootDirectory, {
+						withFileTypes: true,
+					});
+					const folders = files
+						.filter(file => file.isDirectory())
+						.map(directory => directory.name);
 
-				for (const folder of folders) {
-					if (!(listenerBlacklist.blacklist as string[]).includes(folder)) {
-						const routePath = Utils.getRoutePath(rootDirectory, folder);
+					for (const folder of folders) {
+						if (!(routeBlacklist.blacklist as string[]).includes(folder)) {
+							const routePath = getRoutePath(rootDirectory, folder);
 
-						const routeImport = await import(routePath);
-						const route: H3Route = routeImport.default;
+							const { default: route } = await import(routePath);
 
-						route.useRoute(h3, context);
+							route.useRoute(h3, context);
+						}
 					}
+				} catch (error: any) {
+					Logger.error(error.message);
 				}
 			},
 		});
 	};
+}
+
+function getRoutePath(directory: string, routeFolder: string) {
+	return `${directory}/${routeFolder}/${routeFolder}.ts`;
 }

@@ -1,4 +1,4 @@
-import { IncomingMessage, ServerResponse } from "http";
+import { IncomingMessage, ServerResponse } from "h3";
 import { ServeContext } from "$internals/context/context";
 import { GraphQLString } from "graphql";
 
