@@ -13,7 +13,7 @@ export interface Logger {
 const logger: WinstonLogger = createLogger({
 	level: "info",
 	format: format.combine(
-		format.label({ label: "Serve" }),
+		format.label({ label: "Actualise" }),
 		format.timestamp(),
 		format.prettyPrint(),
 	),
@@ -31,12 +31,12 @@ const logger: WinstonLogger = createLogger({
 
 const Winston: Logger = {
 	log: (...args: string[]) => {
-		const message: string = args.join(" ");
+		const message = args.join(" ");
 
 		logger.info(message);
 	},
 	error: (...args: string[]) => {
-		const message: string = args.join(" ");
+		const message = args.join(" ");
 
 		logger.error(message);
 	},

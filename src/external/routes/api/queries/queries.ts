@@ -24,11 +24,11 @@ export default async function useQueries(
 		const queryPath: string = resolve(__dirname, folder, `${folder}.ts`);
 
 		const queryImport = await import(queryPath);
-		const queryHandler: GraphQLQueryHandler = queryImport.default;
+		const useQuery: GraphQLQueryHandler = queryImport.default;
 
 		queries = {
 			...queries,
-			...queryHandler(request, response, context),
+			...useQuery(context, request, response),
 		};
 	}
 
@@ -37,7 +37,7 @@ export default async function useQueries(
 
 type GraphQLField = ThunkObjMap<GraphQLFieldConfig<any, any, any>>;
 type GraphQLQueryHandler = (
+	context: ServeContext,
 	request: IncomingMessage,
 	response: ServerResponse,
-	context: ServeContext,
 ) => GraphQLField;

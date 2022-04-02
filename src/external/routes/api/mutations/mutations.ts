@@ -24,11 +24,11 @@ export default async function useMutations(
 		const mutationPath: string = resolve(__dirname, folder, `${folder}.ts`);
 
 		const mutationImport = await import(mutationPath);
-		const mutationHandler: GraphQLMutationHandler = mutationImport.default;
+		const useMutation: GraphQLMutationHandler = mutationImport.default;
 
 		mutations = {
 			...mutations,
-			...mutationHandler(request, response, context),
+			...useMutation(context, request, response),
 		};
 	}
 
@@ -37,7 +37,7 @@ export default async function useMutations(
 
 type GraphQLField = ThunkObjMap<GraphQLFieldConfig<any, any, any>>;
 type GraphQLMutationHandler = (
+	context: ServeContext,
 	request: IncomingMessage,
 	response: ServerResponse,
-	context: ServeContext,
 ) => GraphQLField;

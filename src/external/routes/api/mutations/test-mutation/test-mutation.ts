@@ -3,9 +3,9 @@ import { ServeContext } from "$internals/context/context";
 import { GraphQLString } from "graphql";
 
 export default function testMutation(
+	context: ServeContext,
 	request: IncomingMessage,
 	response: ServerResponse,
-	context: ServeContext,
 ) {
 	return {
 		world: {

@@ -5,14 +5,14 @@ export interface Utils {
 }
 
 export const Utils: Utils = {
-	sleep: (duration: number) =>
+	sleep: duration =>
 		new Promise((resolve: (...args: any[]) => void) =>
 			setTimeout(resolve, duration),
 		),
-	getListenerPath: (directory: string, listenerFolder: string) => {
+	getListenerPath: (directory, listenerFolder) => {
 		return `${directory}/${listenerFolder}/${listenerFolder}.ts`;
 	},
-	getRoutePath: (directory: string, routeFolder: string) => {
+	getRoutePath: (directory, routeFolder) => {
 		return `${directory}/${routeFolder}/${routeFolder}.ts`;
 	},
 };

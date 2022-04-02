@@ -1,7 +1,6 @@
 import { Logger } from "../logger/logger";
-import { Dirent as DirectoryEntry } from "fs";
 import { readdir } from "fs/promises";
-import { Utils } from "../utils/utils";
+import { Utils } from "../utilities/utilities";
 import listenerBlacklist from "./blacklist.json";
 import { ServeContext } from "../context/context";
 
@@ -24,19 +23,16 @@ export default function buildMakeListenerFactory({
 
 		return Object.freeze({
 			getListeners: async () => {
-				const files: DirectoryEntry[] = await readdir(__dirname, {
+				const files = await readdir(__dirname, {
 					withFileTypes: true,
 				});
-				const folders: string[] = files
-					.filter((file: DirectoryEntry) => file.isDirectory())
-					.map((directory: DirectoryEntry) => directory.name);
+				const folders = files
+					.filter(file => file.isDirectory())
+					.map(directory => directory.name);
 
 				for (const folder of folders) {
 					if (!(listenerBlacklist.blacklist as string[]).includes(folder)) {
-						const listenerPath: string = Utils.getListenerPath(
-							__dirname,
-							folder,
-						);
+						const listenerPath = Utils.getListenerPath(__dirname, folder);
 
 						const listenerImport = await import(listenerPath);
 						const buildMakeListener = listenerImport.default;

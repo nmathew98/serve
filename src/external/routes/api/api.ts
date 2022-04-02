@@ -1,9 +1,12 @@
 import { ServeContext } from "$internals/context/context";
 import { IncomingMessage, ServerResponse } from "http";
 import { useBody } from "h3";
-import { graphql } from "graphql";
+import { graphql, GraphQLSchema } from "graphql";
 import useSchema from "./schema";
 import { Route } from "../route";
+import { sendError, sendSuccess } from "../utilities";
+
+let schema: GraphQLSchema;
 
 async function api(
 	request: IncomingMessage,
@@ -14,17 +17,20 @@ async function api(
 		const body = await useBody(request);
 
 		if (typeof body !== "object" || !body.query)
-			return { error: "Invalid request" };
+			return sendError(response, "Invalid request");
 
-		return await graphql({
-			schema: await useSchema(request, response, context),
-			source: body.query,
-			variableValues: body.variables,
-		});
+		if (!schema) schema = await useSchema(request, response, context);
+
+		return sendSuccess(
+			response,
+			await graphql({
+				schema,
+				source: body.query,
+				variableValues: body.variables,
+			}),
+		);
 	} catch (error: any) {
-		response.statusCode = 500;
-
-		return { error: "Token(s) are invalid" };
+		return sendError(response, error.message);
 	}
 }
 

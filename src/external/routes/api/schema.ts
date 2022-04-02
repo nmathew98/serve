@@ -8,6 +8,7 @@ import {
 import { IncomingMessage, ServerResponse } from "http";
 import useQueries from "./queries/queries";
 import useMutations from "./mutations/mutations";
+import useTypes from "./types/types";
 
 export default async function useSchema(
 	request: IncomingMessage,
@@ -17,7 +18,7 @@ export default async function useSchema(
 	const schema = new GraphQLSchema({
 		query: await createQuery(request, response, context, useQueries),
 		mutation: await createMutation(request, response, context, useMutations),
-		types: [],
+		types: await useTypes(),
 	});
 
 	return schema;

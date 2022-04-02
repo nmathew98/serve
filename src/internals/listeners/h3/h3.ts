@@ -1,15 +1,14 @@
 import cors from "cors";
 import helmet from "helmet";
 import { createApp, App as H3, Middleware, useBody } from "h3";
-import { Dirent as DirectoryEntry } from "fs";
 import { readdir } from "fs/promises";
-import { Utils } from "../../utils/utils";
-import listenerBlacklist from "../../../external/routes/blacklist.json";
+import { Utils } from "$internals/utilities/utilities";
+import listenerBlacklist from "$routes/blacklist.json";
 import { createServer } from "http";
 import { resolve } from "path/posix";
-import { Route as H3Route } from "../../../external/routes/route";
-import { ServeContext } from "../../context/context";
-import { Logger } from "../../logger/logger";
+import { Route as H3Route } from "$routes/route";
+import { ServeContext } from "$internals/context/context";
+import { Logger } from "$internals/logger/logger";
 
 export interface H3Listener {
 	initialize: () => Promise<void>;
@@ -28,16 +27,25 @@ export default function buildMakeH3Listener({ Logger }: { Logger: Logger }) {
 				await this.initializeRoutes();
 			},
 			listen: async () => {
-				const port: number = +((process.env.PORT as string) || "3000");
+				const port = +((process.env.PORT as string) || "3000");
 
 				createServer(h3).listen(port);
 				Logger.log(`H3 server is up and running on port ${port}!`);
 			},
 			initializeRequestHandlers: async () => {
-				h3.use(cors());
-				h3.use(helmet() as Middleware);
+				let corsConfiguration: Record<string, any> = Object.create(null);
+				let helmetConfiguration: Record<string, any> = Object.create(null);
 
-				h3.use(async (request: any, _: any, next: any) => {
+				if (context.has("configuration:cors"))
+					corsConfiguration = context.get("configuration:cors");
+
+				if (context.has("configuration:helmet"))
+					helmetConfiguration = context.get("configuration:helmet");
+
+				h3.use(cors(corsConfiguration));
+				h3.use(helmet(helmetConfiguration) as Middleware);
+
+				h3.use(async (request, _, next) => {
 					Logger.log(`${request.method} ${request.url}`);
 					Logger.log(
 						`Request headers: ${JSON.stringify(request.headers, null, 2)}`,
@@ -51,16 +59,16 @@ export default function buildMakeH3Listener({ Logger }: { Logger: Logger }) {
 			},
 			initializeRoutes: async () => {
 				const rootDirectory = resolve(__dirname, "../../../external/routes/");
-				const files: DirectoryEntry[] = await readdir(rootDirectory, {
+				const files = await readdir(rootDirectory, {
 					withFileTypes: true,
 				});
-				const folders: string[] = files
-					.filter((file: DirectoryEntry) => file.isDirectory())
-					.map((directory: DirectoryEntry) => directory.name);
+				const folders = files
+					.filter(file => file.isDirectory())
+					.map(directory => directory.name);
 
 				for (const folder of folders) {
 					if (!(listenerBlacklist.blacklist as string[]).includes(folder)) {
-						const routePath: string = Utils.getRoutePath(rootDirectory, folder);
+						const routePath = Utils.getRoutePath(rootDirectory, folder);
 
 						const routeImport = await import(routePath);
 						const route: H3Route = routeImport.default;

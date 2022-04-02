@@ -3,14 +3,19 @@ import { ServeContext } from "$internals/context/context";
 import { GraphQLString } from "graphql";
 
 export default function testMutation(
+	context: ServeContext,
 	request: IncomingMessage,
 	response: ServerResponse,
-	context: ServeContext,
 ) {
 	return {
 		hello: {
 			type: GraphQLString,
-			resolve: () => "world",
+			args: {
+				x: {
+					type: GraphQLString,
+				},
+			},
+			resolve: (_: any, { x }: any) => `${x}!`,
 		},
 	};
 }

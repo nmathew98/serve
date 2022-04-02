@@ -1,12 +1,14 @@
 {
 	"name": "serve",
 	"version": "1.0.0",
-	"description": "A lightweight starting point for Express applications",
+	"description": "A lightweight starting point for API applications",
 	"main": "dist/index.js",
 	"_moduleAliases": {
 		"$internals": "src/internals",
 		"$entities": "src/entities",
-		"$app": "src/app"
+		"$app": "src/app",
+		"$graphql/types": "src/external/routes/api/types",
+		"$routes": "src/external/routes"
 	},
 	"scripts": {
 		"build": "tsc --outDir dist",
@@ -33,15 +35,15 @@
 	},
 	"dependencies": {
 		"cors": "^2.8.5",
-		"dotenv": "^10.0.0",
+		"dotenv": "^16.0.0",
 		"graphql": "^16.3.0",
-		"h3": "^0.3.8",
+		"h3": "^0.5.4",
 		"helmet": "^5.0.1",
 		"module-alias": "^2.2.2",
 		"pm2": "^5.2.0",
 		"ts-node": "^10.4.0",
 		"typescript": "^4.5.4",
-		"ufo": "^0.7.11",
+		"ufo": "^0.8.3",
 		"winston": "^3.3.3"
 	}
 }
