@@ -6,17 +6,24 @@ import {
 } from "winston";
 
 export interface Logger {
+	/**
+	 * Log a message
+	 *
+	 * Will be saved to combined.log
+	 */
 	log: (...args: string[]) => void;
+
+	/**
+	 * Log an error
+	 *
+	 * Will be saved to error.log
+	 */
 	error: (...args: string[]) => void;
 }
 
 const logger: WinstonLogger = createLogger({
 	level: "info",
-	format: format.combine(
-		format.label({ label: "Actualise" }),
-		format.timestamp(),
-		format.prettyPrint(),
-	),
+	format: format.combine(format.prettyPrint()),
 	transports: [
 		new transports.File({
 			filename: "error.log",

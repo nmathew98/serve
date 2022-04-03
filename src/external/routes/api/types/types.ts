@@ -16,9 +16,7 @@ export default async function useTypes(): Promise<GraphQLInterfaceType[]> {
 	for (const folder of folders) {
 		const typePath = resolve(__dirname, folder, `${folder}.ts`);
 
-		const typeImport = await import(typePath);
-		const useType: GraphQLTypeHandler = typeImport.default;
-
+		const { default: useType }: GraphQLTypeImport = await import(typePath);
 		const importedTypes = useType();
 
 		if (Array.isArray(importedTypes)) types.push(...importedTypes);
@@ -28,4 +26,5 @@ export default async function useTypes(): Promise<GraphQLInterfaceType[]> {
 	return types;
 }
 
+type GraphQLTypeImport = { default: GraphQLTypeHandler };
 type GraphQLTypeHandler = () => GraphQLInterfaceType | GraphQLInterfaceType[];

@@ -22,8 +22,9 @@ export default async function useMutations(
 	for (const folder of folders) {
 		const mutationPath = resolve(__dirname, folder, `${folder}.ts`);
 
-		const mutationImport = await import(mutationPath);
-		const useMutation: GraphQLMutationHandler = mutationImport.default;
+		const { default: useMutation }: GraphQLMutationImport = await import(
+			mutationPath
+		);
 
 		mutations = {
 			...mutations,
@@ -35,6 +36,7 @@ export default async function useMutations(
 }
 
 type GraphQLField = ThunkObjMap<GraphQLFieldConfig<any, any, any>>;
+type GraphQLMutationImport = { default: GraphQLMutationHandler };
 type GraphQLMutationHandler = (
 	context: ServeContext,
 	request: IncomingMessage,

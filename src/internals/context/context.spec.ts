@@ -1,4 +1,4 @@
-import { makeContext, ServeContext } from "./context";
+import makeContext, { ServeContext } from "./context";
 
 let context: ServeContext;
 

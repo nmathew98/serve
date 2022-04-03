@@ -18,6 +18,9 @@ export default function makeSubscriptionListener(
 			if (!context.has("configuration:graphql:ws:port")) port = 4000;
 			else port = context.get("configuration:graphql:ws:port");
 
+			if (typeof port !== "number")
+				throw new TypeError("WebSocket port is invalid!");
+
 			server = new WebSocketServer({
 				port,
 				path: "/api",

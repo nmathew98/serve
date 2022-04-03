@@ -17,7 +17,7 @@ export default async function useSchema(
 	response: ServerResponse,
 	context: ServeContext,
 ) {
-	let configuration: GraphQLSchemaConfig = {
+	const configuration: GraphQLSchemaConfig = {
 		query: await createQuery(request, response, context, useQueries),
 		mutation: await createMutation(request, response, context, useMutations),
 		types: await useTypes(),

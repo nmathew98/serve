@@ -1,4 +1,4 @@
-interface ServeContext {
+export interface ServeContext {
 	/**
 	 * Checks if a key is available in context
 	 *
@@ -52,4 +52,4 @@ function buildMakeContext() {
 
 const makeContext = buildMakeContext();
 
-export { makeContext, ServeContext };
+export default makeContext;

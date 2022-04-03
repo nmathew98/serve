@@ -1,6 +1,8 @@
 import { IncomingMessage, ServerResponse } from "h3";
 import { ServeContext } from "$internals/context/context";
 import { GraphQLString } from "graphql";
+import buildPrintHelloWorld from "$app/print-hello-world";
+import { Example } from "$entities/example/example";
 
 export default function testMutation(
 	context: ServeContext,
@@ -15,7 +17,19 @@ export default function testMutation(
 					type: GraphQLString,
 				},
 			},
-			resolve: (_: any, { x }: any) => `${x}!`,
+			resolve: (_: any, { x }: any) => {
+				// Always check if a module is available before accessing it
+				if (!context.has("Example"))
+					throw new Error("Example module not found!");
+
+				const Example: Example = context.get("Example");
+
+				const printHelloWorld = buildPrintHelloWorld({ Example });
+
+				printHelloWorld(x);
+
+				return `${x}!!!`;
+			},
 		},
 	};
 }

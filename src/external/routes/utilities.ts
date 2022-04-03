@@ -1,5 +1,12 @@
 import { ServerResponse } from "h3";
 
+/**
+ * Send an error response
+ * @param {ServerResponse} response the response
+ * @param {any} error the error
+ * @param {HttpErrorCodes} statusCode the status code
+ * @returns an error object
+ */
 export function sendError(
 	response: ServerResponse,
 	error: any,
@@ -10,6 +17,13 @@ export function sendError(
 	return { error };
 }
 
+/**
+ * Send an success response
+ * @param {ServerResponse} response the response
+ * @param {any} result the result
+ * @param {HttpSuccessCodes} statusCode the status code
+ * @returns an result object
+ */
 export function sendSuccess(
 	response: ServerResponse,
 	result: any,

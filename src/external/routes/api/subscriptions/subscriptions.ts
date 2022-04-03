@@ -23,9 +23,8 @@ export default async function useSubscription(
 	for (const folder of folders) {
 		const subscriptionPath = resolve(__dirname, folder, `${folder}.ts`);
 
-		const subscriptionImport = await import(subscriptionPath);
-		const useSubscription: GraphQLSubscriptionHandler =
-			subscriptionImport.default;
+		const { default: useSubscription }: GraphQLSubscriptionImport =
+			await import(subscriptionPath);
 
 		subscriptions = {
 			...subscriptions,
@@ -37,6 +36,7 @@ export default async function useSubscription(
 }
 
 type GraphQLField = ThunkObjMap<GraphQLFieldConfig<any, any, any>>;
+type GraphQLSubscriptionImport = { default: GraphQLSubscriptionHandler };
 type GraphQLSubscriptionHandler = (
 	context: ServeContext,
 	request: IncomingMessage,
