@@ -16,10 +16,10 @@ export interface ModuleLoader {
 	load: () => Promise<void>;
 }
 
-export type ModuleLoaderMaker = (
-	context: ServeContext,
-	mock?: any,
-) => ModuleLoader;
+export interface ModuleLoaderMaker {
+	(context: ServeContext): ModuleLoader;
+	(context: ServeContext, mock?: any): ModuleLoader;
+}
 
 export default function buildMakeModuleLoader({
 	Logger,
@@ -32,7 +32,7 @@ export default function buildMakeModuleLoader({
 }): ModuleLoaderMaker {
 	const adapters = Object.create(null);
 
-	const buildMakeRegex = /buildMake\w+\(\{(.*)\}:/gim;
+	const buildMakeRegex = /(?:build[A-Z]+[A-Za-z]+.+{)([\s\w,]*)(?:})/gim;
 	const entitiesPath = resolve(__dirname, "../../entities");
 	const adaptersPath = resolve(__dirname, "../../external/adapters");
 
@@ -52,6 +52,7 @@ export default function buildMakeModuleLoader({
 
 			const matchedLine = contents.match(buildMakeRegex)?.pop();
 
+			/* istanbul ignore next: testing the regex first already safeguards against this */
 			if (!matchedLine) continue;
 
 			const adaptersList = [...matchedLine.matchAll(buildMakeRegex)]
@@ -62,6 +63,7 @@ export default function buildMakeModuleLoader({
 				?.map(item => item.trim())
 				?.filter(item => !!item);
 
+			/* istanbul ignore next: for this to happen the typescript won't compile */
 			if (!adaptersList) continue;
 
 			for (const adapter of adaptersList) {
@@ -93,21 +95,21 @@ export default function buildMakeModuleLoader({
 		}
 	};
 
-	return function makeModuleLoader(context, mock): ModuleLoader {
+	return function makeModuleLoader(context, mock?): ModuleLoader {
 		let entityBlacklist: string[];
 
 		if (!context.has("configuration:entity:blacklist")) entityBlacklist = [];
 		else entityBlacklist = context.get("configuration:entity:blacklist");
 
 		if (!Array.isArray(entityBlacklist))
-			throw new Error("Entity blacklist must be a string array");
+			throw new TypeError("Entity blacklist must be a string array");
 		if (Array.isArray(entityBlacklist) && entityBlacklist.length > 0)
 			if (!entityBlacklist.every(item => typeof item === "string"))
-				throw new Error("Entity blacklist must be a string array");
+				throw new TypeError("Entity blacklist must be a string array");
 
 		return Object.freeze({
 			load: async () => {
-				await loadAdapters(mock);
+				await loadAdapters(mock?.import);
 
 				const files = await readdir(entitiesPath, {
 					withFileTypes: true,
@@ -134,7 +136,7 @@ export default function buildMakeModuleLoader({
 					else entityConfiguration = context.get(configurationKey);
 
 					if (typeof entityConfiguration !== "object")
-						throw new Error(
+						throw new TypeError(
 							`Configuration for ${entityName} must be an object`,
 						);
 
@@ -162,9 +164,10 @@ export default function buildMakeModuleLoader({
 
 type EntityImport = { default: EntityBuilder };
 type EntityBuilder = (adapters: Record<string, any>) => EntityMaker;
-type EntityMaker = (configuration: Record<string, any>) => Record<string, any>;
+type EntityMaker = (configuration: Record<string, any>) => Entity;
 type Entity = Record<string, any>;
 
+/* istanbul ignore next */
 function importModule(
 	path: string,
 	mock?: (path: string) => Promise<any>,
@@ -176,10 +179,12 @@ function importModule(
 	});
 }
 
+/* istanbul ignore next */
 function getEntityConfigurationKeyFromFolder(folder: string) {
 	return `configuration:entity:${getEntityNameFromFolder(folder)}`;
 }
 
+/* istanbul ignore next */
 function getEntityNameFromFolder(folder: string) {
 	return folder
 		.split("-")
@@ -189,6 +194,7 @@ function getEntityNameFromFolder(folder: string) {
 		.join("");
 }
 
+/* istanbul ignore next */
 function getAdapterFolderFromName(name: string) {
 	return name
 		.split(/(?=[A-Z][^A-Z])/)
@@ -196,6 +202,7 @@ function getAdapterFolderFromName(name: string) {
 		.toLowerCase();
 }
 
+/* istanbul ignore next */
 function getModulePathFromFolder(base: string, folder: string) {
 	return `${base}/${folder.toLowerCase()}/${folder.toLowerCase()}`;
 }

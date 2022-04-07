@@ -31,7 +31,10 @@ export type ListenerBuilder = ({
 	Emoji: Emoji;
 }) => ListenerMaker;
 
-export type ListenerMaker = (context: ServeContext) => Listener;
+export interface ListenerMaker {
+	(context: ServeContext): Listener;
+	(context: ServeContext, mock?: any): Listener;
+}
 
 export default function buildMakeListeners({
 	Logger,
@@ -41,8 +44,8 @@ export default function buildMakeListeners({
 	Logger: Logger;
 	Colors: Colors;
 	Emoji: Emoji;
-}) {
-	return function makeListeners(context: ServeContext): Listener {
+}): ListenerMaker {
+	return function makeListeners(context, mock?): Listener {
 		const importedListeners: Listener[] = [];
 
 		let listenerBlacklist: string[];
@@ -78,9 +81,8 @@ export default function buildMakeListeners({
 
 						const listenerPath = getListenerPath(__dirname, listener);
 
-						const { default: buildMakeListener }: ListenerImport = await import(
-							listenerPath
-						);
+						const { default: buildMakeListener }: ListenerImport =
+							await importModule(listenerPath, mock?.import);
 
 						const makeListener: ListenerMaker = buildMakeListener({
 							Logger,
@@ -105,6 +107,19 @@ export default function buildMakeListeners({
 	};
 }
 
+/* istanbul ignore next */
+function importModule(
+	path: string,
+	mock?: (path: string) => Promise<any>,
+): Promise<any> {
+	return new Promise(resolve => {
+		if (mock) return resolve(mock(path));
+
+		return resolve(import(path));
+	});
+}
+
+/* istanbul ignore next */
 function getListenerPath(base: string, folder: string) {
 	return `${base}/${folder.toLowerCase()}/${folder.toLowerCase()}`;
 }

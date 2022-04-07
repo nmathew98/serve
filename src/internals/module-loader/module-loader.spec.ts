@@ -3,6 +3,7 @@ import { ServeContext } from "$internals/context/context";
 import { Emoji } from "$internals/emoji/emoji";
 import { Logger } from "$internals/logger/logger";
 import buildMakeModuleLoader, { ModuleLoaderMaker } from "./module-loader";
+import { resolve } from "path/posix";
 
 jest.mock("fs/promises", () => ({
 	readdir: jest.fn().mockImplementation(() => [
@@ -19,9 +20,16 @@ jest.mock("fs/promises", () => ({
 			name: "c",
 		},
 	]),
-	readFile: jest.fn().mockImplementation(() => ({
-		toString: () => "",
-	})),
+	readFile: jest.fn().mockImplementation((path: string) => {
+		if (/entities\/a\/a/.test(path))
+			return {
+				toString: () => "buildMakeA({ Test, TestA, TestB, Test })",
+			};
+
+		return {
+			toString: () => "makeB({ Test })",
+		};
+	}),
 }));
 
 describe("ModuleLoader", () => {
@@ -69,9 +77,15 @@ describe("ModuleLoader", () => {
 			rocket: "rocket",
 		};
 
-		buildMakeA = jest.fn().mockImplementation(() => () => {});
-		buildMakeB = jest.fn().mockImplementation(() => () => {});
-		buildMakeC = jest.fn().mockImplementation(() => () => {});
+		buildMakeA = jest.fn().mockImplementation(() => () => {
+			return;
+		});
+		buildMakeB = jest.fn().mockImplementation(() => () => {
+			return;
+		});
+		buildMakeC = jest.fn().mockImplementation(() => () => {
+			return;
+		});
 
 		makeModuleLoader = buildMakeModuleLoader({ Logger, Colors, Emoji });
 	});
@@ -92,40 +106,82 @@ describe("ModuleLoader", () => {
 		);
 	});
 
-	it("loads all entities which are not blacklisted", async () => {
-		const mock = {
-			import: jest.fn().mockImplementation((path: string) => {
-				if (/entities\/a\/a/.test(path)) return { default: buildMakeA };
-				else if (/entities\/b\/b/.test(path)) return { default: buildMakeB };
-				else return { default: buildMakeC };
-			}),
-		};
+	describe("load", () => {
+		it("throws an error if the configuration for an entity is not an object", async () => {
+			ServeContext.set("configuration:entity:A", "");
 
-		const moduleLoader = makeModuleLoader(ServeContext, mock);
+			const mock = {
+				import: jest.fn().mockImplementation((path: string) => {
+					if (/entities\/a\/a/.test(path)) return { default: buildMakeA };
+					else if (/entities\/b\/b/.test(path)) return { default: buildMakeB };
+					else return { default: buildMakeC };
+				}),
+			};
 
-		await moduleLoader.load();
+			const moduleLoader = makeModuleLoader(ServeContext, mock);
 
-		expect(buildMakeA).toBeCalledTimes(1);
-		expect(buildMakeB).toBeCalledTimes(1);
-		expect(buildMakeC).toBeCalledTimes(1);
-	});
+			try {
+				await moduleLoader.load();
+			} catch (error: any) {
+				expect(error.message).toStrictEqual(
+					"Configuration for A must be an object",
+				);
+			}
+		});
 
-	it("does not load entities which are blacklisted", async () => {
-		const mock = {
-			import: jest.fn().mockImplementation((path: string) => {
-				if (/entities\/a\/a/.test(path)) return { default: buildMakeA };
-				else if (/entities\/b\/b/.test(path)) return { default: buildMakeB };
-				else return { default: buildMakeC };
-			}),
-		};
+		it("imports the adapters required for an entity", async () => {
+			const mock = {
+				import: jest.fn().mockImplementation((path: string) => {
+					if (/entities\/a\/a/.test(path)) return { default: buildMakeA };
+					else if (/entities\/b\/b/.test(path)) return { default: buildMakeB };
+					else return { default: buildMakeC };
+				}),
+			};
 
-		ServeContext.set("configuration:entity:blacklist", ["a", "b", "c"]);
-		const moduleLoader = makeModuleLoader(ServeContext, mock);
+			const moduleLoader = makeModuleLoader(ServeContext, mock);
 
-		await moduleLoader.load();
+			await moduleLoader.load();
 
-		expect(buildMakeA).toBeCalledTimes(0);
-		expect(buildMakeB).toBeCalledTimes(0);
-		expect(buildMakeC).toBeCalledTimes(0);
+			expect(mock.import).toHaveBeenCalledWith(
+				resolve(__dirname, "../../external/adapters/test/test"),
+			);
+		});
+
+		it("loads all entities which are not blacklisted", async () => {
+			const mock = {
+				import: jest.fn().mockImplementation((path: string) => {
+					if (/entities\/a\/a/.test(path)) return { default: buildMakeA };
+					else if (/entities\/b\/b/.test(path)) return { default: buildMakeB };
+					else return { default: buildMakeC };
+				}),
+			};
+
+			const moduleLoader = makeModuleLoader(ServeContext, mock);
+
+			await moduleLoader.load();
+
+			expect(buildMakeA).toBeCalledTimes(1);
+			expect(buildMakeB).toBeCalledTimes(1);
+			expect(buildMakeC).toBeCalledTimes(1);
+		});
+
+		it("does not load entities which are blacklisted", async () => {
+			const mock = {
+				import: jest.fn().mockImplementation((path: string) => {
+					if (/entities\/a\/a/.test(path)) return { default: buildMakeA };
+					else if (/entities\/b\/b/.test(path)) return { default: buildMakeB };
+					else return { default: buildMakeC };
+				}),
+			};
+
+			ServeContext.set("configuration:entity:blacklist", ["a", "b", "c"]);
+			const moduleLoader = makeModuleLoader(ServeContext, mock);
+
+			await moduleLoader.load();
+
+			expect(buildMakeA).toBeCalledTimes(0);
+			expect(buildMakeB).toBeCalledTimes(0);
+			expect(buildMakeC).toBeCalledTimes(0);
+		});
 	});
 });
