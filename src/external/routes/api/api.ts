@@ -1,4 +1,4 @@
-import { IncomingMessage, ServerResponse, useBody, createRouter } from "h3";
+import { IncomingMessage, ServerResponse, useBody } from "h3";
 import { graphql, GraphQLSchema } from "graphql";
 import { ServeContext } from "$internals/context/context";
 import { Route } from "$routes/route";
@@ -39,19 +39,15 @@ async function api(
 		if (result.errors) return sendError(response, result.errors);
 		else return sendSuccess(response, result.data);
 	} catch (error: any) {
-		return sendError(response, error.message);
+		return sendError(response, { error: error.message, stack: error.stack });
 	}
 }
 
 const API: Route = {
 	useRoute: (app, context) => {
-		const router = createRouter().post(
-			"/api",
-			(request: IncomingMessage, response: ServerResponse) =>
-				api(request, response, context),
+		app.use("/api", (request: IncomingMessage, response: ServerResponse) =>
+			api(request, response, context),
 		);
-
-		app.use(router);
 	},
 };
 

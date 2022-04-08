@@ -1,6 +1,6 @@
 import { ServeContext } from "$internals/context/context";
 import { ThunkObjMap, GraphQLFieldConfig } from "graphql";
-import { IncomingMessage, ServerResponse } from "http";
+import { IncomingMessage, ServerResponse } from "h3";
 import { resolve } from "path/posix";
 import { readdir } from "fs/promises";
 
