@@ -32,7 +32,7 @@ export default function buildMakeModuleLoader({
 }): ModuleLoaderMaker {
 	const adapters = Object.create(null);
 
-	const buildMakeRegex = /(?:build[A-Z]+[A-Za-z]+.+{)([\s\w,]*)(?:})/gim;
+	const buildMakeRegex = /(?:build[A-Z]+[A-Za-z]+\({)([\s\w,]*)(?:})/gim;
 	const entitiesPath = resolve(__dirname, "../../entities");
 	const adaptersPath = resolve(__dirname, "../../external/adapters");
 
