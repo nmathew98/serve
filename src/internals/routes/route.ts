@@ -19,6 +19,7 @@ export class RouteError extends Error implements RouteError {
 		this.statusCode = statusCode;
 	}
 }
+
 export interface RouteError {
 	/**
 	 * The error message
