@@ -6,6 +6,7 @@ import { readdir } from "fs/promises";
 import { getApiRouteFolderName } from "../../../routes/utilities";
 import findSourceDirectory from "../../../directory/directory";
 import Winston from "../../../logger/logger";
+import CliColors from "../../../colors/colors";
 
 export default async function useQueries(
 	request: IncomingMessage,
@@ -39,7 +40,7 @@ export default async function useQueries(
 			};
 		}
 	} catch (error: any) {
-		Winston.error("Unable to load GraphQL queries");
+		Winston.error(CliColors.red("Unable to load GraphQL queries"));
 	}
 
 	return queries;

@@ -6,6 +6,7 @@ import { readdir } from "fs/promises";
 import { getApiRouteFolderName } from "../../../routes/utilities";
 import findSourceDirectory from "../../../directory/directory";
 import Winston from "../../../logger/logger";
+import CliColors from "../../../colors/colors";
 
 export default async function useMutations(
 	request: IncomingMessage,
@@ -41,7 +42,7 @@ export default async function useMutations(
 			};
 		}
 	} catch (error: any) {
-		Winston.error("Unable to load GraphQL mutations");
+		Winston.error(CliColors.red("Unable to load GraphQL mutations"));
 	}
 
 	return mutations;

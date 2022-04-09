@@ -10,6 +10,8 @@ import { Listener } from "../listeners";
 import { Colors } from "../../colors/colors";
 import { Emoji } from "../../emoji/emoji";
 import API from "../../routes/api/api";
+import StorageUpload from "../../routes/storage-upload/storage-upload";
+import StorageRemove from "../../routes/storage-remove/storage-remove";
 import findSourceDirectory from "../../directory/directory";
 
 export default function buildMakeH3Listener({
@@ -65,9 +67,14 @@ export default function buildMakeH3Listener({
 			});
 		};
 
-		const initializeRoutes = async () => {
-			routeBlacklist.push(getApiRouteFolderName(context));
+		const initializeInternalRoutes = () => {
 			API.useRoute(h3, context);
+			StorageUpload.useRoute(h3, context);
+			StorageRemove.useRoute(h3, context);
+		};
+
+		const initializeRoutes = async () => {
+			initializeInternalRoutes();
 
 			try {
 				const sourceDirectory = await findSourceDirectory();
@@ -89,7 +96,7 @@ export default function buildMakeH3Listener({
 					}
 				}
 			} catch (error: any) {
-				Logger.error(Colors.red(error.message));
+				Logger.error(Colors.red(error.message, error.stack));
 			}
 		};
 
@@ -113,13 +120,4 @@ export default function buildMakeH3Listener({
 
 function getRoutePath(base: string, folder: string) {
 	return `${base.toLowerCase()}/${folder.toLowerCase()}/${folder.toLowerCase()}`;
-}
-
-function getApiRouteFolderName(context: ServeContext) {
-	let path: string;
-	if (context.has("configuration:routes:api:path"))
-		path = context.get("configuration:routes:api:path");
-	else path = "/api";
-
-	return path.replaceAll("/", "");
 }

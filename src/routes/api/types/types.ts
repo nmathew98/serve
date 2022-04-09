@@ -5,6 +5,7 @@ import { getApiRouteFolderName } from "../../../routes/utilities";
 import { ServeContext } from "../../../context/context";
 import findSourceDirectory from "../../../directory/directory";
 import Winston from "../../../logger/logger";
+import CliColors from "../../../colors/colors";
 
 export default async function useTypes(
 	context: ServeContext,
@@ -35,7 +36,7 @@ export default async function useTypes(
 			else types.push(importedTypes);
 		}
 	} catch (error: any) {
-		Winston.error("Unable to load GraphQL types");
+		Winston.error(CliColors.red("Unable to load GraphQL types"));
 	}
 
 	return types;

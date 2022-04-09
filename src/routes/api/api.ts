@@ -13,29 +13,31 @@ async function api(
 	response: ServerResponse,
 	context: ServeContext,
 ) {
-	let verifyAuthorization: any;
-	let verifyAuthorizationOptions: any;
+	{
+		let verifyAuthorization: any;
+		let verifyAuthorizationOptions: any;
 
-	if (context.has("configuration:routes:authorization:verify")) {
-		if (context.has("configuration:routes:api:verify")) {
-			const verificationOptionsInContext = context.get(
-				"configuration:routes:api:verify",
+		if (context.has("configuration:routes:authorization:verify")) {
+			if (context.has("configuration:routes:api:verify")) {
+				const verificationOptionsInContext = context.get(
+					"configuration:routes:api:verify",
+				);
+
+				if (typeof verificationOptionsInContext === "object")
+					verifyAuthorizationOptions = verificationOptionsInContext;
+				else verifyAuthorizationOptions = Object.create(null);
+			} else verifyAuthorizationOptions = Object.create(null);
+
+			verifyAuthorization = context.get(
+				"configuration:routes:authorization:verify",
 			);
 
-			if (typeof verificationOptionsInContext === "object")
-				verifyAuthorizationOptions = verificationOptionsInContext;
-			else verifyAuthorizationOptions = Object.create(null);
-		} else verifyAuthorizationOptions = Object.create(null);
-
-		verifyAuthorization = context.get(
-			"configuration:routes:authorization:verify",
-		);
-
-		if (typeof verifyAuthorization === "function") {
-			try {
-				await verifyAuthorization(request, verifyAuthorizationOptions);
-			} catch (error: any) {
-				return sendError(response, error.message, error.statusCode);
+			if (typeof verifyAuthorization === "function") {
+				try {
+					await verifyAuthorization(request, verifyAuthorizationOptions);
+				} catch (error: any) {
+					return sendError(response, error.message, error.statusCode);
+				}
 			}
 		}
 	}

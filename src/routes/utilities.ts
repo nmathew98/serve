@@ -3,6 +3,7 @@ import { IncomingMessage, ServerResponse } from "h3";
 
 /**
  * Send an error response
+ *
  * @param {ServerResponse} response the response
  * @param {any} error the error
  * @param {HttpErrorCodes} statusCode the status code
@@ -20,6 +21,7 @@ export function sendError(
 
 /**
  * Send an success response
+ *
  * @param {ServerResponse} response the response
  * @param {any} result the result
  * @param {HttpSuccessCodes} statusCode the status code

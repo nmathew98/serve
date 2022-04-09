@@ -6,6 +6,7 @@ import { readdir } from "fs/promises";
 import { getApiRouteFolderName } from "../../utilities";
 import findSourceDirectory from "../../../directory/directory";
 import Winston from "../../../logger/logger";
+import CliColors from "../../../colors/colors";
 
 export default async function useSubscription(
 	request: IncomingMessage,
@@ -40,7 +41,7 @@ export default async function useSubscription(
 			};
 		}
 	} catch (error: any) {
-		Winston.error("Unable to load GraphQL subscriptions");
+		Winston.error(CliColors.red("Unable to load GraphQL subscriptions"));
 	}
 
 	return subscriptions;
