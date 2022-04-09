@@ -10,9 +10,9 @@ The whole idea is around a standard design pattern and a standard directory stru
 
 The standard directory structure is as follows:
 
-- Entities are placed in `examples/entities`
-- Adapters are placed in `examples/external/adapters`
-- Routes are placed in `examples/external/routes`
+- Entities are placed in `src/entities`
+- Adapters are placed in `src/external/adapters`
+- Routes are placed in `src/external/routes`
 
 The standard design pattern is as follows:
 
