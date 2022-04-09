@@ -70,6 +70,10 @@ async function initializeContext() {
 	// Throw a RouteError if error
 	const getAuthorization: GetAuthorization = Object.create(null);
 	context.set("configuration:routes:authorization:get", getAuthorization);
+
+	// If route access is restricted, set the options for the API route
+	// to pass to verifyAuthorization here
+	context.set("configuration:routes:api:verify", Object.create(null));
 }
 
 async function initializeEntityConfiguration() {
