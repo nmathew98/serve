@@ -110,6 +110,7 @@ export default function buildMakeH3Listener({
 			listen: async () => {
 				const port = +(process.env.PORT ?? "3000");
 
+				context.set(`test:h3`, h3);
 				createServer(h3).listen(port);
 				Logger.log(
 					Colors.brightGreen(`[H3] Listening on port ${port}!`),

@@ -15,7 +15,7 @@ export interface Listener {
 	/**
 	 * Initializes and sets up all listeners which have been imported
 	 */
-	listen(): Promise<void>;
+	listen(): Promise<void | ServeContext>;
 }
 
 export type ListenerImport = { default: ListenerBuilder };
@@ -98,10 +98,12 @@ export default function buildMakeListeners({
 				}
 			},
 			listen: async () => {
-				importedListeners.forEach(async listener => {
+				for (const listener of importedListeners) {
 					await listener.initialize();
 					await listener.listen();
-				});
+				}
+
+				return context;
 			},
 		});
 	};
