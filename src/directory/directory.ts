@@ -3,6 +3,12 @@ import { readdir } from "fs/promises";
 
 let sourceDirectory: string;
 
+/**
+ * Walk upwards until we encounter a folder named `src`
+ *
+ * @param {string} path no need to set this, its used internally
+ * @returns the path to the directory named `src`
+ */
 export default async function findSourceDirectory(
 	path?: string,
 ): Promise<string> {

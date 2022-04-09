@@ -1,5 +1,5 @@
 import { IncomingMessage, ServerResponse } from "h3";
-import { ServeContext } from "$internals/context/context";
+import { ServeContext } from "@skulpture/serve";
 import { GraphQLString } from "graphql";
 
 export default function testSubscription(

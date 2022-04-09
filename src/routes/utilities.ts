@@ -50,16 +50,33 @@ export function getApiRouteFolderName(context: ServeContext) {
 	return path.replaceAll("/", "");
 }
 
+/**
+ * To verify the authorization status of a user
+ *
+ * @param {IncomingMessage} request The request from h3
+ * @param {Record<string, any> | undefined} payload any other options which are needed
+ * @returns a string or void
+ */
 export type VerifyAuthorization = (
 	request: IncomingMessage,
 	payload?: Record<string, any>,
 ) => Promise<string | void>;
 
+/**
+ * To get the authorization confirmation of a user
+ *
+ * @param {IncomingMessage} request The request from h3
+ * @param {Record<string, any> | undefined} payload any other options which are needed
+ * @returns a string
+ */
 export type GetAuthorization = (
 	request: IncomingMessage,
 	payload?: Record<string, any>,
 ) => Promise<string>;
 
+/**
+ * HTTP success status codes
+ */
 export type HttpSuccessCodes =
 	| 200
 	| 201
@@ -72,6 +89,9 @@ export type HttpSuccessCodes =
 	| 208
 	| 226;
 
+/**
+ * HTTP error status codes
+ */
 export type HttpErrorCodes =
 	| 400
 	| 401

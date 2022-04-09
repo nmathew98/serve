@@ -1,5 +1,5 @@
 import { IncomingMessage, ServerResponse } from "h3";
-import { ServeContext } from "$internals/context/context";
+import { ServeContext } from "@skulpture/serve";
 import { GraphQLString } from "graphql";
 import buildPrintHelloWorld from "$app/print-hello-world";
 import { Example } from "$entities/example/example";

@@ -25,23 +25,21 @@ The standard design pattern is as follows:
 - Entities must have a default function export which returns a function.
   Multiword entity names like `Test Entity` will have the key `TestEntity` (the file this corresponds to would be `src/entities/test-entity/test-entity.ts`).
 
-- All routes must adhere to the `Route` interface (see `src/external/routes/route.ts`)
+- All routes must adhere to the `Route` interface.
 
   The top level function accepts an object of the adapters used by the entity. The returned function accepts a configuration object to configure the entity.
 
-- The default function export must be named in the format `buildMake${entity}` where `entity` is its key (the entity `User` would have `entity` be equal to `User`)
+- The default function export must be named in the format `buildMake${entity}` where `entity` is its key (the entity `User` would have `entity` be equal to `User`).
 
 - To use an entity in a route, get it from the context, the entity in `src/entities/user/user.ts` will have the key `User` in the context.
 
 - To set the configuration of an entity, set it in the context, the configuration must be an `object` and it must map to the key `configuration:entity:${entity}` where `entity` is its key.
 
-- The template comes with GraphQL configured with support for subscriptions using WebSockets.
-
-  Add your mutations, queries, subscriptions and types to `src/external/routes/api/mutations`, `src/external/routes/api/queries`, `src/external/routes/api/subscriptions` and `src/external/routes/api/types` respectively.
+- Add your mutations, queries, subscriptions and types to `src/external/routes/api/mutations`, `src/external/routes/api/queries`, `src/external/routes/api/subscriptions` and `src/external/routes/api/types` respectively.
 
   Each GraphQL query, mutation, type or subscription must be in a folder with the same name as the file within it with a default function export.
 
-  Queries must adhere to the `GraphQLQueryHandler` type, mutations `GraphQLMutationHandler`, subscriptions `GraphQLSubscriptionHandler` and types `GraphQLTypeHandler` (see the existing files in `src/external/routes/api/` for an example).
+  Queries must adhere to the `GraphQLQueryHandler` type, mutations `GraphQLMutationHandler`, subscriptions `GraphQLSubscriptionHandler` and types `GraphQLTypeHandler`.
 
 No need to worry about the initializations of the entities, adapters or routes. This is all done automatically!
 
@@ -70,20 +68,6 @@ No need to worry about the initializations of the entities, adapters or routes. 
 
 - The directory structures and filenames are very important.
 
-Just dig through the code and see how things are structured to get a better idea!
+## Examples
 
-## Other notes
-
-The following files are crucial to how everything works:
-
-- `package.json`
-- `src/external/routes/api/route.ts`
-- `src/external/routes/api/utilities.ts`
-- `src/external/routes/api/api.ts`
-- `src/external/routes/api/mutations/mutations.ts`
-- `src/external/routes/api/queries/queries.ts`
-- `src/external/routes/api/schema/schema.ts`
-- `src/external/routes/api/subscriptions/subscriptions.ts`
-- `src/external/routes/api/types/types.ts`
-- Everything in `src/external/routes/api/subscriptions/websockets`
-- Everything in `src/internals`
+- Take a look at `examples/` to see how it should be used
