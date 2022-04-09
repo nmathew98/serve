@@ -13,6 +13,21 @@ async function api(
 	response: ServerResponse,
 	context: ServeContext,
 ) {
+	let verifyAuthorization: any;
+	if (context.has("configuration:routes:authorization:verify")) {
+		verifyAuthorization = context.get(
+			"configuration:routes:authorization:verify",
+		);
+
+		if (typeof verifyAuthorization === "function") {
+			try {
+				await verifyAuthorization(request);
+			} catch (error: any) {
+				return sendError(response, error.message, error.statusCode);
+			}
+		}
+	}
+
 	try {
 		const body = await useBody(request);
 

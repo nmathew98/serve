@@ -1,5 +1,5 @@
 import { ServeContext } from "$internals/context/context";
-import { ServerResponse } from "h3";
+import { IncomingMessage, ServerResponse } from "h3";
 
 /**
  * Send an error response
@@ -50,7 +50,17 @@ export function getApiRouteFolderName(context: ServeContext) {
 	return path.replaceAll("/", "");
 }
 
-type HttpSuccessCodes =
+export type VerifyAuthorization = (
+	request: IncomingMessage,
+	payload?: Record<string, any>,
+) => Promise<string | void>;
+
+export type GetAuthorization = (
+	request: IncomingMessage,
+	payload?: Record<string, any>,
+) => Promise<string>;
+
+export type HttpSuccessCodes =
 	| 200
 	| 201
 	| 202
@@ -62,7 +72,7 @@ type HttpSuccessCodes =
 	| 208
 	| 226;
 
-type HttpErrorCodes =
+export type HttpErrorCodes =
 	| 400
 	| 401
 	| 402

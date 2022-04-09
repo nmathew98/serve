@@ -12,6 +12,10 @@ import buildMakeModuleLoader, {
 	ModuleLoader,
 	ModuleLoaderMaker,
 } from "$internals/module-loader/module-loader";
+import {
+	GetAuthorization,
+	VerifyAuthorization,
+} from "$internals/routes/utilities";
 
 let context: ServeContext;
 
@@ -51,6 +55,21 @@ async function initializeContext() {
 	context.set("configuration:graphql:subscription", true);
 	// If no value is set, it defaults to 4000
 	context.set("configuration:graphql:ws:port", 5000);
+
+	// If route access is restricted set the functions(!) to
+	// verify and get authorization confirmation here
+
+	// The value must conform to the VerifyAuthorization type
+	// Import it from `$internals/routes/utilities`
+	// Throw a RouteError if error
+	const verifyAuthorization: VerifyAuthorization = Object.create(null);
+	context.set("configuration:routes:authorization:verify", verifyAuthorization);
+
+	// The value must conform to the GetAuthroization type
+	// Import it from `$internals/routes/utilities`
+	// Throw a RouteError if error
+	const getAuthorization: GetAuthorization = Object.create(null);
+	context.set("configuration:routes:authorization:get", getAuthorization);
 }
 
 async function initializeEntityConfiguration() {

@@ -1,5 +1,6 @@
 import { App } from "$internals/app/app";
 import { ServeContext } from "$internals/context/context";
+import { HttpErrorCodes } from "./utilities";
 
 export interface Route {
 	/**
@@ -9,4 +10,23 @@ export interface Route {
 	 * @param {ServeContext} context the global context object
 	 */
 	useRoute(app: App, context: ServeContext): void;
+}
+
+export class RouteError extends Error implements RouteError {
+	constructor(message: string, statusCode?: HttpErrorCodes) {
+		super(message);
+
+		this.statusCode = statusCode;
+	}
+}
+export interface RouteError {
+	/**
+	 * The error message
+	 */
+	message: string;
+
+	/**
+	 * The HTTP status code
+	 */
+	statusCode?: HttpErrorCodes;
 }
