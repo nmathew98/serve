@@ -5,6 +5,7 @@ import { resolve } from "path/posix";
 import { readdir } from "fs/promises";
 import { getApiRouteFolderName } from "../../utilities";
 import findSourceDirectory from "../../../directory/directory";
+import Winston from "../../../logger/logger";
 
 export default async function useSubscription(
 	request: IncomingMessage,
@@ -13,29 +14,33 @@ export default async function useSubscription(
 ): Promise<GraphQLField> {
 	let subscriptions: GraphQLField = Object.create(null);
 
-	const apiRouteFolder = getApiRouteFolderName(context);
-	const sourceDirectory = await findSourceDirectory();
-	const rootDirectory = resolve(
-		sourceDirectory,
-		`./external/routes/${apiRouteFolder}/subscriptions`,
-	);
-	const files = await readdir(rootDirectory, {
-		withFileTypes: true,
-	});
-	const folders = files
-		.filter(file => file.isDirectory())
-		.map(directory => directory.name);
+	try {
+		const apiRouteFolder = getApiRouteFolderName(context);
+		const sourceDirectory = await findSourceDirectory();
+		const rootDirectory = resolve(
+			sourceDirectory,
+			`./external/routes/${apiRouteFolder}/subscriptions`,
+		);
+		const files = await readdir(rootDirectory, {
+			withFileTypes: true,
+		});
+		const folders = files
+			.filter(file => file.isDirectory())
+			.map(directory => directory.name);
 
-	for (const folder of folders) {
-		const subscriptionPath = resolve(rootDirectory, folder, folder);
+		for (const folder of folders) {
+			const subscriptionPath = resolve(rootDirectory, folder, folder);
 
-		const { default: useSubscription }: GraphQLSubscriptionImport =
-			await import(subscriptionPath);
+			const { default: useSubscription }: GraphQLSubscriptionImport =
+				await import(subscriptionPath);
 
-		subscriptions = {
-			...subscriptions,
-			...useSubscription(context, request, response),
-		};
+			subscriptions = {
+				...subscriptions,
+				...useSubscription(context, request, response),
+			};
+		}
+	} catch (error: any) {
+		Winston.error("Unable to load GraphQL subscriptions");
 	}
 
 	return subscriptions;

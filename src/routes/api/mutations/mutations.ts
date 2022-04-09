@@ -5,6 +5,7 @@ import { resolve } from "path/posix";
 import { readdir } from "fs/promises";
 import { getApiRouteFolderName } from "../../../routes/utilities";
 import findSourceDirectory from "../../../directory/directory";
+import Winston from "../../../logger/logger";
 
 export default async function useMutations(
 	request: IncomingMessage,
@@ -13,30 +14,34 @@ export default async function useMutations(
 ): Promise<GraphQLField> {
 	let mutations: GraphQLField = Object.create(null);
 
-	const apiRouteFolder = getApiRouteFolderName(context);
-	const sourceDirectory = await findSourceDirectory();
-	const rootDirectory = resolve(
-		sourceDirectory,
-		`./external/routes/${apiRouteFolder}/mutations`,
-	);
-	const files = await readdir(rootDirectory, {
-		withFileTypes: true,
-	});
-	const folders = files
-		.filter(file => file.isDirectory())
-		.map(directory => directory.name);
-
-	for (const folder of folders) {
-		const mutationPath = resolve(rootDirectory, folder, folder);
-
-		const { default: useMutation }: GraphQLMutationImport = await import(
-			mutationPath
+	try {
+		const apiRouteFolder = getApiRouteFolderName(context);
+		const sourceDirectory = await findSourceDirectory();
+		const rootDirectory = resolve(
+			sourceDirectory,
+			`./external/routes/${apiRouteFolder}/mutations`,
 		);
+		const files = await readdir(rootDirectory, {
+			withFileTypes: true,
+		});
+		const folders = files
+			.filter(file => file.isDirectory())
+			.map(directory => directory.name);
 
-		mutations = {
-			...mutations,
-			...useMutation(context, request, response),
-		};
+		for (const folder of folders) {
+			const mutationPath = resolve(rootDirectory, folder, folder);
+
+			const { default: useMutation }: GraphQLMutationImport = await import(
+				mutationPath
+			);
+
+			mutations = {
+				...mutations,
+				...useMutation(context, request, response),
+			};
+		}
+	} catch (error: any) {
+		Winston.error("Unable to load GraphQL mutations");
 	}
 
 	return mutations;

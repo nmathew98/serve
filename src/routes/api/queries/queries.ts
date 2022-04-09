@@ -5,6 +5,7 @@ import { resolve } from "path/posix";
 import { readdir } from "fs/promises";
 import { getApiRouteFolderName } from "../../../routes/utilities";
 import findSourceDirectory from "../../../directory/directory";
+import Winston from "../../../logger/logger";
 
 export default async function useQueries(
 	request: IncomingMessage,
@@ -13,28 +14,32 @@ export default async function useQueries(
 ): Promise<GraphQLField> {
 	let queries: GraphQLField = Object.create(null);
 
-	const apiRouteFolder = getApiRouteFolderName(context);
-	const sourceDirectory = await findSourceDirectory();
-	const rootDirectory = resolve(
-		sourceDirectory,
-		`./external/routes/${apiRouteFolder}/queries`,
-	);
-	const files = await readdir(rootDirectory, {
-		withFileTypes: true,
-	});
-	const folders = files
-		.filter(file => file.isDirectory())
-		.map(directory => directory.name);
+	try {
+		const apiRouteFolder = getApiRouteFolderName(context);
+		const sourceDirectory = await findSourceDirectory();
+		const rootDirectory = resolve(
+			sourceDirectory,
+			`./external/routes/${apiRouteFolder}/queries`,
+		);
+		const files = await readdir(rootDirectory, {
+			withFileTypes: true,
+		});
+		const folders = files
+			.filter(file => file.isDirectory())
+			.map(directory => directory.name);
 
-	for (const folder of folders) {
-		const queryPath = resolve(rootDirectory, folder, folder);
+		for (const folder of folders) {
+			const queryPath = resolve(rootDirectory, folder, folder);
 
-		const { default: useQuery }: GraphQLQueryImport = await import(queryPath);
+			const { default: useQuery }: GraphQLQueryImport = await import(queryPath);
 
-		queries = {
-			...queries,
-			...useQuery(context, request, response),
-		};
+			queries = {
+				...queries,
+				...useQuery(context, request, response),
+			};
+		}
+	} catch (error: any) {
+		Winston.error("Unable to load GraphQL queries");
 	}
 
 	return queries;
