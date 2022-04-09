@@ -3,6 +3,7 @@ import { ThunkObjMap, GraphQLFieldConfig } from "graphql";
 import { IncomingMessage, ServerResponse } from "h3";
 import { resolve } from "path/posix";
 import { readdir } from "fs/promises";
+import { getApiRouteFolderName } from "$internals/routes/utilities";
 
 export default async function useSubscription(
 	request: IncomingMessage,
@@ -11,17 +12,20 @@ export default async function useSubscription(
 ): Promise<GraphQLField> {
 	let subscriptions: GraphQLField = Object.create(null);
 
-	const rootDirectory = resolve(__dirname);
+	const apiRouteFolder = getApiRouteFolderName(context);
+	const rootDirectory = resolve(
+		__dirname,
+		`../../../../external/routes/${apiRouteFolder}/subscriptions`,
+	);
 	const files = await readdir(rootDirectory, {
 		withFileTypes: true,
 	});
 	const folders = files
 		.filter(file => file.isDirectory())
-		.map(directory => directory.name)
-		.filter(directory => directory !== "websocket");
+		.map(directory => directory.name);
 
 	for (const folder of folders) {
-		const subscriptionPath = resolve(__dirname, folder, `${folder}.ts`);
+		const subscriptionPath = resolve(rootDirectory, folder, folder);
 
 		const { default: useSubscription }: GraphQLSubscriptionImport =
 			await import(subscriptionPath);

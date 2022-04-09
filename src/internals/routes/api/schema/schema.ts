@@ -1,4 +1,5 @@
 import { ServeContext } from "$internals/context/context";
+import useSubscription from "$internals/routes/api/subscriptions/subscriptions";
 import {
 	GraphQLFieldConfig,
 	GraphQLObjectType,
@@ -10,7 +11,6 @@ import { IncomingMessage, ServerResponse } from "h3";
 import useQueries from "../queries/queries";
 import useMutations from "../mutations/mutations";
 import useTypes from "../types/types";
-import useSubscription from "../subscriptions/subscriptions";
 
 export default async function useSchema(
 	request: IncomingMessage,
@@ -20,7 +20,7 @@ export default async function useSchema(
 	const configuration: GraphQLSchemaConfig = {
 		query: await createQuery(request, response, context, useQueries),
 		mutation: await createMutation(request, response, context, useMutations),
-		types: await useTypes(),
+		types: await useTypes(context),
 	};
 
 	if (context.has("configuration:graphql:subscription"))

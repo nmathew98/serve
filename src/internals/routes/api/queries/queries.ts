@@ -3,15 +3,20 @@ import { ThunkObjMap, GraphQLFieldConfig } from "graphql";
 import { IncomingMessage, ServerResponse } from "h3";
 import { resolve } from "path/posix";
 import { readdir } from "fs/promises";
+import { getApiRouteFolderName } from "$internals/routes/utilities";
 
-export default async function useMutations(
+export default async function useQueries(
 	request: IncomingMessage,
 	response: ServerResponse,
 	context: ServeContext,
 ): Promise<GraphQLField> {
-	let mutations: GraphQLField = Object.create(null);
+	let queries: GraphQLField = Object.create(null);
 
-	const rootDirectory = resolve(__dirname);
+	const apiRouteFolder = getApiRouteFolderName(context);
+	const rootDirectory = resolve(
+		__dirname,
+		`../../../../external/routes/${apiRouteFolder}/queries`,
+	);
 	const files = await readdir(rootDirectory, {
 		withFileTypes: true,
 	});
@@ -20,24 +25,22 @@ export default async function useMutations(
 		.map(directory => directory.name);
 
 	for (const folder of folders) {
-		const mutationPath = resolve(__dirname, folder, `${folder}.ts`);
+		const queryPath = resolve(rootDirectory, folder, folder);
 
-		const { default: useMutation }: GraphQLMutationImport = await import(
-			mutationPath
-		);
+		const { default: useQuery }: GraphQLQueryImport = await import(queryPath);
 
-		mutations = {
-			...mutations,
-			...useMutation(context, request, response),
+		queries = {
+			...queries,
+			...useQuery(context, request, response),
 		};
 	}
 
-	return mutations;
+	return queries;
 }
 
 type GraphQLField = ThunkObjMap<GraphQLFieldConfig<any, any, any>>;
-type GraphQLMutationImport = { default: GraphQLMutationHandler };
-type GraphQLMutationHandler = (
+type GraphQLQueryImport = { default: GraphQLQueryHandler };
+type GraphQLQueryHandler = (
 	context: ServeContext,
 	request: IncomingMessage,
 	response: ServerResponse,

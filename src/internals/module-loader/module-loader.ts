@@ -91,8 +91,8 @@ export default function buildMakeModuleLoader({
 					Emoji.whiteCheckMark,
 				);
 			}
-			Logger.log();
 		}
+		Logger.log();
 	};
 
 	return function makeModuleLoader(context, mock?): ModuleLoader {

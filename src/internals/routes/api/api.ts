@@ -1,8 +1,8 @@
 import { IncomingMessage, ServerResponse, useBody } from "h3";
 import { graphql, GraphQLSchema } from "graphql";
 import { ServeContext } from "$internals/context/context";
-import { Route } from "$routes/route";
-import { sendError, sendSuccess } from "$routes/utilities";
+import { Route } from "$internals/routes/route";
+import { sendError, sendSuccess } from "$internals/routes/utilities";
 import useSchema from "./schema/schema";
 import makeSubscriptionListener from "./subscriptions/websocket/websocket";
 
@@ -45,7 +45,13 @@ async function api(
 
 const API: Route = {
 	useRoute: (app, context) => {
-		app.use("/api", (request: IncomingMessage, response: ServerResponse) =>
+		let path: string;
+
+		if (context.has("configuration:routes:api:path"))
+			path = context.get("configuration:routes:api:path");
+		else path = "/api";
+
+		app.use(path, (request: IncomingMessage, response: ServerResponse) =>
 			api(request, response, context),
 		);
 	},

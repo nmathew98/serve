@@ -1,3 +1,4 @@
+import { ServeContext } from "$internals/context/context";
 import { ServerResponse } from "h3";
 
 /**
@@ -32,6 +33,21 @@ export function sendSuccess(
 	response.statusCode = statusCode;
 
 	return { result };
+}
+
+/**
+ * Get the name of the folder which contains the api route
+ *
+ * @param {ServeContext} context the ServeContext
+ * @returns the folder which contains the api route
+ */
+export function getApiRouteFolderName(context: ServeContext) {
+	let path: string;
+	if (context.has("configuration:routes:api:path"))
+		path = context.get("configuration:routes:api:path");
+	else path = "/api";
+
+	return path.replaceAll("/", "");
 }
 
 type HttpSuccessCodes =
