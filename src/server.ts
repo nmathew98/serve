@@ -58,7 +58,7 @@ async function initializeContext() {
 	context.set("Logger", Winston);
 	context.set("configuration:serve:package", {
 		name: "serve",
-		version: "0.1.0",
+		version: "0.1.1",
 	});
 
 	return context;

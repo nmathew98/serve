@@ -68,7 +68,9 @@ export default function buildMakeH3Listener({
 		};
 
 		const initializeInternalRoutes = () => {
+			routeBlacklist.push(getApiRouteFolderName(context));
 			API.useRoute(h3, context);
+
 			StorageUpload.useRoute(h3, context);
 			StorageRemove.useRoute(h3, context);
 		};
@@ -120,4 +122,13 @@ export default function buildMakeH3Listener({
 
 function getRoutePath(base: string, folder: string) {
 	return `${base.toLowerCase()}/${folder.toLowerCase()}/${folder.toLowerCase()}`;
+}
+
+function getApiRouteFolderName(context: ServeContext) {
+	let path: string;
+	if (context.has("configuration:routes:api:path"))
+		path = context.get("configuration:routes:api:path");
+	else path = "/api";
+
+	return path.replaceAll("/", "");
 }
