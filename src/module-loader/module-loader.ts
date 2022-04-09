@@ -82,7 +82,7 @@ export default function buildMakeModuleLoader({
 					adapterFolder,
 				);
 
-				const { default: adapterImport } = await importModule(
+				const { default: adapterImport }: AdapterImport = await importModule(
 					adapterPath,
 					mock,
 				);
@@ -173,6 +173,9 @@ type EntityImport = { default: EntityBuilder };
 type EntityBuilder = (adapters: Record<string, any>) => EntityMaker;
 type EntityMaker = (configuration: Record<string, any>) => Entity;
 type Entity = Record<string, any>;
+
+type AdapterImport = { default: Adapter };
+type Adapter = Record<string, any>;
 
 /* istanbul ignore next */
 function importModule(

@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from "h3";
 import { Upload } from "../../upload/upload";
 import { ServeContext } from "../../context/context";
-import { sendSuccess, sendError } from "../utilities";
+import { sendSuccess, sendError, VerifyAuthorization } from "../utilities";
 import { Route } from "../route";
 
 async function remove(
@@ -9,12 +9,12 @@ async function remove(
 	response: ServerResponse,
 	context: ServeContext,
 ) {
-	if (!context.has("configuration:routes:storage"))
+	if (!context.has("configuration:adapter:upload"))
 		return sendError(response, "Storage module not available");
 
 	{
-		let verifyAuthorization: any;
-		let verifyAuthorizationOptions: any;
+		let verifyAuthorization: VerifyAuthorization;
+		let verifyAuthorizationOptions: Record<string, any> | undefined;
 
 		if (context.has("configuration:routes:verify")) {
 			if (context.has("configuration:routes:storage:verify")) {
@@ -24,8 +24,7 @@ async function remove(
 
 				if (typeof verificationOptionsInContext === "object")
 					verifyAuthorizationOptions = verificationOptionsInContext;
-				else verifyAuthorizationOptions = Object.create(null);
-			} else verifyAuthorizationOptions = Object.create(null);
+			}
 
 			verifyAuthorization = context.get("configuration:storage:verify");
 
@@ -39,8 +38,8 @@ async function remove(
 		}
 	}
 
-	const Upload: Upload = context.get("configuration:routes:storage");
-	const fileRemoveHandler = Upload.remove;
+	const upload: Upload = context.get("configuration:adapter:upload");
+	const fileRemoveHandler = upload.remove;
 
 	try {
 		return sendSuccess(response, await fileRemoveHandler(request));

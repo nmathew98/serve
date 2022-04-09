@@ -1,6 +1,6 @@
 {
 	"name": "@skulpture/serve",
-	"version": "0.1.1",
+	"version": "1.0.1",
 	"description": "A lightweight starting point for API applications",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -24,9 +24,9 @@
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-plugin-prettier": "^4.0.0",
 		"jest": "^27.4.5",
-		"nodemon": "^2.0.15",
 		"prettier": "^2.6.2",
-		"ts-jest": "^27.1.1"
+		"ts-jest": "^27.1.1",
+		"typescript": "^4.6.3"
 	},
 	"dependencies": {
 		"cli-color": "^2.0.2",
@@ -36,8 +36,6 @@
 		"h3": "^0.7.1",
 		"helmet": "^5.0.1",
 		"node-emoji": "^1.11.0",
-		"typescript": "^4.5.4",
-		"ufo": "^0.8.3",
 		"winston": "^3.3.3",
 		"ws": "^8.5.0"
 	}

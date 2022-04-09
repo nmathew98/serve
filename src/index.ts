@@ -3,9 +3,9 @@ import "module-alias/register";
 
 export {
 	initialize,
-	setProjectConfiguration,
-	setServeConfiguration,
-	setEntityConfiguration,
+	useProjectConfiguration,
+	useServeConfiguration,
+	useEntityConfiguration,
 } from "./server";
 
 export { App } from "./app/app";

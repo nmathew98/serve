@@ -26,21 +26,21 @@ export async function initialize() {
 	}
 }
 
-export function setProjectConfiguration(hook: () => Promise<void>) {
+export function useProjectConfiguration(hook: () => Promise<void>) {
 	hooks.projectConfiguration = hook;
 }
 
-export function setServeConfiguration(hook: ServeHook) {
+export function useServeConfiguration(hook: ServeHook) {
 	hooks.serveConfiguration = hook;
 }
 
-export function setEntityConfiguration(hook: ServeHook) {
+export function useEntityConfiguration(hook: ServeHook) {
 	hooks.entityConfiguration = hook;
 }
 
-export type ServeHook = (context: ServeContext) => Promise<void>;
+type ServeHook = (context: ServeContext) => Promise<void>;
 
-export interface ServeHooks {
+interface ServeHooks {
 	projectConfiguration?: () => Promise<void>;
 	serveConfiguration?: ServeHook;
 	entityConfiguration?: ServeHook;
@@ -58,7 +58,7 @@ async function initializeContext() {
 	context.set("Logger", Winston);
 	context.set("configuration:serve:package", {
 		name: "serve",
-		version: "0.1.1",
+		version: "1.0.1",
 	});
 
 	return context;

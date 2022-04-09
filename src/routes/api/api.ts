@@ -2,7 +2,11 @@ import { IncomingMessage, ServerResponse, useBody } from "h3";
 import { graphql, GraphQLSchema } from "graphql";
 import { ServeContext } from "../../context/context";
 import { Route } from "../../routes/route";
-import { sendError, sendSuccess } from "../../routes/utilities";
+import {
+	sendError,
+	sendSuccess,
+	VerifyAuthorization,
+} from "../../routes/utilities";
 import useSchema from "./schema/schema";
 import makeSubscriptionListener from "./subscriptions/websocket/websocket";
 
@@ -14,8 +18,8 @@ async function api(
 	context: ServeContext,
 ) {
 	{
-		let verifyAuthorization: any;
-		let verifyAuthorizationOptions: any;
+		let verifyAuthorization: VerifyAuthorization;
+		let verifyAuthorizationOptions: Record<string, any> | undefined;
 
 		if (context.has("configuration:routes:authorization:verify")) {
 			if (context.has("configuration:routes:api:verify")) {
@@ -25,8 +29,7 @@ async function api(
 
 				if (typeof verificationOptionsInContext === "object")
 					verifyAuthorizationOptions = verificationOptionsInContext;
-				else verifyAuthorizationOptions = Object.create(null);
-			} else verifyAuthorizationOptions = Object.create(null);
+			}
 
 			verifyAuthorization = context.get(
 				"configuration:routes:authorization:verify",
