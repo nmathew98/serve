@@ -1,6 +1,6 @@
 {
 	"name": "@skulpture/serve",
-	"version": "2.0.0",
+	"version": "3.0.0",
 	"description": "A lightweight starting point for API applications",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",

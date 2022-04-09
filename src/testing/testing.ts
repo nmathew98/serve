@@ -4,8 +4,10 @@ export interface ServeTest {
 	getListener: () => any;
 }
 
-export default function buildMakeTest(context: ServeContext) {
-	return function makeTest(configuration: ServeTestConfiguration): ServeTest {
+export default function buildMakeTesting(context: ServeContext) {
+	return function makeTesting(
+		configuration: ServeTestConfiguration,
+	): ServeTest {
 		return Object.freeze({
 			getListener: () => {
 				switch (configuration.name) {

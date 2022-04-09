@@ -1,5 +1,5 @@
 import Winston from "./logger/logger";
-import "module-alias/register";
+import buildMakeTesting from "./testing/testing";
 
 export {
 	initialize,
@@ -28,3 +28,6 @@ export {
 	HttpErrorCodes,
 	HttpSuccessCodes,
 } from "./routes/utilities";
+
+export { buildMakeTesting };
+export { ServeTest, ServeTestConfiguration } from "./testing/testing";
