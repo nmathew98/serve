@@ -4,12 +4,13 @@ import { createApp, App as H3, Middleware, IncomingMessage } from "h3";
 import { readdir } from "fs/promises";
 import { createServer } from "http";
 import { resolve } from "path/posix";
-import { ServeContext } from "$internals/context/context";
-import { Logger } from "$internals/logger/logger";
+import { ServeContext } from "../../context/context";
+import { Logger } from "../../logger/logger";
 import { Listener } from "../listeners";
-import { Colors } from "$internals/colors/colors";
-import { Emoji } from "$internals/emoji/emoji";
-import API from "$internals/routes/api/api";
+import { Colors } from "../../colors/colors";
+import { Emoji } from "../../emoji/emoji";
+import API from "../../routes/api/api";
+import findSourceDirectory from "../../directory/directory";
 
 export default function buildMakeH3Listener({
 	Logger,
@@ -69,7 +70,8 @@ export default function buildMakeH3Listener({
 			API.useRoute(h3, context);
 
 			try {
-				const rootDirectory = resolve(__dirname, "../../../external/routes/");
+				const sourceDirectory = await findSourceDirectory();
+				const rootDirectory = resolve(sourceDirectory, "./external/routes/");
 				const files = await readdir(rootDirectory, {
 					withFileTypes: true,
 				});

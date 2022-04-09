@@ -1,4 +1,4 @@
-import { ServeContext } from "$internals/context/context";
+import { ServeContext } from "../context/context";
 import { IncomingMessage, ServerResponse } from "h3";
 
 /**

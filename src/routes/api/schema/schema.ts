@@ -1,5 +1,5 @@
-import { ServeContext } from "$internals/context/context";
-import useSubscription from "$internals/routes/api/subscriptions/subscriptions";
+import { ServeContext } from "../../../context/context";
+import useSubscription from "../subscriptions/subscriptions";
 import {
 	GraphQLFieldConfig,
 	GraphQLObjectType,

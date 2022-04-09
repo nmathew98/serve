@@ -1,9 +1,10 @@
-import { ServeContext } from "$internals/context/context";
+import { ServeContext } from "../../../context/context";
 import { ThunkObjMap, GraphQLFieldConfig } from "graphql";
 import { IncomingMessage, ServerResponse } from "h3";
 import { resolve } from "path/posix";
 import { readdir } from "fs/promises";
-import { getApiRouteFolderName } from "$internals/routes/utilities";
+import { getApiRouteFolderName } from "../../utilities";
+import findSourceDirectory from "../../../directory/directory";
 
 export default async function useSubscription(
 	request: IncomingMessage,
@@ -13,9 +14,10 @@ export default async function useSubscription(
 	let subscriptions: GraphQLField = Object.create(null);
 
 	const apiRouteFolder = getApiRouteFolderName(context);
+	const sourceDirectory = await findSourceDirectory();
 	const rootDirectory = resolve(
-		__dirname,
-		`../../../../external/routes/${apiRouteFolder}/subscriptions`,
+		sourceDirectory,
+		`./external/routes/${apiRouteFolder}/subscriptions`,
 	);
 	const files = await readdir(rootDirectory, {
 		withFileTypes: true,

@@ -20,13 +20,9 @@
 		"outDir": "dist",
 		"baseUrl": ".",
 		"paths": {
-			"$internals*": ["src/internals*"],
-			"$entities*": ["src/entities*"],
-			"$app*": ["src/app*"],
-			"$graphql/types*": ["src/external/routes/api/types*"],
-			"$routes*": ["src/external/routes*"],
 			"*": ["node_modules/*"]
 		}
 	},
-	"include": ["src"]
+	"include": ["src"],
+	"exclude": ["dist"]
 }

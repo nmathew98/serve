@@ -1,8 +1,8 @@
 import { Server, WebSocketServer } from "ws";
 import { useServer } from "graphql-ws/lib/use/ws";
 import { GraphQLSchema } from "graphql";
-import { ServeContext } from "$internals/context/context";
-import { Listener } from "$internals/listeners/listeners";
+import { ServeContext } from "../../../../context/context";
+import { Listener } from "../../../../listeners/listeners";
 
 export default function makeSubscriptionListener(
 	context: ServeContext,

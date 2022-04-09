@@ -1,8 +1,8 @@
 import { IncomingMessage, ServerResponse, useBody } from "h3";
 import { graphql, GraphQLSchema } from "graphql";
-import { ServeContext } from "$internals/context/context";
-import { Route } from "$internals/routes/route";
-import { sendError, sendSuccess } from "$internals/routes/utilities";
+import { ServeContext } from "../../context/context";
+import { Route } from "../../routes/route";
+import { sendError, sendSuccess } from "../../routes/utilities";
 import useSchema from "./schema/schema";
 import makeSubscriptionListener from "./subscriptions/websocket/websocket";
 

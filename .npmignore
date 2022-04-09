@@ -1,0 +1,10 @@
+src/**
+*.spec.js
+*.spec.js.map
+examples/**
+coverage/**
+.eslintrc.js
+.gitignore
+.prettierignore
+.prettierrc.json
+jest.config.js

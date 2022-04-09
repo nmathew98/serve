@@ -1,5 +1,5 @@
-import { App } from "$internals/app/app";
-import { ServeContext } from "$internals/context/context";
+import { App } from "../app/app";
+import { ServeContext } from "../context/context";
 import { HttpErrorCodes } from "./utilities";
 
 export interface Route {

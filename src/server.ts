@@ -1,16 +1,16 @@
 import "module-alias/register";
-import Winston from "$internals/logger/logger";
-import CliColors from "$internals/colors/colors";
-import Emoji from "$internals/emoji/emoji";
+import Winston from "./logger/logger";
+import CliColors from "./colors/colors";
+import Emoji from "./emoji/emoji";
 import buildMakeListeners, {
 	Listener,
 	ListenerMaker,
-} from "$internals/listeners/listeners";
-import makeContext, { ServeContext } from "$internals/context/context";
+} from "./listeners/listeners";
+import makeContext, { ServeContext } from "./context/context";
 import buildMakeModuleLoader, {
 	ModuleLoader,
 	ModuleLoaderMaker,
-} from "$internals/module-loader/module-loader";
+} from "./module-loader/module-loader";
 
 const hooks: ServeHooks = Object.create(null);
 
@@ -56,6 +56,10 @@ async function initializeContext() {
 	if (hooks.serveConfiguration) await hooks.serveConfiguration(context);
 
 	context.set("Logger", Winston);
+	context.set("configuration:serve:package", {
+		name: "serve",
+		version: "0.0.4",
+	});
 
 	return context;
 }

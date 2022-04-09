@@ -1,8 +1,9 @@
 import { GraphQLInterfaceType } from "graphql";
 import { resolve } from "path/posix";
 import { readdir } from "fs/promises";
-import { getApiRouteFolderName } from "$internals/routes/utilities";
-import { ServeContext } from "$internals/context/context";
+import { getApiRouteFolderName } from "../../../routes/utilities";
+import { ServeContext } from "../../../context/context";
+import findSourceDirectory from "../../../directory/directory";
 
 export default async function useTypes(
 	context: ServeContext,
@@ -10,9 +11,10 @@ export default async function useTypes(
 	const types: GraphQLInterfaceType[] = [];
 
 	const apiRouteFolder = getApiRouteFolderName(context);
+	const sourceDirectory = await findSourceDirectory();
 	const rootDirectory = resolve(
-		__dirname,
-		`../../../../external/routes/${apiRouteFolder}/types`,
+		sourceDirectory,
+		`./external/routes/${apiRouteFolder}/types`,
 	);
 	const files = await readdir(rootDirectory, {
 		withFileTypes: true,

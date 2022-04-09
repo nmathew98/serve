@@ -1,9 +1,8 @@
 import { Logger } from "../logger/logger";
 import { readdir } from "fs/promises";
 import { ServeContext } from "../context/context";
-import { Colors } from "$internals/colors/colors";
-import { Emoji } from "$internals/emoji/emoji";
-import packageDetails from "../../../package.json";
+import { Colors } from "../colors/colors";
+import { Emoji } from "../emoji/emoji";
 
 export interface Listener {
 	/**
@@ -61,6 +60,7 @@ export default function buildMakeListeners({
 
 		return Object.freeze({
 			initialize: async () => {
+				const packageDetails = context.get("configuration:serve:package");
 				Logger.log(
 					Colors.brightGreen(
 						`${packageDetails.name}@${packageDetails.version} powering up ...`,

@@ -1,9 +1,10 @@
-import { ServeContext } from "$internals/context/context";
-import { Logger } from "$internals/logger/logger";
+import { ServeContext } from "../context/context";
+import { Logger } from "../logger/logger";
 import { resolve } from "path/posix";
 import { readFile, readdir } from "fs/promises";
-import { Colors } from "$internals/colors/colors";
-import { Emoji } from "$internals/emoji/emoji";
+import { Colors } from "../colors/colors";
+import { Emoji } from "../emoji/emoji";
+import findSourceDirectory from "../directory/directory";
 
 export interface ModuleLoader {
 	/**
@@ -33,10 +34,12 @@ export default function buildMakeModuleLoader({
 	const adapters = Object.create(null);
 
 	const buildMakeRegex = /(?:build[A-Z]+[A-Za-z]+\({)([\s\w,]*)(?:})/gim;
-	const entitiesPath = resolve(__dirname, "../../entities");
-	const adaptersPath = resolve(__dirname, "../../external/adapters");
+	let sourceDirectory;
 
-	const loadAdapters = async (mock?: any) => {
+	const loadAdapters = async (sourceDirectory: string, mock?: any) => {
+		const entitiesPath = resolve(sourceDirectory, "./entities");
+		const adaptersPath = resolve(sourceDirectory, "./external/adapters");
+
 		const files = await readdir(entitiesPath, {
 			withFileTypes: true,
 		});
@@ -109,7 +112,11 @@ export default function buildMakeModuleLoader({
 
 		return Object.freeze({
 			load: async () => {
-				await loadAdapters(mock?.import);
+				sourceDirectory = await findSourceDirectory();
+
+				const entitiesPath = resolve(sourceDirectory, "./entities");
+
+				await loadAdapters(sourceDirectory, mock?.import);
 
 				const files = await readdir(entitiesPath, {
 					withFileTypes: true,
