@@ -1,32 +1,17 @@
 import { resolve } from "path/posix";
-import { readdir } from "fs/promises";
 
-let sourceDirectory: string;
+export default async function findSourceDirectory(): Promise<string> {
+	const directoryRegex = /(.*)\/node_modules\/@skulpture\/serve/gim;
+	const isProduction = process.env.NODE_ENV === "production";
+	const currentDirectory = resolve(__dirname);
 
-/**
- * Walk upwards until we encounter a folder named `src`
- *
- * @param {string} path no need to set this, its used internally
- * @returns the path to the directory named `src`
- */
-export default async function findSourceDirectory(
-	path?: string,
-): Promise<string> {
-	if (sourceDirectory) return sourceDirectory;
+	const packageDirectory = currentDirectory
+		.match(directoryRegex)
+		?.pop() as string;
 
-	let currentDirectory;
-	if (path) currentDirectory = path;
-	else currentDirectory = __dirname;
+	let sourceDirectory: string;
+	if (isProduction) sourceDirectory = `${packageDirectory}/dist`;
+	else sourceDirectory = `${packageDirectory}/src`;
 
-	const files = await readdir(currentDirectory, {
-		withFileTypes: true,
-	});
-	const folders = files
-		.filter(file => file.isDirectory())
-		.map(directory => directory.name);
-
-	if (folders.includes("src")) {
-		sourceDirectory = `${currentDirectory}/src`;
-		return sourceDirectory;
-	} else return await findSourceDirectory(resolve(currentDirectory, "../"));
+	return sourceDirectory;
 }

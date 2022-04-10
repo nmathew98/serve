@@ -56,10 +56,6 @@ async function initializeContext() {
 	if (hooks.serveConfiguration) await hooks.serveConfiguration(context);
 
 	context.set("Logger", Winston);
-	context.set("configuration:serve:package", {
-		name: "serve",
-		version: "3.0.1",
-	});
 
 	return context;
 }

@@ -17,10 +17,7 @@ export interface ModuleLoader {
 	load: () => Promise<void>;
 }
 
-export interface ModuleLoaderMaker {
-	(context: ServeContext): ModuleLoader;
-	(context: ServeContext, mock?: any): ModuleLoader;
-}
+export type ModuleLoaderMaker = (context: ServeContext) => ModuleLoader;
 
 export default function buildMakeModuleLoader({
 	Logger,
@@ -48,7 +45,11 @@ export default function buildMakeModuleLoader({
 			.map(directory => directory.name);
 
 		for (const folder of folders) {
-			const buffer = await readFile(`${entitiesPath}/${folder}/${folder}.ts`);
+			let buffer;
+			if (process.env.NODE_ENV === "production")
+				buffer = await readFile(`${entitiesPath}/${folder}/${folder}.js`);
+			else buffer = await readFile(`${entitiesPath}/${folder}/${folder}.ts`);
+
 			const contents = buffer.toString().replace(/(?:\r\n|\r|\n|\t)/g, " ");
 
 			if (!buildMakeRegex.test(contents)) continue;
@@ -98,7 +99,7 @@ export default function buildMakeModuleLoader({
 		Logger.log();
 	};
 
-	return function makeModuleLoader(context, mock?): ModuleLoader {
+	return function makeModuleLoader(context): ModuleLoader {
 		let entityBlacklist: string[];
 
 		if (!context.has("configuration:entity:blacklist")) entityBlacklist = [];
@@ -116,7 +117,7 @@ export default function buildMakeModuleLoader({
 
 				const entitiesPath = resolve(sourceDirectory, "./entities");
 
-				await loadAdapters(sourceDirectory, mock?.import);
+				await loadAdapters(sourceDirectory);
 
 				const files = await readdir(entitiesPath, {
 					withFileTypes: true,
@@ -151,7 +152,6 @@ export default function buildMakeModuleLoader({
 
 					const { default: buildMakeEntity }: EntityImport = await importModule(
 						entityPath,
-						mock?.import,
 					);
 
 					const makeEntity: EntityMaker = buildMakeEntity(adapters);

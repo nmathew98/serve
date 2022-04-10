@@ -3,6 +3,7 @@ import { readdir } from "fs/promises";
 import { ServeContext } from "../context/context";
 import { Colors } from "../colors/colors";
 import { Emoji } from "../emoji/emoji";
+import packageDetails from "../../package.json";
 
 export interface Listener {
 	/**
@@ -60,7 +61,6 @@ export default function buildMakeListeners({
 
 		return Object.freeze({
 			initialize: async () => {
-				const packageDetails = context.get("configuration:serve:package");
 				Logger.log(
 					Colors.brightGreen(
 						`${packageDetails.name}@${packageDetails.version} powering up ...`,
