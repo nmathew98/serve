@@ -3,8 +3,8 @@ src/**
 *.spec.js.map
 examples/**
 coverage/**
-.eslintrc.js
+.eslintrc.cjs
 .gitignore
 .prettierignore
 .prettierrc.json
-jest.config.js
+jest.config.cjs

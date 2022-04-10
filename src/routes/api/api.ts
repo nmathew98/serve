@@ -1,4 +1,4 @@
-import { IncomingMessage, ServerResponse, useBody } from "h3";
+import { IncomingMessage, assertMethod, ServerResponse, useBody } from "h3";
 import { graphql, GraphQLSchema } from "graphql";
 import { ServeContext } from "../../context/context";
 import { Route } from "../../routes/route";
@@ -18,6 +18,8 @@ async function api(
 	context: ServeContext,
 ) {
 	{
+		assertMethod(request.event, "POST");
+
 		let verifyAuthorization: VerifyAuthorization;
 		let verifyAuthorizationOptions: Record<string, any> | undefined;
 

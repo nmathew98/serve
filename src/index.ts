@@ -1,6 +1,8 @@
 import Winston from "./logger/logger";
 import buildMakeTesting from "./testing/testing";
 
+export * as H3 from "h3";
+
 export {
 	initialize,
 	useProjectConfiguration,

@@ -1,4 +1,4 @@
-import { IncomingMessage, ServerResponse } from "h3";
+import { assertMethod, IncomingMessage, ServerResponse } from "h3";
 import { Upload } from "../../upload/upload";
 import { ServeContext } from "../../context/context";
 import { sendSuccess, sendError, VerifyAuthorization } from "../utilities";
@@ -9,6 +9,8 @@ async function remove(
 	response: ServerResponse,
 	context: ServeContext,
 ) {
+	assertMethod(request.event, "POST");
+
 	if (!context.has("configuration:adapter:upload"))
 		return sendError(response, "Storage module not available");
 
@@ -16,7 +18,7 @@ async function remove(
 		let verifyAuthorization: VerifyAuthorization;
 		let verifyAuthorizationOptions: Record<string, any> | undefined;
 
-		if (context.has("configuration:routes:verify")) {
+		if (context.has("configuration:routes:authorization:verify")) {
 			if (context.has("configuration:routes:storage:verify")) {
 				const verificationOptionsInContext = context.get(
 					"configuration:routes:storage:verify",
@@ -26,7 +28,9 @@ async function remove(
 					verifyAuthorizationOptions = verificationOptionsInContext;
 			}
 
-			verifyAuthorization = context.get("configuration:storage:verify");
+			verifyAuthorization = context.get(
+				"configuration:routes:authorization:verify",
+			);
 
 			if (typeof verifyAuthorization === "function") {
 				try {

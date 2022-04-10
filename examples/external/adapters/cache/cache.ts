@@ -8,3 +8,5 @@ const Cache: Cache = {
 		return;
 	},
 };
+
+export default Cache;
