@@ -1,4 +1,3 @@
-import "module-alias/register";
 import Winston from "./logger/logger";
 import CliColors from "./colors/colors";
 import Emoji from "./emoji/emoji";

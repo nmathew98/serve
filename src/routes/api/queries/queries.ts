@@ -17,7 +17,7 @@ export default async function useQueries(
 
 	try {
 		const apiRouteFolder = getApiRouteFolderName(context);
-		const sourceDirectory = await findSourceDirectory();
+		const sourceDirectory = await findSourceDirectory(context);
 		const rootDirectory = resolve(
 			sourceDirectory,
 			`./external/routes/${apiRouteFolder}/queries`,
