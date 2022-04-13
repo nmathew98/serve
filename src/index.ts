@@ -25,6 +25,7 @@ export { Route, RouteError } from "./routes/route";
 export {
 	sendError,
 	sendSuccess,
+	useProduction,
 	VerifyAuthorization,
 	GetAuthorization,
 	HttpErrorCodes,

@@ -38,6 +38,16 @@ export function sendSuccess(
 }
 
 /**
+ * Use a value in production
+ * @param {T} x value to use in production
+ * @param {T} y value to use in development
+ * @returns the appropriate value
+ */
+export function useProduction<T = any>(x: T, y: T) {
+	return process.env.NODE_ENV === "production" ? x : y;
+}
+
+/**
  * Get the name of the folder which contains the api route
  *
  * @param {ServeContext} context the ServeContext
