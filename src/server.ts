@@ -19,9 +19,12 @@ export async function initialize() {
 		const context = await initializeContext();
 		await initializeEntityConfiguration(context);
 		await initializeModules(context);
+		await initializeScripts(context);
 		await listen(context);
+
+		return context;
 	} catch (error: any) {
-		Winston.error(CliColors.red(error));
+		return Winston.error(CliColors.red(error));
 	}
 }
 
@@ -37,12 +40,17 @@ export function useEntityConfiguration(hook: ServeHook) {
 	hooks.entityConfiguration = hook;
 }
 
+export function useScripts(hook: ServeHook) {
+	hooks.scripts = hook;
+}
+
 type ServeHook = (context: ServeContext) => Promise<void>;
 
 interface ServeHooks {
 	projectConfiguration?: () => Promise<void>;
 	serveConfiguration?: ServeHook;
 	entityConfiguration?: ServeHook;
+	scripts?: ServeHook;
 }
 
 async function initializeConfig() {
@@ -61,8 +69,6 @@ async function initializeContext() {
 
 async function initializeEntityConfiguration(context: ServeContext) {
 	if (hooks.entityConfiguration) await hooks.entityConfiguration(context);
-
-	return context;
 }
 
 async function initializeModules(context: ServeContext) {
@@ -74,8 +80,10 @@ async function initializeModules(context: ServeContext) {
 	const moduleLoader: ModuleLoader = makeModuleLoader(context);
 
 	await moduleLoader.load();
+}
 
-	return context;
+async function initializeScripts(context: ServeContext) {
+	if (hooks.scripts) await hooks.scripts(context);
 }
 
 async function listen(context: ServeContext) {
