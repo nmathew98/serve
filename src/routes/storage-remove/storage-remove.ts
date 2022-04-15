@@ -46,7 +46,7 @@ async function remove(
 	const fileRemoveHandler = upload.remove;
 
 	try {
-		return sendSuccess(response, await fileRemoveHandler(request));
+		return sendSuccess(response, await fileRemoveHandler(request, response));
 	} catch (error: any) {
 		return sendError(response, error.message, error?.statusCode);
 	}

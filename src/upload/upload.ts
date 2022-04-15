@@ -1,4 +1,4 @@
-import { IncomingMessage } from "h3";
+import { IncomingMessage, ServerResponse } from "h3";
 
 export interface Upload {
 	/**
@@ -12,4 +12,7 @@ export interface Upload {
 	remove: UploadHandler;
 }
 
-type UploadHandler = (request: IncomingMessage) => Promise<Record<string, any>>;
+type UploadHandler = (
+	request: IncomingMessage,
+	response: ServerResponse,
+) => Promise<Record<string, any>>;

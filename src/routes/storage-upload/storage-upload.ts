@@ -46,7 +46,7 @@ async function upload(
 	const fileUploadHandler = upload.handle;
 
 	try {
-		return sendSuccess(response, await fileUploadHandler(request));
+		return sendSuccess(response, await fileUploadHandler(request, response));
 	} catch (error: any) {
 		return sendError(response, error.message, error?.statusCode);
 	}
