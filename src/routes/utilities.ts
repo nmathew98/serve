@@ -72,7 +72,7 @@ export function getApiRouteFolderName(context: ServeContext) {
 export type VerifyAuthorization = (
 	request: IncomingMessage,
 	payload?: Record<string, any>,
-) => Promise<string | void>;
+) => Promise<string | Record<string, any> | void>;
 
 /**
  * To get the authorization confirmation of a user
@@ -84,7 +84,7 @@ export type VerifyAuthorization = (
 export type GetAuthorization = (
 	request: IncomingMessage,
 	payload?: Record<string, any>,
-) => Promise<string>;
+) => Promise<string | Record<string, any>>;
 
 /**
  * HTTP success status codes

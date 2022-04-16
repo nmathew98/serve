@@ -20,7 +20,7 @@ export interface ServeContext {
 	 *
 	 * @param key the unique identifier for the value
 	 */
-	get(key: symbol | string): any;
+	get<T = any>(key: symbol | string): T;
 }
 
 function buildMakeContext() {
