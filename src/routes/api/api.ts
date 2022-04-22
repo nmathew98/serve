@@ -2,11 +2,7 @@ import { IncomingMessage, assertMethod, ServerResponse, useBody } from "h3";
 import { graphql, GraphQLSchema } from "graphql";
 import { ServeContext } from "../../context/context";
 import { Route } from "../../routes/route";
-import {
-	sendError,
-	sendSuccess,
-	VerifyAuthorization,
-} from "../../routes/utilities";
+import { sendError, VerifyAuthorization } from "../../routes/utilities";
 import useSchema from "./schema/schema";
 import makeSubscriptionListener from "./subscriptions/websocket/websocket";
 
@@ -70,8 +66,8 @@ async function api(
 					await ws.listen();
 				}
 
-		if (result.errors) return sendError(response, result.errors);
-		else return sendSuccess(response, result.data);
+		response.statusCode = 200;
+		return result;
 	} catch (error: any) {
 		return sendError(response, { error: error.message, stack: error.stack });
 	}
