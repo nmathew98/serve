@@ -71,3 +71,9 @@ No need to worry about the initializations of the entities, adapters or routes. 
 ## Examples
 
 - Take a look at `examples/` to see how it should be used
+
+## Planned functionality for next major release
+
+- Dynamically generated TypeScript definition files for application use cases
+- Dynamically generated TypeScript definition files for adapters
+- Auto import application use cases
