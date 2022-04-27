@@ -10,8 +10,7 @@
 		},
 		"target": "es2022",
 		"minify": {
-			"compress": true,
-			"mangle": true
+			"compress": true
 		}
 	},
 	"module": {
