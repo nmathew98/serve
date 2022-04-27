@@ -14,7 +14,7 @@ export default async function findSourceDirectory(
 
 	let outputFolder;
 	if (context.has("configuration:build:output")) {
-		let outputInContext = context.get("configuration:build:output");
+		const outputInContext = context.get("configuration:build:output");
 
 		if (typeof outputInContext === "string") outputFolder = outputInContext;
 		else outputFolder = "dist";

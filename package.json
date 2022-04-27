@@ -3,10 +3,10 @@
 	"version": "3.0.14",
 	"description": "A lightweight starting point for API applications",
 	"main": "dist/src/index.js",
-	"types": "dist/src/index.d.ts",
-	"type": "commonjs",
+	"types": "dist/types/src/index.d.ts",
+	"type": "module",
 	"scripts": {
-		"build": "tsc --declaration --outDir dist",
+		"build": "tsc --emitDeclarationOnly --declaration --outDir dist/types && swc ./src -d dist",
 		"lint": "eslint --ext .ts --ignore-path .gitignore . --fix",
 		"format": "prettier .  --write",
 		"test": "jest src/ --coverage --verbose",
@@ -15,9 +15,11 @@
 	"author": "Naveen Mathew",
 	"license": "MIT",
 	"devDependencies": {
+		"@swc/jest": "^0.2.20",
 		"@types/cli-color": "^2.0.2",
 		"@types/cors": "^2.8.12",
 		"@types/jest": "^27.0.3",
+		"@types/node": "^17.0.29",
 		"@types/node-emoji": "^1.8.1",
 		"@types/ws": "^8.5.3",
 		"@typescript-eslint/eslint-plugin": "^5.7.0",
@@ -26,10 +28,11 @@
 		"eslint-plugin-prettier": "^4.0.0",
 		"jest": "^27.4.5",
 		"prettier": "^2.6.2",
-		"ts-jest": "^27.1.1",
 		"typescript": "^4.6.3"
 	},
 	"dependencies": {
+		"@swc/cli": "^0.1.57",
+		"@swc/core": "^1.2.172",
 		"cli-color": "^2.0.2",
 		"cors": "^2.8.5",
 		"graphql": "^16.3.0",

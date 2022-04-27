@@ -21,8 +21,6 @@ export async function initialize() {
 		await initializeModules(context);
 		await initializeScripts(context);
 		await listen(context);
-
-		return context;
 	} catch (error: any) {
 		return Winston.error(CliColors.red(error));
 	}

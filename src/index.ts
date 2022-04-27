@@ -1,7 +1,6 @@
 import Winston from "./logger/logger";
 import CliColors from "./colors/colors";
 import Emoji from "./emoji/emoji";
-import buildMakeTesting from "./testing/testing";
 
 export * as H3 from "h3";
 
@@ -36,6 +35,3 @@ export {
 	HttpErrorCodes,
 	HttpSuccessCodes,
 } from "./routes/utilities";
-
-export { buildMakeTesting };
-export { ServeTest, ServeTestConfiguration } from "./testing/testing";

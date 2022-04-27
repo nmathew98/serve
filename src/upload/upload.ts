@@ -1,4 +1,5 @@
 import { IncomingMessage, ServerResponse } from "h3";
+import { Readable } from "stream";
 
 export interface Upload {
 	/**
@@ -15,4 +16,4 @@ export interface Upload {
 type UploadHandler = (
 	request: IncomingMessage,
 	response: ServerResponse,
-) => Promise<Record<string, any>>;
+) => Promise<Record<string, any> | Readable>;

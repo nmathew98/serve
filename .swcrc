@@ -1,0 +1,20 @@
+{
+	"jsc": {
+		"parser": {
+			"syntax": "typescript",
+			"tsx": false,
+			"decorators": true,
+			"dynamicImport": false,
+			"sourceMaps": true
+		},
+		"target": "es2022",
+		"paths": {
+			"*": ["node_modules/*"]
+		}
+	},
+	"module": {
+		"type": "es6",
+		"strictMode": true,
+		"lazy": true
+	}
+}
