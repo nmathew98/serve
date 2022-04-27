@@ -3,7 +3,7 @@
 ## About
 
 A lightweight starting point for API applications.
-It uses SWC under the hood for super fast build times and test times.
+It uses SWC under the hood for super fast build, run, and test times.
 
 ## Background information
 
@@ -72,7 +72,8 @@ No need to worry about the initializations of the entities, adapters or routes. 
 ## Building and testing
 
 - To build the project run `npx @skulpture/serve build`
-- To run Jest, run `npx @skulpture/serve jest --config`, where `--config` are any additional options you'd like to pass to Jest
+- To run Jest, run `npx @skulpture/serve jest --config`, where `--config` are any (optional) additional options you'd like to pass to Jest
+- To check types, run `npx @skulpture/serve typecheck --config`, where `--config` are any (optional) additional options you'd like to pass to the TypeScript compiler
 
 ## Planned functionality for next major release
 
