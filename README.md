@@ -2,7 +2,8 @@
 
 ## About
 
-A lightweight starting point for API applications
+A lightweight starting point for API applications.
+It uses SWC under the hood for super fast build times and test times.
 
 ## Background information
 
@@ -68,9 +69,10 @@ No need to worry about the initializations of the entities, adapters or routes. 
 
 - The directory structures and filenames are very important.
 
-## Examples
+## Building and testing
 
-- Take a look at `examples/` to see how it should be used
+- To build the project run `npx @skulpture/serve build`
+- To run Jest, run `npx @skulpture/serve jest --config`, where `--config` are any additional options you'd like to pass to Jest
 
 ## Planned functionality for next major release
 
