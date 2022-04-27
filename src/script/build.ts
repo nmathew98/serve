@@ -24,8 +24,6 @@ export default async function build(args: string[]) {
 		),
 	);
 
-	await generateComposableDeclarations();
-
 	const build = spawn(
 		"npx swc",
 		["./src", "-d", output, "--config-file", swcConfigPath],
@@ -48,8 +46,10 @@ export default async function build(args: string[]) {
 		process.exit(1);
 	});
 
-	build.on("close", code => {
+	build.on("close", async code => {
 		if (!code) {
+			await generateComposableDeclarations();
+
 			console.log(
 				CliColors.brightGreen(
 					`Built ${projectDetails.name}@${projectDetails.version}`,

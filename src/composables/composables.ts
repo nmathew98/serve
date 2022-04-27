@@ -1,3 +1,5 @@
+/* eslint no-console: "off" */
+
 import { writeFile, readdir, stat, mkdir } from "fs/promises";
 import { resolve } from "path/posix";
 import NodeEmoji from "../emoji/emoji";
@@ -23,29 +25,23 @@ export default async function generateComposableDeclarations() {
 
 	let declarations = "declare global {";
 	for (const composable of composables) {
+		const composableName = getComposableNameFromFile(
+			composable.replace(".ts", ""),
+		);
 		const composablePath = `${composablesPath}/${composable}`;
 
-		const importedComposables = await import(composablePath);
-
-		for (const importedComposable of Object.keys(importedComposables)) {
-			if (typeof importedComposables[importedComposable] !== "function")
-				continue;
-
-			const composableName = (
-				importedComposables[importedComposable] as Function
-			).name;
-
-			if (!composableName) continue;
-
-			declarations += `\n\tconst ${composableName}: typeof import('${composablePath})`;
-		}
+		declarations += `\n\tconst build${composableName}: typeof import('${composablePath.replace(
+			".ts",
+			"",
+		)}')['default']`;
 	}
 	declarations += "\n}";
+	declarations += "\nexport {}";
 
 	await createDeclarationOutputFolder(rootDirectory);
 
 	await writeFile(
-		`${rootDirectory}/serve/types/composables.d.ts`,
+		`${rootDirectory}/src/serve/types/composables.d.ts`,
 		declarations,
 		{ flag: "w+" },
 	);
@@ -58,8 +54,15 @@ export default async function generateComposableDeclarations() {
 
 async function createDeclarationOutputFolder(rootDirectory: string) {
 	try {
-		await stat(`${rootDirectory}/serve/types`);
+		await stat(`${rootDirectory}/src/serve/types`);
 	} catch (error: any) {
-		await mkdir(`${rootDirectory}/serve/types`, { recursive: true });
+		await mkdir(`${rootDirectory}/src/serve/types`, { recursive: true });
 	}
+}
+
+function getComposableNameFromFile(file: string) {
+	return file
+		.split("-")
+		.map(word => word.slice(0, 1).toUpperCase() + word.slice(1).toLowerCase())
+		.join("");
 }
