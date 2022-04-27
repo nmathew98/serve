@@ -1,20 +1,50 @@
-import { exec } from "child_process";
-import Winston from "../logger/logger";
-import util from "util";
-import findSourceDirectory from "../directory/directory";
+import { spawn } from "child_process";
+import { resolve } from "path";
 import CliColors from "../colors/colors";
+import { findRootDirectory } from "../directory/directory";
+import Winston from "../logger/logger";
 
-export default async function build() {
-	const sourceDirectory = await findSourceDirectory();
-	const projectDirectory = sourceDirectory.replace("/src", "");
-	const execPromisified = util.promisify(exec);
+export default async function build(args: string[]) {
+	const projectDirectory = await findRootDirectory();
 
 	const output = process.env.OUTPUT_DIRECTORY ?? "dist";
-	const compileProject = `npx swc ${projectDirectory} -d ${projectDirectory}/${output}`;
 
-	const { stdout, stderr } = await execPromisified(compileProject);
+	const swcConfigPath = resolve(__dirname, "../../.swcrc");
 
-	if (stderr) throw new Error(stderr);
+	const build = spawn(
+		"npx swc",
+		["./src", "-d", output, "--config-file", swcConfigPath],
+		{
+			stdio: "inherit",
+			cwd: projectDirectory,
+			shell: true,
+		},
+	);
 
-	return Winston.log(CliColors.green(stdout));
+	build.on("error", error => {
+		Winston.error(CliColors.red("Error while building project!"));
+		Winston.error(CliColors.red(error.message));
+
+		if (error.stack) Winston.error(CliColors.red(error.stack));
+	});
+
+	build.on("close", code => {
+		if (!code) {
+			const cp = spawn("cp", [`./package.json`, `./${output}/package.json`], {
+				stdio: "inherit",
+				cwd: projectDirectory,
+				shell: true,
+			});
+
+			cp.on("close", code => {
+				if (!code) {
+					args.forEach(script => `node ${script}`, {
+						stdio: "inherit",
+						cwd: projectDirectory,
+						shell: true,
+					});
+				}
+			});
+		}
+	});
 }

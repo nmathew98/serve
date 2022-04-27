@@ -1,19 +1,21 @@
-import { exec } from "child_process";
-import Winston from "../logger/logger";
-import util from "util";
-import findSourceDirectory from "../directory/directory";
+import { spawn } from "child_process";
 import CliColors from "../colors/colors";
+import { findRootDirectory } from "../directory/directory";
 
 export default async function jest(args: string[]) {
-	const sourceDirectory = await findSourceDirectory();
-	const projectDirectory = sourceDirectory.replace("/src", "/");
-	const execPromisified = util.promisify(exec);
+	const projectDirectory = await findRootDirectory();
 
-	const testProject = `npx jest ${projectDirectory} ${args.join(" ")}`;
+	const jest = spawn("npx jest", [`${projectDirectory}/src`, ...args], {
+		stdio: "inherit",
+		cwd: projectDirectory,
+		shell: true,
+	});
 
-	const { stdout, stderr } = await execPromisified(testProject);
+	jest.on("error", error => {
+		/* eslint no-console: "off" */
+		console.error(CliColors.red("Error while running Jest!"));
+		console.error(CliColors.red(error.message));
 
-	if (stderr) throw new Error(stderr);
-
-	return Winston.log(CliColors.green(stdout));
+		if (error.stack) console.error(CliColors.red(error.stack));
+	});
 }

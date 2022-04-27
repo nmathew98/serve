@@ -3,7 +3,7 @@ import { resolve } from "path/posix";
 import { readdir } from "fs/promises";
 import { getApiRouteFolderName } from "../../../routes/utilities";
 import { ServeContext } from "../../../context/context";
-import findSourceDirectory from "../../../directory/directory";
+import { findOutputDirectory } from "../../../directory/directory";
 import Winston from "../../../logger/logger";
 import CliColors from "../../../colors/colors";
 
@@ -14,7 +14,7 @@ export default async function useTypes(
 
 	try {
 		const apiRouteFolder = getApiRouteFolderName(context);
-		const sourceDirectory = await findSourceDirectory();
+		const sourceDirectory = await findOutputDirectory();
 		const rootDirectory = resolve(
 			sourceDirectory,
 			`./external/routes/${apiRouteFolder}/types`,

@@ -4,7 +4,7 @@ import { resolve } from "path/posix";
 import { readFile, readdir } from "fs/promises";
 import { Colors } from "../colors/colors";
 import { Emoji } from "../emoji/emoji";
-import findSourceDirectory from "../directory/directory";
+import { findOutputDirectory } from "../directory/directory";
 
 export interface ModuleLoader {
 	/**
@@ -45,10 +45,7 @@ export default function buildMakeModuleLoader({
 			.map(directory => directory.name);
 
 		for (const folder of folders) {
-			let buffer;
-			if (process.env.NODE_ENV === "production")
-				buffer = await readFile(`${entitiesPath}/${folder}/${folder}.js`);
-			else buffer = await readFile(`${entitiesPath}/${folder}/${folder}.ts`);
+			const buffer = await readFile(`${entitiesPath}/${folder}/${folder}.js`);
 
 			const contents = buffer.toString().replace(/(?:\r\n|\r|\n|\t)/g, " ");
 
@@ -113,7 +110,7 @@ export default function buildMakeModuleLoader({
 
 		return Object.freeze({
 			load: async () => {
-				sourceDirectory = await findSourceDirectory();
+				sourceDirectory = await findOutputDirectory();
 
 				const entitiesPath = resolve(sourceDirectory, "./entities");
 

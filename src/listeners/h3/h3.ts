@@ -12,7 +12,7 @@ import { Emoji } from "../../emoji/emoji";
 import API from "../../routes/api/api";
 import StorageUpload from "../../routes/storage-upload/storage-upload";
 import StorageRemove from "../../routes/storage-remove/storage-remove";
-import findSourceDirectory from "../../directory/directory";
+import { findOutputDirectory } from "../../directory/directory";
 
 export default function buildMakeH3Listener({
 	Logger,
@@ -79,7 +79,7 @@ export default function buildMakeH3Listener({
 			initializeInternalRoutes();
 
 			try {
-				const sourceDirectory = await findSourceDirectory();
+				const sourceDirectory = await findOutputDirectory();
 				const rootDirectory = resolve(sourceDirectory, "./external/routes/");
 				const files = await readdir(rootDirectory, {
 					withFileTypes: true,

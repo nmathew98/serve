@@ -1,19 +1,23 @@
 import { resolve } from "path/posix";
 
-export default async function findSourceDirectory(): Promise<string> {
+export async function findRootDirectory(): Promise<string> {
 	const directoryRegex = /(.*)(?:\/node_modules\/@skulpture\/serve)/gim;
-	const isProduction = process.env.NODE_ENV === "production";
 	const currentDirectory = resolve(__dirname);
 
 	const packageDirectory = [...currentDirectory.matchAll(directoryRegex)]
 		?.pop()
-		?.slice(1);
+		?.slice(1)
+		?.pop();
 
-	const outputFolder = process.env.OUTPUT_DIRECTORY ?? "dist";
+	if (!packageDirectory) throw new Error("Unable to determine root directory");
 
-	let sourceDirectory: string;
-	if (isProduction) sourceDirectory = `${packageDirectory}/${outputFolder}`;
-	else sourceDirectory = `${packageDirectory}/src`;
+	return packageDirectory;
+}
 
-	return sourceDirectory;
+export async function findOutputDirectory(): Promise<string> {
+	const rootDirectory = await findRootDirectory();
+
+	const outputDirectory = process.env.OUTPUT_DIRECTORY ?? "dist";
+
+	return `${rootDirectory}/${outputDirectory}`;
 }

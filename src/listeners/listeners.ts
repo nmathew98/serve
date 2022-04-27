@@ -13,6 +13,7 @@ export interface Listener {
 	 * and loads the listener within it
 	 */
 	initialize(): Promise<void>;
+
 	/**
 	 * Initializes and sets up all listeners which have been imported
 	 */
@@ -109,7 +110,6 @@ export default function buildMakeListeners({
 	};
 }
 
-/* istanbul ignore next */
 function importModule(
 	path: string,
 	mock?: (path: string) => Promise<any>,
@@ -121,7 +121,6 @@ function importModule(
 	});
 }
 
-/* istanbul ignore next */
 function getListenerPath(base: string, folder: string) {
 	return `${base}/${folder.toLowerCase()}/${folder.toLowerCase()}`;
 }
