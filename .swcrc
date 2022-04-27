@@ -8,10 +8,7 @@
 			"dynamicImport": false,
 			"sourceMaps": true
 		},
-		"target": "es2022",
-		"minify": {
-			"compress": true
-		}
+		"target": "es2022"
 	},
 	"module": {
 		"type": "commonjs",
