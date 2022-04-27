@@ -5,6 +5,7 @@ import { readFile, readdir } from "fs/promises";
 import { Colors } from "../colors/colors";
 import { Emoji } from "../emoji/emoji";
 import { findOutputDirectory } from "../directory/directory";
+import { findComposables } from "../composables/composables";
 
 export interface ModuleLoader {
 	/**
@@ -96,6 +97,28 @@ export default function buildMakeModuleLoader({
 		Logger.log();
 	};
 
+	const loadComposables = async () => {
+		const composables = await findComposables();
+
+		for (const composable of composables) {
+			Logger.log(
+				Colors.yellow(`Loading composable: ${composable.name}`),
+				Emoji.hourglass,
+			);
+
+			const { default: fn } = await import(composable.distPath);
+
+			// @ts-expect-error The types for the composable will be generated
+			global[`build${composable.name}`] = fn;
+
+			Logger.log(
+				Colors.green(`Loaded composable: ${composable.name}`),
+				Emoji.whiteCheckMark,
+			);
+		}
+		Logger.log();
+	};
+
 	return function makeModuleLoader(context): ModuleLoader {
 		let entityBlacklist: string[];
 
@@ -115,6 +138,7 @@ export default function buildMakeModuleLoader({
 				const entitiesPath = resolve(sourceDirectory, "./entities");
 
 				await loadAdapters(sourceDirectory);
+				await loadComposables();
 
 				const files = await readdir(entitiesPath, {
 					withFileTypes: true,
