@@ -79,7 +79,7 @@ export default function buildMakeH3Listener({
 			initializeInternalRoutes();
 
 			try {
-				const sourceDirectory = await findSourceDirectory(context);
+				const sourceDirectory = await findSourceDirectory();
 				const rootDirectory = resolve(sourceDirectory, "./external/routes/");
 				const files = await readdir(rootDirectory, {
 					withFileTypes: true,

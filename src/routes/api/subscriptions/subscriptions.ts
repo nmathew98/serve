@@ -17,7 +17,7 @@ export default async function useSubscription(
 
 	try {
 		const apiRouteFolder = getApiRouteFolderName(context);
-		const sourceDirectory = await findSourceDirectory(context);
+		const sourceDirectory = await findSourceDirectory();
 		const rootDirectory = resolve(
 			sourceDirectory,
 			`./external/routes/${apiRouteFolder}/subscriptions`,

@@ -1,10 +1,10 @@
 {
 	"name": "@skulpture/serve",
-	"version": "3.0.14",
+	"version": "3.0.16",
 	"description": "A lightweight starting point for API applications",
 	"main": "dist/src/index.js",
 	"types": "dist/types/src/index.d.ts",
-	"type": "module",
+	"type": "commonjs",
 	"scripts": {
 		"build": "tsc --emitDeclarationOnly --declaration --outDir dist/types && swc ./src -d dist",
 		"lint": "eslint --ext .ts --ignore-path .gitignore . --fix",

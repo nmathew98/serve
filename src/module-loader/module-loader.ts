@@ -113,7 +113,7 @@ export default function buildMakeModuleLoader({
 
 		return Object.freeze({
 			load: async () => {
-				sourceDirectory = await findSourceDirectory(context);
+				sourceDirectory = await findSourceDirectory();
 
 				const entitiesPath = resolve(sourceDirectory, "./entities");
 

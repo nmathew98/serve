@@ -7,13 +7,10 @@
 			"dynamicImport": false,
 			"sourceMaps": true
 		},
-		"target": "es2022",
-		"paths": {
-			"*": ["node_modules/*"]
-		}
+		"target": "es2022"
 	},
 	"module": {
-		"type": "es6",
+		"type": "commonjs",
 		"strictMode": true,
 		"lazy": true
 	}

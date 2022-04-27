@@ -1,9 +1,6 @@
 import { resolve } from "path/posix";
-import { ServeContext } from "../context/context";
 
-export default async function findSourceDirectory(
-	context: ServeContext,
-): Promise<string> {
+export default async function findSourceDirectory(): Promise<string> {
 	const directoryRegex = /(.*)(?:\/node_modules\/@skulpture\/serve)/gim;
 	const isProduction = process.env.NODE_ENV === "production";
 	const currentDirectory = resolve(__dirname);
@@ -12,13 +9,7 @@ export default async function findSourceDirectory(
 		?.pop()
 		?.slice(1);
 
-	let outputFolder;
-	if (context.has("configuration:build:output")) {
-		const outputInContext = context.get("configuration:build:output");
-
-		if (typeof outputInContext === "string") outputFolder = outputInContext;
-		else outputFolder = "dist";
-	} else outputFolder = "dist";
+	const outputFolder = process.env.OUTPUT_DIRECTORY ?? "dist";
 
 	let sourceDirectory: string;
 	if (isProduction) sourceDirectory = `${packageDirectory}/${outputFolder}`;

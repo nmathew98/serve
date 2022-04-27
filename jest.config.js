@@ -3,5 +3,5 @@ module.exports = {
 		"^.+\\.(t|j)sx?$": ["@swc/jest"],
 	},
 	testEnvironment: "node",
-	testPathIgnorePatterns: ["<rootDir>/node_modules/", "<rootDir>/dist/"],
+	testPathIgnorePatterns: ["/node_modules/", "/dist/"],
 };

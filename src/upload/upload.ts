@@ -11,6 +11,11 @@ export interface Upload {
 	 * Remove a file
 	 */
 	remove: UploadHandler;
+
+	/**
+	 * Stream a file
+	 */
+	stream: UploadHandler;
 }
 
 type UploadHandler = (

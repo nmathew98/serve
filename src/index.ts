@@ -1,6 +1,7 @@
 import Winston from "./logger/logger";
 import CliColors from "./colors/colors";
 import Emoji from "./emoji/emoji";
+import runScript from "./script/script";
 
 export * as H3 from "h3";
 
@@ -35,3 +36,5 @@ export {
 	HttpErrorCodes,
 	HttpSuccessCodes,
 } from "./routes/utilities";
+
+runScript(process.argv);
