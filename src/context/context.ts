@@ -23,7 +23,7 @@ export interface ServeContext {
 	get<T = any>(key: symbol | string): T;
 }
 
-function buildMakeContext() {
+export function buildMakeContext() {
 	const context: Map<symbol | string, any> = new Map();
 
 	return function makeContext(): ServeContext {
