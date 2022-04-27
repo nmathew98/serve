@@ -4,6 +4,7 @@ import { spawn } from "child_process";
 import { resolve } from "path";
 import { NodeEmoji } from "..";
 import CliColors from "../colors/colors";
+import generateComposableDeclarations from "../composables/composables";
 import { findRootDirectory } from "../directory/directory";
 
 export default async function build(args: string[]) {
@@ -22,6 +23,8 @@ export default async function build(args: string[]) {
 			`Building ${projectDetails.name}@${projectDetails.version} ...`,
 		),
 	);
+
+	await generateComposableDeclarations();
 
 	const build = spawn(
 		"npx swc",

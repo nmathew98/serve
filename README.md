@@ -74,9 +74,3 @@ No need to worry about the initializations of the entities, adapters or routes. 
 - To build the project run `npx @skulpture/serve build`
 - To run Jest, run `npx @skulpture/serve jest --config`, where `--config` are any (optional) additional options you'd like to pass to Jest
 - To check types, run `npx @skulpture/serve typecheck --config`, where `--config` are any (optional) additional options you'd like to pass to the TypeScript compiler
-
-## Planned functionality for next major release
-
-- Dynamically generated TypeScript definition files for application use cases
-- Dynamically generated TypeScript definition files for adapters
-- Auto import application use cases
