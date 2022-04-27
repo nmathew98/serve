@@ -26,7 +26,7 @@ export default async function typecheck(args: string[]) {
 	typecheck.on("close", code => {
 		if (!code) {
 			console.log(
-				CliColors.brightGreen("Looking good!"),
+				CliColors.brightGreen("Looks good"),
 				NodeEmoji.whiteCheckMark,
 			);
 		}

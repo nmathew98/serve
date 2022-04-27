@@ -49,7 +49,7 @@ export default async function build(args: string[]) {
 		if (!code) {
 			console.log(
 				CliColors.brightGreen(
-					`Successfully built ${projectDetails.name}@${projectDetails.version}`,
+					`Built ${projectDetails.name}@${projectDetails.version}`,
 				),
 				NodeEmoji.whiteCheckMark,
 			);
@@ -68,7 +68,7 @@ export default async function build(args: string[]) {
 			cp.on("close", code => {
 				if (!code) {
 					console.log(
-						CliColors.brightGreen("Successfully copied project details"),
+						CliColors.brightGreen("Copied project details"),
 						NodeEmoji.whiteCheckMark,
 					);
 
@@ -92,7 +92,7 @@ export default async function build(args: string[]) {
 						spawnedInstance.on("close", code => {
 							if (!code) {
 								console.log(
-									CliColors.brightGreen(`Ran script ${script} successfully`),
+									CliColors.brightGreen(`Ran script ${script}`),
 									NodeEmoji.whiteCheckMark,
 								);
 							}
