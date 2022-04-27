@@ -1,19 +1,34 @@
+/* eslint no-console: "off" */
+
 import { spawn } from "child_process";
+import { resolve } from "path";
 import CliColors from "../colors/colors";
 import { findRootDirectory } from "../directory/directory";
 
 export default async function jest(args: string[]) {
 	const projectDirectory = await findRootDirectory();
 
-	const jest = spawn("npx jest", [`${projectDirectory}/src`, ...args], {
-		stdio: "inherit",
-		cwd: projectDirectory,
-		shell: true,
-	});
+	const jestConfigFile = resolve(__dirname, "../../jest.config.js");
+
+	const jest = spawn(
+		"npx jest",
+		[
+			`${projectDirectory}/src`,
+			...args,
+			"--config",
+			jestConfigFile,
+			"--roots",
+			`${projectDirectory}`,
+		],
+		{
+			stdio: "inherit",
+			cwd: projectDirectory,
+			shell: true,
+		},
+	);
 
 	jest.on("error", error => {
-		/* eslint no-console: "off" */
-		console.error(CliColors.red("Error while running Jest!"));
+		console.error(CliColors.red("Error while running jest"));
 		console.error(CliColors.red(error.message));
 
 		if (error.stack) console.error(CliColors.red(error.stack));
