@@ -36,6 +36,12 @@ export {
 	HttpSuccessCodes,
 } from "./routes/utilities";
 
+export { GraphQLQueryHandler } from "./routes/api/queries/queries";
+export { GraphQLMutationHandler } from "./routes/api/mutations/mutations";
+export { GraphQLSubscriptionHandler } from "./routes/api/subscriptions/subscriptions";
+export { GraphQLTypeHandler } from "./routes/api/types/types";
+export { GraphQLField } from "./routes/api/schema/schema";
+
 export { Ref, makeRef, assign, watch } from "./utilities/ref/ref";
 export { useState } from "./utilities/state/state";
 export { doesModuleExist } from "./plugins/utilities";

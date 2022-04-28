@@ -46,10 +46,10 @@ export default async function useQueries(
 	return queries;
 }
 
-type GraphQLField = ThunkObjMap<GraphQLFieldConfig<any, any, any>>;
-type GraphQLQueryImport = { default: GraphQLQueryHandler };
-type GraphQLQueryHandler = (
+export type GraphQLQueryHandler = (
 	context: ServeContext,
 	request: IncomingMessage,
 	response: ServerResponse,
 ) => GraphQLField;
+type GraphQLField = ThunkObjMap<GraphQLFieldConfig<any, any, any>>;
+type GraphQLQueryImport = { default: GraphQLQueryHandler };

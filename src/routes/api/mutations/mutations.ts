@@ -48,10 +48,10 @@ export default async function useMutations(
 	return mutations;
 }
 
-type GraphQLField = ThunkObjMap<GraphQLFieldConfig<any, any, any>>;
-type GraphQLMutationImport = { default: GraphQLMutationHandler };
-type GraphQLMutationHandler = (
+export type GraphQLMutationHandler = (
 	context: ServeContext,
 	request: IncomingMessage,
 	response: ServerResponse,
 ) => GraphQLField;
+type GraphQLField = ThunkObjMap<GraphQLFieldConfig<any, any, any>>;
+type GraphQLMutationImport = { default: GraphQLMutationHandler };

@@ -41,7 +41,7 @@ export default async function useSchema(
 	return schema;
 }
 
-type GraphQLField = ThunkObjMap<GraphQLFieldConfig<any, any, any>>;
+export type GraphQLField = ThunkObjMap<GraphQLFieldConfig<any, any, any>>;
 
 async function createQuery(
 	request: IncomingMessage,

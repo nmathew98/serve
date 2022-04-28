@@ -42,5 +42,7 @@ export default async function useTypes(
 	return types;
 }
 
+export type GraphQLTypeHandler = () =>
+	| GraphQLInterfaceType
+	| GraphQLInterfaceType[];
 type GraphQLTypeImport = { default: GraphQLTypeHandler };
-type GraphQLTypeHandler = () => GraphQLInterfaceType | GraphQLInterfaceType[];

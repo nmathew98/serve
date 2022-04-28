@@ -47,10 +47,10 @@ export default async function useSubscription(
 	return subscriptions;
 }
 
-type GraphQLField = ThunkObjMap<GraphQLFieldConfig<any, any, any>>;
-type GraphQLSubscriptionImport = { default: GraphQLSubscriptionHandler };
-type GraphQLSubscriptionHandler = (
+export type GraphQLSubscriptionHandler = (
 	context: ServeContext,
 	request: IncomingMessage,
 	response: ServerResponse,
 ) => GraphQLField;
+type GraphQLField = ThunkObjMap<GraphQLFieldConfig<any, any, any>>;
+type GraphQLSubscriptionImport = { default: GraphQLSubscriptionHandler };
