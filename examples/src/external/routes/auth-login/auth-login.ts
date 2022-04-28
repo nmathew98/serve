@@ -2,7 +2,6 @@ import passport from "passport";
 import passportLocal from "passport-local";
 import Hasher from "../../adapters/hasher/hasher";
 import { User, UserRecord } from "../../../entities/user/user";
-import buildFindUser from "../../../composables/find-user";
 import {
 	Route,
 	GetAuthorization,
@@ -25,12 +24,11 @@ async function login(
 	{
 		H3.assertMethod(request.event, "POST");
 
-		if (!context.has("Humantic"))
-			if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET)
-				return sendError(
-					response,
-					"Access and refresh token secrets are not set",
-				);
+		if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET)
+			return sendError(
+				response,
+				"Access and refresh token secrets are not set",
+			);
 
 		if (!context.has("configuration:routes:authorization:get"))
 			return sendError(response, "Routes configured incorrectly");

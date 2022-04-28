@@ -5,6 +5,7 @@ import {
 	sendError,
 	sendSuccess,
 	H3,
+	doesModuleExist,
 } from "@skulpture/serve";
 import { User, UserRecord } from "../../../entities/user/user";
 
@@ -18,12 +19,6 @@ async function register(
 ) {
 	{
 		H3.assertMethod(request.event, "POST");
-
-		if (!context.has("User"))
-			return sendError(response, "User module not available");
-
-		if (!context.has("Humantic"))
-			return sendError(response, "Humantic module not available");
 
 		if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET)
 			return sendError(
@@ -41,11 +36,13 @@ async function register(
 	if (typeof getAuthorization !== "function")
 		return sendError(response, "Routes configured incorrectly");
 
-	const User: User = context.get("User");
-	const findUser = buildFindUser({ User });
-	const createUser = buildCreateUser({ User });
-
 	try {
+		doesModuleExist(context, "User");
+
+		const User: User = context.get("User");
+		const findUser = buildFindUser({ User });
+		const createUser = buildCreateUser({ User });
+
 		const body = await H3.useBody(request);
 
 		if (!body.password) return sendError(response, "Invalid user");
