@@ -18,6 +18,27 @@ It uses SWC under the hood for super fast build, run, and test times.
 - Sensible security headers set by default ✅
 - Lightweight and easy to extend ✅
 
+## Examples
+
+- See the `examples` folder for a sudoku solver API built using this package
+
+### Functionality demonstrated
+
+- Entity objects and adapters ✅
+- Composables ✅
+- GraphQL queries and mutations ✅
+- Authorized routes and unauthorized routes ✅
+- Setting CORS and other security headers ✅
+- File upload to Amazon S3 ✅
+- Serving files from Amazon S3 ✅
+- Tests using Jest ✅
+
+## Building and testing
+
+- To build the project run `npx @skulpture/serve build`
+- To run Jest, run `npx @skulpture/serve jest --config`, where `--config` are any (optional) additional options you'd like to pass to Jest
+- To check types, run `npx @skulpture/serve typecheck --config`, where `--config` are any (optional) additional options you'd like to pass to the TypeScript compiler
+
 ## Background information
 
 ### Introduction
@@ -62,13 +83,3 @@ The reason for the strict directory structure is to insulate the core business r
   Each GraphQL query, mutation, type or subscription must be in a folder with the same name as the file within it with a default function export.
 
   Queries must adhere to the `GraphQLQueryHandler` type, mutations `GraphQLMutationHandler`, subscriptions `GraphQLSubscriptionHandler` and types `GraphQLTypeHandler`.
-
-## Examples
-
-- See the `examples` folder for a sudoku solver API built using this package
-
-## Building and testing
-
-- To build the project run `npx @skulpture/serve build`
-- To run Jest, run `npx @skulpture/serve jest --config`, where `--config` are any (optional) additional options you'd like to pass to Jest
-- To check types, run `npx @skulpture/serve typecheck --config`, where `--config` are any (optional) additional options you'd like to pass to the TypeScript compiler
