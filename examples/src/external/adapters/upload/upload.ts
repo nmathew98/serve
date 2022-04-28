@@ -40,7 +40,7 @@ const Bucket = useProduction(
 );
 
 const Upload: Upload = {
-	handle: (request: H3.IncomingMessage) => {
+	handle: request => {
 		return new Promise((resolve, reject) => {
 			const identifiers: Record<string, string> = Object.create(null);
 			const uploadedFile: {
@@ -127,7 +127,7 @@ const Upload: Upload = {
 			request.pipe(bb);
 		});
 	},
-	remove: async (request: H3.IncomingMessage) => {
+	remove: async request => {
 		const body = await H3.useBody(request);
 
 		if (typeof body !== "object") throw new Error("Invalid request");
@@ -142,7 +142,7 @@ const Upload: Upload = {
 			}),
 		);
 	},
-	stream: async (request: H3.IncomingMessage, response: H3.ServerResponse) => {
+	stream: async (request, response) => {
 		const parameters = request.context.params;
 
 		if (!parameters.folder || !parameters.file)
