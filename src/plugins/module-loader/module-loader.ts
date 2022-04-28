@@ -34,7 +34,7 @@ export default function buildMakeModuleLoader({
 	const buildMakeRegex = /(?:build[A-Z]+[A-Za-z]+\({)([\s\w,]*)(?:})/gim;
 	let sourceDirectory;
 
-	const loadAdapters = async (sourceDirectory: string, mock?: any) => {
+	const loadAdapters = async (sourceDirectory: string) => {
 		const entitiesPath = resolve(sourceDirectory, "./entities");
 		const adaptersPath = resolve(sourceDirectory, "./external/adapters");
 
@@ -79,9 +79,8 @@ export default function buildMakeModuleLoader({
 					adapterFolder,
 				);
 
-				const { default: adapterImport }: AdapterImport = await importModule(
-					adapterPath,
-					mock,
+				const { default: adapterImport }: AdapterImport = await import(
+					adapterPath
 				);
 
 				adapters[adapter] = adapterImport;
@@ -169,8 +168,8 @@ export default function buildMakeModuleLoader({
 
 					const entityPath = getModulePathFromFolder(entitiesPath, entity);
 
-					const { default: buildMakeEntity }: EntityImport = await importModule(
-						entityPath,
+					const { default: buildMakeEntity }: EntityImport = await import(
+						entityPath
 					);
 
 					const makeEntity: EntityMaker = buildMakeEntity(adapters);
@@ -195,17 +194,6 @@ type Entity = Record<string, any>;
 
 type AdapterImport = { default: Adapter };
 type Adapter = Record<string, any>;
-
-function importModule(
-	path: string,
-	mock?: (path: string) => Promise<any>,
-): Promise<any> {
-	return new Promise(resolve => {
-		if (mock) return resolve(mock(path));
-
-		return resolve(import(path));
-	});
-}
 
 function getEntityConfigurationKeyFromFolder(folder: string) {
 	return `configuration:entity:${getEntityNameFromFolder(folder)}`;

@@ -46,7 +46,7 @@ export default function buildMakeListeners({
 	Colors: Colors;
 	Emoji: Emoji;
 }): ListenerMaker {
-	return function makeListeners(context, mock?): Listener {
+	return function makeListeners(context): Listener {
 		const importedListeners: Listener[] = [];
 
 		let listenerBlacklist: string[];
@@ -88,8 +88,9 @@ export default function buildMakeListeners({
 
 						const listenerPath = getListenerPath(__dirname, listener);
 
-						const { default: buildMakeListener }: ListenerImport =
-							await importModule(listenerPath, mock?.import);
+						const { default: buildMakeListener }: ListenerImport = await import(
+							listenerPath
+						);
 
 						const makeListener: ListenerMaker = buildMakeListener({
 							Logger,
@@ -114,17 +115,6 @@ export default function buildMakeListeners({
 			},
 		});
 	};
-}
-
-function importModule(
-	path: string,
-	mock?: (path: string) => Promise<any>,
-): Promise<any> {
-	return new Promise(resolve => {
-		if (mock) return resolve(mock(path));
-
-		return resolve(import(path));
-	});
 }
 
 function getListenerPath(base: string, folder: string) {
