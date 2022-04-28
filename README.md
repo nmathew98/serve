@@ -3,11 +3,28 @@
 ## About
 
 A lightweight starting point for API applications.
+
 It uses SWC under the hood for super fast build, run, and test times.
+
+## Features
+
+- Minified builds for fast build, run and test times ✅
+- Auto loaded entities and adapters ✅
+- Auto imported composables for better code reuse ✅
+- Auto generated types for composables ✅
+- Quick test times ✅
+- GraphQL set up and ready to go with support for subscriptions using WebSockets ✅
+- Static file serving routes already set up ✅
+- Sensible security headers set by default ✅
+- Lightweight and easy to extend ✅
 
 ## Background information
 
-The whole idea is around a standard design pattern and a standard directory structure.
+### Introduction
+
+The whole idea is around a standard design pattern and directory structure.
+
+It is modelled around the hexagonal architecture.
 
 The standard directory structure is as follows:
 
@@ -15,59 +32,40 @@ The standard directory structure is as follows:
 - Adapters are placed in `src/external/adapters`
 - Routes are placed in `src/external/routes`
 
-The standard design pattern is as follows:
+The reason for the strict directory structure is to insulate the core business rules from external dependencies, ensuring the core of the application is not affected by external factors. If anything uses an external dependency, it belongs in `src/external`.
 
-- Adapters are the packages used by the entity objects.
-  Entity objects define the interface and the adapters adhere to them.
+### Design pattern
 
-- Adapters must be a default export of the constant object that wraps around the package being used.
-  Multiword adapter names like `Test Adapter` should be stored in `examples/adapters/test-adapter/test-adapter.ts`.
+- There are three main layers (going from inside out): `entities` -> `app` -> `external`. The inner layers are not allowed to reach the outer layers.
 
-- Entities must have a default function export which returns a function.
-  Multiword entity names like `Test Entity` will have the key `TestEntity` (the file this corresponds to would be `examples/entities/test-entity/test-entity.ts`).
+- Entity objects are the prime focus, they contain the business rules of the application
+
+- Composables belong in the application layer, they are the application specific business rules and use entity objects to perform their responsibilities.
+
+- The external layer is where the routes and adapters belong. It is here that we set up packages to conform to the interfaces specified by entities.
+
+- Entities must have a default builder function export while adapters must have a default export of the constant that conforms to the interface.
+
+  The builder function must be named in the format `buildMake${entity}` where `entity` is the name of the entity. Entities are accessible in the context which is provided to every route.
+
+  The entity `Test Entity` would have a builder function called `buildMakeTestEntity` and it will be accessible in the context by the key `TestEntity` while the entity `User` would have a builder function called `buildMakeUser` and it will be accessible in the context by the key `User`.
+
+- Entities and adapters must be placed in a file in a folder with the same name.
+
+  For example, the adapter `Test Adapter` would be placed in `src/external/adapters/test-adapter/test-adapter.ts` and the entity `User` would be placed in a folder called `src/entities/user/user.ts`.
+
+  The names of the file must always be lowercase and if it is multi-word, the words are separated by a hyphen.
 
 - All routes must adhere to the `Route` interface.
-
-  The top level function accepts an object of the adapters used by the entity. The returned function accepts a configuration object to configure the entity.
-
-- The default function export must be named in the format `buildMake${entity}` where `entity` is its key (the entity `User` would have `entity` be equal to `User`).
-
-- To use an entity in a route, get it from the context, the entity in `examples/entities/user/user.ts` will have the key `User` in the context.
-
-- To set the configuration of an entity, set it in the context, the configuration must be an `object` and it must map to the key `configuration:entity:${entity}` where `entity` is its key.
-
-- Add your mutations, queries, subscriptions and types to `examples/external/routes/api/mutations`, `examples/external/routes/api/queries`, `examples/external/routes/api/subscriptions` and `examples/external/routes/api/types` respectively.
+- Add your mutations, queries, subscriptions and types to `src/external/routes/api/mutations`, `src/external/routes/api/queries`, `src/external/routes/api/subscriptions` and `src/external/routes/api/types` respectively.
 
   Each GraphQL query, mutation, type or subscription must be in a folder with the same name as the file within it with a default function export.
 
   Queries must adhere to the `GraphQLQueryHandler` type, mutations `GraphQLMutationHandler`, subscriptions `GraphQLSubscriptionHandler` and types `GraphQLTypeHandler`.
 
-No need to worry about the initializations of the entities, adapters or routes. This is all done automatically!
+## Examples
 
-## Usage (in a nutshell)
-
-- Built around the hexagonal architecture.
-
-  There are three main layers to all this (going from inside out): entities -> app -> external. Inner layers are not allowed to reach the outer layers.
-  So, entities cannot have package imports, they contain the pure business rules.
-
-  Application layers contain the application specific business rules (something like create a user). The external layer is where the adapters (and routes) belong, they allow for package imports.
-
-- Entity objects should not be used directly.
-
-  Instead, get them from the context and inject them into the desired use case. For example, see `examples/external/routes/api/queries/test-query/test-query.ts`
-
-- Uses GraphQL to process requests, see `examples/routes/api` to see examples of mutations, queries, subscriptions and types.
-
-- Any mutation, query, subscription or type will be loaded automatically.
-
-  Just add them in a folder with a file in it with the same name. See `examples/external/routes/api/mutations/test-mutation/test-mutation.ts` for an example.
-
-- Adding a new route is simple, add a folder under `examples/external/routes` with the name of the route and within it a file of the same name.
-
-  In the file export a default constant that is of type `Route` (see `examples/external/routes/api/api.ts` and how the `api` route is structured for an example).
-
-- The directory structures and filenames are very important.
+- See the `examples` folder for a sudoku solver API built using this package
 
 ## Building and testing
 
