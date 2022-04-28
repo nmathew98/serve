@@ -2,9 +2,9 @@
 
 import { writeFile, readdir, stat, mkdir } from "fs/promises";
 import { resolve } from "path/posix";
-import NodeEmoji from "../emoji/emoji";
-import CliColors from "../colors/colors";
-import { findRootDirectory } from "../directory/directory";
+import NodeEmoji from "../../adapters/emoji/emoji";
+import CliColors from "../../adapters/colors/colors";
+import { findRootDirectory } from "../../utilities/directory/directory";
 
 export default async function generateComposableDeclarations() {
 	console.log(

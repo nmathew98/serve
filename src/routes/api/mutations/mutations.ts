@@ -1,12 +1,12 @@
-import { ServeContext } from "../../../context/context";
+import { ServeContext } from "../../../listeners/context/context";
 import { ThunkObjMap, GraphQLFieldConfig } from "graphql";
 import { IncomingMessage, ServerResponse } from "h3";
 import { resolve } from "path/posix";
 import { readdir } from "fs/promises";
 import { getApiRouteFolderName } from "../../../routes/utilities";
-import { findOutputDirectory } from "../../../directory/directory";
-import Winston from "../../../logger/logger";
-import CliColors from "../../../colors/colors";
+import { findOutputDirectory } from "../../../utilities/directory/directory";
+import Winston from "../../../adapters/logger/logger";
+import CliColors from "../../../adapters/colors/colors";
 
 export default async function useMutations(
 	request: IncomingMessage,

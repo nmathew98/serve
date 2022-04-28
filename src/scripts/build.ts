@@ -3,9 +3,9 @@
 import { spawn } from "child_process";
 import { resolve } from "path";
 import { NodeEmoji } from "..";
-import CliColors from "../colors/colors";
-import generateComposableDeclarations from "../composables/composables";
-import { findRootDirectory } from "../directory/directory";
+import CliColors from "../adapters/colors/colors";
+import generateComposableDeclarations from "../plugins/composables/composables";
+import { findRootDirectory } from "../utilities/directory/directory";
 
 export default async function build(args: string[]) {
 	const projectDirectory = await findRootDirectory();

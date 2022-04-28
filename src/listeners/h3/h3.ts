@@ -4,15 +4,15 @@ import { createApp, App as H3, Middleware, IncomingMessage } from "h3";
 import { readdir } from "fs/promises";
 import { createServer } from "http";
 import { resolve } from "path/posix";
-import { ServeContext } from "../../context/context";
-import { Logger } from "../../logger/logger";
+import { ServeContext } from "../context/context";
+import { Logger } from "../../adapters/logger/logger";
 import { Listener } from "../listeners";
-import { Colors } from "../../colors/colors";
-import { Emoji } from "../../emoji/emoji";
+import { Colors } from "../../adapters/colors/colors";
+import { Emoji } from "../../adapters/emoji/emoji";
 import API from "../../routes/api/api";
 import StorageUpload from "../../routes/storage-upload/storage-upload";
 import StorageRemove from "../../routes/storage-remove/storage-remove";
-import { findOutputDirectory } from "../../directory/directory";
+import { findOutputDirectory } from "../../utilities/directory/directory";
 
 export default function buildMakeH3Listener({
 	Logger,

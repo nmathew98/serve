@@ -1,8 +1,8 @@
-import { Logger } from "../logger/logger";
+import { Logger } from "../adapters/logger/logger";
 import { readdir } from "fs/promises";
-import { ServeContext } from "../context/context";
-import { Colors } from "../colors/colors";
-import { Emoji } from "../emoji/emoji";
+import { ServeContext } from "./context/context";
+import { Colors } from "../adapters/colors/colors";
+import { Emoji } from "../adapters/emoji/emoji";
 import packageDetails from "../../package.json";
 
 export interface Listener {
@@ -68,6 +68,8 @@ export default function buildMakeListeners({
 					),
 				);
 
+				const notAListener = ["app", "context"];
+
 				try {
 					const files = await readdir(__dirname, {
 						withFileTypes: true,
@@ -78,7 +80,11 @@ export default function buildMakeListeners({
 						.map(directory => directory.name);
 
 					for (const listener of listeners) {
-						if (listenerBlacklist.includes(listener)) continue;
+						if (
+							listenerBlacklist.includes(listener) ||
+							notAListener.includes(listener)
+						)
+							continue;
 
 						const listenerPath = getListenerPath(__dirname, listener);
 

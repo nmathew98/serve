@@ -1,6 +1,6 @@
 import { IncomingMessage, assertMethod, ServerResponse } from "h3";
-import { Upload } from "../../upload/upload";
-import { ServeContext } from "../../context/context";
+import { Upload } from "../../adapters/upload/upload";
+import { ServeContext } from "../../listeners/context/context";
 import { sendSuccess, sendError, VerifyAuthorization } from "../utilities";
 import { Route } from "../route";
 

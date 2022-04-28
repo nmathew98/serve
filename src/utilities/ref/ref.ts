@@ -2,7 +2,7 @@ export interface Ref<T = any> {
 	[key: string | symbol]: T | RefWatcher<T>[];
 }
 
-export default function makeRef<T = any>(initialValue?: T): Ref<T> {
+export function makeRef<T = any>(initialValue?: T): Ref<T> {
 	const ref = Object.create(null);
 
 	if (initialValue) ref.value = initialValue;

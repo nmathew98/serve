@@ -2,10 +2,10 @@ import { GraphQLInterfaceType } from "graphql";
 import { resolve } from "path/posix";
 import { readdir } from "fs/promises";
 import { getApiRouteFolderName } from "../../../routes/utilities";
-import { ServeContext } from "../../../context/context";
-import { findOutputDirectory } from "../../../directory/directory";
-import Winston from "../../../logger/logger";
-import CliColors from "../../../colors/colors";
+import { ServeContext } from "../../../listeners/context/context";
+import { findOutputDirectory } from "../../../utilities/directory/directory";
+import Winston from "../../../adapters/logger/logger";
+import CliColors from "../../../adapters/colors/colors";
 
 export default async function useTypes(
 	context: ServeContext,

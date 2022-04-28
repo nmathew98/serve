@@ -2,9 +2,9 @@
 
 import { spawn } from "child_process";
 import { NodeEmoji } from "..";
-import CliColors from "../colors/colors";
-import generateComposableDeclarations from "../composables/composables";
-import { findRootDirectory } from "../directory/directory";
+import CliColors from "../adapters/colors/colors";
+import generateComposableDeclarations from "../plugins/composables/composables";
+import { findRootDirectory } from "../utilities/directory/directory";
 
 export default async function typecheck(args: string[]) {
 	const projectDirectory = await findRootDirectory();
@@ -26,8 +26,10 @@ export default async function typecheck(args: string[]) {
 		if (error.stack) console.error(CliColors.red(error.stack));
 	});
 
-	typecheck.on("close", code => {
+	typecheck.on("close", async code => {
 		if (!code) {
+			await generateComposableDeclarations();
+
 			console.log(
 				CliColors.brightGreen("Looks good"),
 				NodeEmoji.whiteCheckMark,

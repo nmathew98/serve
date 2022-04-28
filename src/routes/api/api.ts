@@ -1,6 +1,6 @@
 import { IncomingMessage, assertMethod, ServerResponse, useBody } from "h3";
 import { graphql, GraphQLSchema } from "graphql";
-import { ServeContext } from "../../context/context";
+import { ServeContext } from "../../listeners/context/context";
 import { Route } from "../../routes/route";
 import { sendError, VerifyAuthorization } from "../../routes/utilities";
 import useSchema from "./schema/schema";

@@ -1,10 +1,10 @@
-import { ServeContext } from "../context/context";
-import { Logger } from "../logger/logger";
+import { ServeContext } from "../../listeners/context/context";
+import { Logger } from "../../adapters/logger/logger";
 import { resolve } from "path/posix";
 import { readFile, readdir } from "fs/promises";
-import { Colors } from "../colors/colors";
-import { Emoji } from "../emoji/emoji";
-import { findOutputDirectory } from "../directory/directory";
+import { Colors } from "../../adapters/colors/colors";
+import { Emoji } from "../../adapters/emoji/emoji";
+import { findOutputDirectory } from "../../utilities/directory/directory";
 import { findComposables } from "../composables/composables";
 
 export interface ModuleLoader {
@@ -54,7 +54,6 @@ export default function buildMakeModuleLoader({
 
 			const matchedLine = contents.match(buildMakeRegex)?.pop();
 
-			/* istanbul ignore next: testing the regex first already safeguards against this */
 			if (!matchedLine) continue;
 
 			const adaptersList = [...matchedLine.matchAll(buildMakeRegex)]
@@ -65,7 +64,6 @@ export default function buildMakeModuleLoader({
 				?.map(item => item.trim())
 				?.filter(item => !!item);
 
-			/* istanbul ignore next: for this to happen the typescript won't compile */
 			if (!adaptersList) continue;
 
 			for (const adapter of adaptersList) {
@@ -198,7 +196,6 @@ type Entity = Record<string, any>;
 type AdapterImport = { default: Adapter };
 type Adapter = Record<string, any>;
 
-/* istanbul ignore next */
 function importModule(
 	path: string,
 	mock?: (path: string) => Promise<any>,
@@ -210,12 +207,10 @@ function importModule(
 	});
 }
 
-/* istanbul ignore next */
 function getEntityConfigurationKeyFromFolder(folder: string) {
 	return `configuration:entity:${getEntityNameFromFolder(folder)}`;
 }
 
-/* istanbul ignore next */
 function getEntityNameFromFolder(folder: string) {
 	return folder
 		.split("-")
@@ -225,7 +220,6 @@ function getEntityNameFromFolder(folder: string) {
 		.join("");
 }
 
-/* istanbul ignore next */
 function getAdapterFolderFromName(name: string) {
 	return name
 		.split(/(?=[A-Z][^A-Z])/)
@@ -233,7 +227,6 @@ function getAdapterFolderFromName(name: string) {
 		.toLowerCase();
 }
 
-/* istanbul ignore next */
 function getModulePathFromFolder(base: string, folder: string) {
 	return `${base}/${folder.toLowerCase()}/${folder.toLowerCase()}`;
 }

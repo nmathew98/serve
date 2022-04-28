@@ -1,11 +1,11 @@
-import { buildMakeContext } from "../context/context";
-import makeRef, { Ref } from "../ref/ref";
+import { buildMakeContext } from "../../listeners/context/context";
+import { Ref, makeRef } from "../ref/ref";
 
 const makeContext = buildMakeContext();
 
 const states = makeContext();
 
-export default function useState<T = any>(
+export function useState<T = any>(
 	key: string,
 	initializor: (...args: T[]) => T,
 ): Ref<T> {

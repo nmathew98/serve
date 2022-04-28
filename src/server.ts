@@ -1,15 +1,15 @@
-import Winston from "./logger/logger";
-import CliColors from "./colors/colors";
-import Emoji from "./emoji/emoji";
+import Winston from "./adapters/logger/logger";
+import CliColors from "./adapters/colors/colors";
+import Emoji from "./adapters/emoji/emoji";
 import buildMakeListeners, {
 	Listener,
 	ListenerMaker,
 } from "./listeners/listeners";
-import makeContext, { ServeContext } from "./context/context";
+import makeContext, { ServeContext } from "./listeners/context/context";
 import buildMakeModuleLoader, {
 	ModuleLoader,
 	ModuleLoaderMaker,
-} from "./module-loader/module-loader";
+} from "./plugins/module-loader/module-loader";
 
 const hooks: ServeHooks = Object.create(null);
 

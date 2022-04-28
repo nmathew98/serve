@@ -2,8 +2,8 @@
 
 import { spawn } from "child_process";
 import { resolve } from "path";
-import CliColors from "../colors/colors";
-import { findRootDirectory } from "../directory/directory";
+import CliColors from "../adapters/colors/colors";
+import { findRootDirectory } from "../utilities/directory/directory";
 
 export default async function jest(args: string[]) {
 	const projectDirectory = await findRootDirectory();
