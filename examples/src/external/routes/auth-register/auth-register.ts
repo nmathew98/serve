@@ -6,13 +6,17 @@ import {
 	sendSuccess,
 	H3,
 	BaseRoute,
+	Methods,
+	Modules,
 } from "@skulpture/serve";
 import { User, UserRecord } from "../../../entities/user/user";
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
-@Route("/auth/register", ["post"], ["User"])
+@Methods("post")
+@Modules("User")
+@Route("/auth/register")
 export default class Register extends BaseRoute {
 	async use(
 		request: H3.IncomingMessage,

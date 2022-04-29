@@ -1,14 +1,15 @@
 import { IncomingMessage, ServerResponse, useBody } from "h3";
 import { graphql, GraphQLSchema } from "graphql";
 import { ServeContext } from "../../listeners/context/context";
-import { BaseRoute, Route } from "../../routes/route";
+import { BaseRoute, Methods, Route } from "../../routes/route";
 import { sendError, VerifyAuthorization } from "../../routes/utilities";
 import useSchema from "./schema/schema";
 import makeSubscriptionListener from "./subscriptions/websocket/websocket";
 
 let schema: GraphQLSchema;
 
-@Route("/api", ["post"])
+@Methods("post")
+@Route("/api")
 export default class API extends BaseRoute {
 	async use(
 		request: IncomingMessage,

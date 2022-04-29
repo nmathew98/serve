@@ -2,9 +2,11 @@ import { IncomingMessage, ServerResponse } from "h3";
 import { Upload } from "../../adapters/upload/upload";
 import { ServeContext } from "../../listeners/context/context";
 import { sendSuccess, sendError, VerifyAuthorization } from "../utilities";
-import { BaseRoute, Route } from "../route";
+import { BaseRoute, Route, Modules, Methods } from "../route";
 
-@Route("/storage/upload", ["post"], ["Upload"])
+@Methods("post")
+@Modules("Upload")
+@Route("/storage/upload")
 export default class StorageUpload extends BaseRoute {
 	async use(
 		request: IncomingMessage,

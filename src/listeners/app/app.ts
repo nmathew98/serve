@@ -9,5 +9,5 @@ export interface Router {
 	/**
 	 * Add a route
 	 */
-	use: (...args: any[]) => void;
+	use: (...args: any[]) => Router;
 }

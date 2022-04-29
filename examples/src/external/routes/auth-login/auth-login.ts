@@ -11,13 +11,17 @@ import {
 	ServeContext,
 	H3,
 	BaseRoute,
+	Methods,
+	Modules,
 } from "@skulpture/serve";
 
 const LocalStategy = passportLocal.Strategy;
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
-@Route("/auth/login", ["post"], ["User"])
+@Methods("post")
+@Modules("User")
+@Route("/auth/login")
 export default class Login extends BaseRoute {
 	constructor(context: ServeContext) {
 		super();

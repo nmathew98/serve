@@ -25,7 +25,14 @@ export { Upload } from "./adapters/upload/upload";
 
 export { ModuleLoader } from "./plugins/module-loader/module-loader";
 
-export { BaseRoute, Route, RouteError } from "./routes/route";
+export {
+	BaseRoute,
+	Route,
+	RouteError,
+	Modules,
+	Protected,
+	Methods,
+} from "./routes/route";
 export {
 	sendError,
 	sendSuccess,
