@@ -49,7 +49,7 @@ async function initializeServeConfiguration() {
 			},
 		});
 
-		context.set("configuration:adapter:upload", Upload);
+		context.set("Upload", Upload);
 
 		const verifyAuthorization: VerifyAuthorization = async (
 			request,

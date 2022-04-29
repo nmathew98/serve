@@ -77,12 +77,16 @@ export default function buildMakeH3Listener({
 		const initializeInternalRoutes = () => {
 			routeBlacklist.push(getApiRouteFolderName(context));
 			const apiRoute = new API();
-			const storageUploadRoute = new StorageUpload();
-			const storageRemoveRoute = new StorageRemove();
 
 			(apiRoute as any).useRoute(h3, context);
-			(storageUploadRoute as any).useRoute(h3, context);
-			(storageRemoveRoute as any).useRoute(h3, context);
+
+			if (context.has("Upload")) {
+				const storageUploadRoute = new StorageUpload();
+				const storageRemoveRoute = new StorageRemove();
+
+				(storageUploadRoute as any).useRoute(h3, context);
+				(storageRemoveRoute as any).useRoute(h3, context);
+			}
 		};
 
 		const initializeRoutes = async () => {

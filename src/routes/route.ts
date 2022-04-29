@@ -1,24 +1,39 @@
-import { H3 } from "..";
+import { IncomingMessage, ServerResponse } from "h3";
 import { Router } from "../listeners/app/app";
 import { ServeContext } from "../listeners/context/context";
 import { doesModuleExist } from "../plugins/utilities";
 import { HttpErrorCodes } from "./utilities";
 
+/**
+ * All routes must extend `BaseRoute`
+ */
 export abstract class BaseRoute {
 	/**
-	 * Use a route with the app
+	 * Will be loaded and used with the specified route
 	 *
-	 * @param {App} app the app
-	 * @param {ServeContext} context the global context object
+	 * Serve will provide the request, response and context to be used with the route
+	 *
+	 * @param {IncomingMessage} request the request
+	 * @param {ServerResponse} response the response
+	 * @param {ServeContext} context the global context provided by Serve
 	 */
 	abstract use(
-		request: H3.IncomingMessage,
-		response: H3.ServerResponse,
+		request: IncomingMessage,
+		response: ServerResponse,
 		context: ServeContext,
 	): any;
 }
 
-export function Route<T extends { new (...args: any[]): {} }>(
+/**
+ * Decorator to use a Route
+ *
+ * All routes must extend `BaseRoute`
+ *
+ * @param {string} path the path associated with the route
+ * @param {HTTPMethod[]} method the HTTP methods the route is valid for
+ * @param {string[]} modules the keys of the modules used by the route
+ */
+export function Route<T extends { new (...args: any[]): Record<string, any> }>(
 	path: string,
 	method?: HTTPMethod[],
 	modules?: string[],
@@ -30,7 +45,7 @@ export function Route<T extends { new (...args: any[]): {} }>(
 
 				router.use(
 					path,
-					(request: H3.IncomingMessage, response: H3.ServerResponse) =>
+					(request: IncomingMessage, response: ServerResponse) =>
 						(this as unknown as BaseRoute).use(request, response, context),
 					method,
 				);
@@ -48,13 +63,7 @@ type HTTPMethod =
 	| "connect"
 	| "options"
 	| "trace"
-	| "get"
-	| "head"
-	| "post"
-	| "put"
-	| "delete"
-	| "connect"
-	| "options";
+	| "post";
 
 export class RouteError extends Error implements RouteError {
 	constructor(message: string, statusCode?: HttpErrorCodes) {

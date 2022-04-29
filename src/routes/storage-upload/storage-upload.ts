@@ -4,16 +4,13 @@ import { ServeContext } from "../../listeners/context/context";
 import { sendSuccess, sendError, VerifyAuthorization } from "../utilities";
 import { BaseRoute, Route } from "../route";
 
-@Route("/storage/upload", ["post"])
+@Route("/storage/upload", ["post"], ["Upload"])
 export default class StorageUpload extends BaseRoute {
 	async use(
 		request: IncomingMessage,
 		response: ServerResponse,
 		context: ServeContext,
 	) {
-		if (!context.has("configuration:adapter:upload"))
-			return sendError(response, "Storage module not available");
-
 		{
 			let verifyAuthorization: VerifyAuthorization;
 			let verifyAuthorizationOptions: Record<string, any> | undefined;
@@ -42,7 +39,7 @@ export default class StorageUpload extends BaseRoute {
 			}
 		}
 
-		const upload: Upload = context.get("configuration:adapter:upload");
+		const upload: Upload = context.get("Upload");
 		const fileUploadHandler = upload.handle;
 
 		try {
