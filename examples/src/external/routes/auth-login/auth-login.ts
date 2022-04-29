@@ -17,7 +17,7 @@ const LocalStategy = passportLocal.Strategy;
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
-@Route("/auth/login", ["post"])
+@Route("/auth/login", ["post"], ["User"])
 export default class Login extends BaseRoute {
 	constructor(context: ServeContext) {
 		super();
@@ -30,9 +30,6 @@ export default class Login extends BaseRoute {
 					password: string,
 					done: (error: any, user?: Partial<UserRecord>) => void,
 				) => {
-					if (!context.has("User"))
-						return done(new RouteError("User module not available", 500));
-
 					const User: User = context.get("User");
 					const findUser = buildFindUser({ User });
 

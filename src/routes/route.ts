@@ -1,6 +1,7 @@
 import { H3 } from "..";
 import { Router } from "../listeners/app/app";
 import { ServeContext } from "../listeners/context/context";
+import { doesModuleExist } from "../plugins/utilities";
 import { HttpErrorCodes } from "./utilities";
 
 export abstract class BaseRoute {
@@ -20,10 +21,13 @@ export abstract class BaseRoute {
 export function Route<T extends { new (...args: any[]): {} }>(
 	path: string,
 	method?: HTTPMethod[],
+	modules?: string[],
 ) {
 	return (constructor: T) => {
 		return class extends constructor {
 			useRoute(router: Router, context: ServeContext) {
+				if (modules) doesModuleExist(context, ...modules);
+
 				router.use(
 					path,
 					(request: H3.IncomingMessage, response: H3.ServerResponse) =>

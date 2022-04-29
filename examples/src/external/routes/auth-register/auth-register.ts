@@ -5,7 +5,6 @@ import {
 	sendError,
 	sendSuccess,
 	H3,
-	doesModuleExist,
 	BaseRoute,
 } from "@skulpture/serve";
 import { User, UserRecord } from "../../../entities/user/user";
@@ -13,15 +12,13 @@ import { User, UserRecord } from "../../../entities/user/user";
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
-@Route("/auth/register", ["post"])
+@Route("/auth/register", ["post"], ["User"])
 export default class Register extends BaseRoute {
 	async use(
 		request: H3.IncomingMessage,
 		response: H3.ServerResponse,
 		context: ServeContext,
 	) {
-		doesModuleExist(context, "User");
-
 		{
 			if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET)
 				return sendError(
