@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
-import { Hasher } from "../../../entities/user/user";
+import { Hasher as UserHasher } from "../../../entities/user/user";
 
-const Hasher: Hasher & RouteHasher = {
+const Hasher: UserHasher & RouteHasher = {
 	hash: async (value: string) => {
 		return new Promise((resolve, reject) => {
 			return bcrypt.hash(value, 12, (err, hash) => {
