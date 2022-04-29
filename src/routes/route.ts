@@ -1,15 +1,34 @@
+import { H3 } from "..";
 import { App } from "../listeners/app/app";
 import { ServeContext } from "../listeners/context/context";
 import { HttpErrorCodes } from "./utilities";
 
-export interface Route {
+export abstract class BaseRoute {
 	/**
 	 * Use a route with the app
 	 *
 	 * @param {App} app the app
 	 * @param {ServeContext} context the global context object
 	 */
-	useRoute(app: App, context: ServeContext): void;
+	abstract use(
+		request: H3.IncomingMessage,
+		response: H3.ServerResponse,
+		context: ServeContext,
+	): any;
+}
+
+export function Route<T extends { new (...args: any[]): {} }>(path: string) {
+	return (constructor: T) => {
+		return class extends constructor {
+			useRoute(app: App, context: ServeContext) {
+				app.use(
+					path,
+					(request: H3.IncomingMessage, response: H3.ServerResponse) =>
+						(this as unknown as BaseRoute).use(request, response, context),
+				);
+			}
+		} as any;
+	};
 }
 
 export class RouteError extends Error implements RouteError {
