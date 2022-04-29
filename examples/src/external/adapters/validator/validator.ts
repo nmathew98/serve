@@ -1,13 +1,9 @@
-import UuidValidator from "uuid-validate";
+import { Validator as UserValidator } from "../../../entities/user/user";
 import * as EmailValidator from "email-validator";
 import PasswordValidator from "password-validator";
 import mongoose from "mongoose";
 
-const Validator = {
-	isUuidValid: async (uuid: any) => {
-		return UuidValidator(uuid);
-	},
-
+const Validator: UserValidator = {
 	isPasswordValid: async (password: any) => {
 		const schema = new PasswordValidator();
 
@@ -28,7 +24,6 @@ const Validator = {
 
 		return result;
 	},
-
 	isEmailValid: async (email: any) => {
 		const isEmailFormatValid = EmailValidator.validate(email);
 

@@ -235,7 +235,7 @@ export default function buildMakeSudoku({ Graph }: { Graph: Graph }) {
 						hasEmptyPositions = true;
 
 					return attributes.color;
-				});
+				}, graph);
 
 				if (hasEmptyPositions) throw new Error("Puzzle cannot be solved");
 
@@ -260,6 +260,7 @@ export interface Graph<T = any> {
 	clearEdges: (graph: T) => void;
 	neighbors: (node: number, graph: T) => number[];
 	mapNodes: (
-		callback: (node: number, attributes: Record<string, any>) => any,
+		callback: (node: string, attributes: Record<string, any>) => any,
+		graph: T,
 	) => any[];
 }
