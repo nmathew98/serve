@@ -6,93 +6,84 @@ import {
 	sendSuccess,
 	H3,
 	doesModuleExist,
+	BaseRoute,
 } from "@skulpture/serve";
 import { User, UserRecord } from "../../../entities/user/user";
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
-async function register(
-	request: H3.IncomingMessage,
-	response: H3.ServerResponse,
-	context: ServeContext,
-) {
-	{
-		H3.assertMethod(request.event, "POST");
-
-		if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET)
-			return sendError(
-				response,
-				"Access and refresh token secrets are not set",
-			);
-
-		if (!context.has("configuration:routes:authorization:get"))
-			return sendError(response, "Routes configured incorrectly");
-	}
-
-	const getAuthorization: GetAuthorization = context.get(
-		"configuration:routes:authorization:get",
-	);
-	if (typeof getAuthorization !== "function")
-		return sendError(response, "Routes configured incorrectly");
-
-	try {
+@Route("/auth/register", ["post"])
+export default class Register extends BaseRoute {
+	async use(
+		request: H3.IncomingMessage,
+		response: H3.ServerResponse,
+		context: ServeContext,
+	) {
 		doesModuleExist(context, "User");
 
-		const User: User = context.get("User");
-		const findUser = buildFindUser({ User });
-		const createUser = buildCreateUser({ User });
+		{
+			if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET)
+				return sendError(
+					response,
+					"Access and refresh token secrets are not set",
+				);
 
-		const body = await H3.useBody(request);
+			if (!context.has("configuration:routes:authorization:get"))
+				return sendError(response, "Routes configured incorrectly");
+		}
 
-		if (!body.password) return sendError(response, "Invalid user");
+		const getAuthorization: GetAuthorization = context.get(
+			"configuration:routes:authorization:get",
+		);
+		if (typeof getAuthorization !== "function")
+			return sendError(response, "Routes configured incorrectly");
 
-		await createUser(body);
+		try {
+			const User: User = context.get("User");
+			const findUser = buildFindUser({ User });
+			const createUser = buildCreateUser({ User });
 
-		const foundUsers = await findUser({ email: body.email });
+			const body = await H3.useBody(request);
 
-		if (!foundUsers) return sendError(response, "Unexpected error occured");
+			if (!body.password) return sendError(response, "Invalid user");
 
-		const user = foundUsers.pop() as UserRecord;
+			await createUser(body);
 
-		const accessToken = (await getAuthorization(request, {
-			sub: user.uuid,
-			secret: ACCESS_TOKEN_SECRET,
-			expiresIn: "1 hour",
-		})) as string;
-		const refreshToken = (await getAuthorization(request, {
-			sub: user.uuid,
-			secret: REFRESH_TOKEN_SECRET,
-			expiresIn: "7 days",
-		})) as string;
+			const foundUsers = await findUser({ email: body.email });
 
-		response.statusCode = 200;
-		H3.setCookie(response.event, "authorization", accessToken, {
-			secure: process.env.NODE_ENV === "production",
-			maxAge: oneHourFromNow(),
-		});
-		H3.setCookie(response.event, "refresh", refreshToken, {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
-			maxAge: sevenDaysFromNow(),
-		});
+			if (!foundUsers) return sendError(response, "Unexpected error occured");
 
-		return sendSuccess(response, `${user.uuid} successfully registered`);
-	} catch (error: any) {
-		return sendError(response, error.message, error.statusCode);
+			const user = foundUsers.pop() as UserRecord;
+
+			const accessToken = (await getAuthorization(request, {
+				sub: user.uuid,
+				secret: ACCESS_TOKEN_SECRET,
+				expiresIn: "1 hour",
+			})) as string;
+			const refreshToken = (await getAuthorization(request, {
+				sub: user.uuid,
+				secret: REFRESH_TOKEN_SECRET,
+				expiresIn: "7 days",
+			})) as string;
+
+			response.statusCode = 200;
+			H3.setCookie(response.event, "authorization", accessToken, {
+				secure: process.env.NODE_ENV === "production",
+				maxAge: oneHourFromNow(),
+			});
+			H3.setCookie(response.event, "refresh", refreshToken, {
+				httpOnly: true,
+				secure: process.env.NODE_ENV === "production",
+				maxAge: sevenDaysFromNow(),
+			});
+
+			return sendSuccess(response, `${user.uuid} successfully registered`);
+		} catch (error: any) {
+			return sendError(response, error.message, error.statusCode);
+		}
 	}
 }
-
-const Register: Route = {
-	useRoute: (app, context) =>
-		app.use(
-			"/auth/register",
-			(request: H3.IncomingMessage, response: H3.ServerResponse) =>
-				register(request, response, context),
-		),
-};
-
-export default Register;
 
 function oneHourFromNow() {
 	const oneHour = 60 * 60 * Math.pow(10, 3);

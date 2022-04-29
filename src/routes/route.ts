@@ -1,5 +1,5 @@
 import { H3 } from "..";
-import { App } from "../listeners/app/app";
+import { Router } from "../listeners/app/app";
 import { ServeContext } from "../listeners/context/context";
 import { HttpErrorCodes } from "./utilities";
 
@@ -17,19 +17,40 @@ export abstract class BaseRoute {
 	): any;
 }
 
-export function Route<T extends { new (...args: any[]): {} }>(path: string) {
+export function Route<T extends { new (...args: any[]): {} }>(
+	path: string,
+	method?: HTTPMethod[],
+) {
 	return (constructor: T) => {
 		return class extends constructor {
-			useRoute(app: App, context: ServeContext) {
-				app.use(
+			useRoute(router: Router, context: ServeContext) {
+				router.use(
 					path,
 					(request: H3.IncomingMessage, response: H3.ServerResponse) =>
 						(this as unknown as BaseRoute).use(request, response, context),
+					method,
 				);
 			}
 		} as any;
 	};
 }
+
+type HTTPMethod =
+	| "get"
+	| "head"
+	| "patch"
+	| "put"
+	| "delete"
+	| "connect"
+	| "options"
+	| "trace"
+	| "get"
+	| "head"
+	| "post"
+	| "put"
+	| "delete"
+	| "connect"
+	| "options";
 
 export class RouteError extends Error implements RouteError {
 	constructor(message: string, statusCode?: HttpErrorCodes) {

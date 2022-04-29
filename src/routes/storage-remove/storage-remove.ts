@@ -1,18 +1,16 @@
-import { assertMethod, IncomingMessage, ServerResponse } from "h3";
+import { IncomingMessage, ServerResponse } from "h3";
 import { Upload } from "../../adapters/upload/upload";
 import { ServeContext } from "../../listeners/context/context";
 import { sendSuccess, sendError, VerifyAuthorization } from "../utilities";
 import { BaseRoute, Route } from "../route";
 
-@Route("/storage/remove")
+@Route("/storage/remove", ["post"])
 export default class StorageRemove extends BaseRoute {
 	async use(
 		request: IncomingMessage,
 		response: ServerResponse,
 		context: ServeContext,
 	) {
-		assertMethod(request.event, "POST");
-
 		if (!context.has("configuration:adapter:upload"))
 			return sendError(response, "Storage module not available");
 

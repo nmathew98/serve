@@ -1,4 +1,4 @@
-import { IncomingMessage, assertMethod, ServerResponse, useBody } from "h3";
+import { IncomingMessage, ServerResponse, useBody } from "h3";
 import { graphql, GraphQLSchema } from "graphql";
 import { ServeContext } from "../../listeners/context/context";
 import { BaseRoute, Route } from "../../routes/route";
@@ -8,7 +8,7 @@ import makeSubscriptionListener from "./subscriptions/websocket/websocket";
 
 let schema: GraphQLSchema;
 
-@Route("/api")
+@Route("/api", ["post"])
 export default class API extends BaseRoute {
 	async use(
 		request: IncomingMessage,
@@ -16,8 +16,6 @@ export default class API extends BaseRoute {
 		context: ServeContext,
 	) {
 		{
-			assertMethod(request.event, "POST");
-
 			let verifyAuthorization: VerifyAuthorization;
 			let verifyAuthorizationOptions: Record<string, any> | undefined;
 

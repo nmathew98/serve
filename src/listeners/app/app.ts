@@ -4,3 +4,10 @@ export interface App {
 	 */
 	use: (...args: any[]) => void;
 }
+
+export interface Router {
+	/**
+	 * Add a route
+	 */
+	use: (...args: any[]) => void;
+}

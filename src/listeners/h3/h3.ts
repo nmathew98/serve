@@ -1,6 +1,12 @@
 import cors from "cors";
 import helmet from "helmet";
-import { createApp, App as H3, Middleware, IncomingMessage } from "h3";
+import {
+	createApp,
+	App as H3,
+	Middleware,
+	IncomingMessage,
+	createRouter,
+} from "h3";
 import { readdir } from "fs/promises";
 import { createServer } from "http";
 import { resolve } from "path/posix";
@@ -25,6 +31,7 @@ export default function buildMakeH3Listener({
 }) {
 	return function makeH3Listener(context: ServeContext): Listener {
 		const h3: H3 = createApp();
+		const router = createRouter();
 
 		let routeBlacklist: string[];
 
@@ -97,11 +104,13 @@ export default function buildMakeH3Listener({
 
 						const { default: importedRouteClass } = await import(routePath);
 
-						const importedRoute = new importedRouteClass();
+						const importedRoute = new importedRouteClass(context);
 
-						importedRoute.useRoute(h3, context);
+						importedRoute.useRoute(router, context);
 					}
 				}
+
+				h3.use(router);
 			} catch (error: any) {
 				Logger.error(Colors.red(error.message, error.stack));
 			}

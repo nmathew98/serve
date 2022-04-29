@@ -10,74 +10,18 @@ import {
 	RouteError,
 	ServeContext,
 	H3,
+	BaseRoute,
 } from "@skulpture/serve";
 
 const LocalStategy = passportLocal.Strategy;
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
-async function login(
-	request: H3.IncomingMessage,
-	response: H3.ServerResponse,
-	context: ServeContext,
-) {
-	{
-		H3.assertMethod(request.event, "POST");
+@Route("/auth/login", ["post"])
+export default class Login extends BaseRoute {
+	constructor(context: ServeContext) {
+		super();
 
-		if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET)
-			return sendError(
-				response,
-				"Access and refresh token secrets are not set",
-			);
-
-		if (!context.has("configuration:routes:authorization:get"))
-			return sendError(response, "Routes configured incorrectly");
-	}
-
-	const getAuthorization: GetAuthorization = context.get(
-		"configuration:routes:authorization:get",
-	);
-	if (typeof getAuthorization !== "function")
-		return sendError(response, "Routes configured incorrectly");
-
-	try {
-		const user = (await passportAuthenticatePromisified(
-			request,
-			response,
-		)) as UserRecord;
-
-		const body = await H3.useBody(request);
-
-		const accessToken = (await getAuthorization(request, {
-			sub: user.uuid,
-			secret: ACCESS_TOKEN_SECRET,
-			expiresIn: body.rememberMe ? "1 hour" : "7 days",
-		})) as string;
-		const refreshToken = (await getAuthorization(request, {
-			sub: user.uuid,
-			secret: REFRESH_TOKEN_SECRET,
-			expiresIn: "7 days",
-		})) as string;
-
-		response.statusCode = 200;
-		H3.setCookie(response.event, "authorization", accessToken, {
-			secure: process.env.NODE_ENV === "production",
-			maxAge: body.rememberMe ? oneHourFromNow() : sevenDaysFromNow(),
-		});
-		H3.setCookie(response.event, "refresh", refreshToken, {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
-			maxAge: sevenDaysFromNow(),
-		});
-
-		return sendSuccess(response, `${user.uuid} successfully authenticated`);
-	} catch (error: any) {
-		return sendError(response, error.message, error.statusCode);
-	}
-}
-
-const Login: Route = {
-	useRoute: (app, context) => {
 		passport.use(
 			new LocalStategy(
 				{ usernameField: "email", passwordField: "password" },
@@ -114,16 +58,66 @@ const Login: Route = {
 				},
 			),
 		);
+	}
 
-		app.use(
-			"/auth/login",
-			(request: H3.IncomingMessage, response: H3.ServerResponse) =>
-				login(request, response, context),
+	async use(
+		request: H3.IncomingMessage,
+		response: H3.ServerResponse,
+		context: ServeContext,
+	) {
+		{
+			if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET)
+				return sendError(
+					response,
+					"Access and refresh token secrets are not set",
+				);
+
+			if (!context.has("configuration:routes:authorization:get"))
+				return sendError(response, "Routes configured incorrectly");
+		}
+
+		const getAuthorization: GetAuthorization = context.get(
+			"configuration:routes:authorization:get",
 		);
-	},
-};
+		if (typeof getAuthorization !== "function")
+			return sendError(response, "Routes configured incorrectly");
 
-export default Login;
+		try {
+			const user = (await passportAuthenticatePromisified(
+				request,
+				response,
+			)) as UserRecord;
+
+			const body = await H3.useBody(request);
+
+			const accessToken = (await getAuthorization(request, {
+				sub: user.uuid,
+				secret: ACCESS_TOKEN_SECRET,
+				expiresIn: body.rememberMe ? "1 hour" : "7 days",
+			})) as string;
+			const refreshToken = (await getAuthorization(request, {
+				sub: user.uuid,
+				secret: REFRESH_TOKEN_SECRET,
+				expiresIn: "7 days",
+			})) as string;
+
+			response.statusCode = 200;
+			H3.setCookie(response.event, "authorization", accessToken, {
+				secure: process.env.NODE_ENV === "production",
+				maxAge: body.rememberMe ? oneHourFromNow() : sevenDaysFromNow(),
+			});
+			H3.setCookie(response.event, "refresh", refreshToken, {
+				httpOnly: true,
+				secure: process.env.NODE_ENV === "production",
+				maxAge: sevenDaysFromNow(),
+			});
+
+			return sendSuccess(response, `${user.uuid} successfully authenticated`);
+		} catch (error: any) {
+			return sendError(response, error.message, error.statusCode);
+		}
+	}
+}
 
 function oneHourFromNow() {
 	const oneHour = 60 * 60 * Math.pow(10, 3);
