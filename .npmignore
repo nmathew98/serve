@@ -7,4 +7,3 @@ coverage/**
 .gitignore
 .prettierignore
 .prettierrc.json
-jest.config.cjs

@@ -112,7 +112,7 @@ export default function buildMakeSudoku({ Graph }: { Graph: Graph }) {
 		});
 	};
 
-	const colorGraph = (node: number = 0) => {
+	const colorGraph = (node = 0) => {
 		const setNodeColor = (node: number, color: number) =>
 			Graph.setNodeAttribute(node, "color", color, graph);
 
