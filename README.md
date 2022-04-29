@@ -33,6 +33,10 @@ It uses SWC under the hood for super fast build, run, and test times.
 - Serving files from Amazon S3 ✅
 - Tests using Jest ✅
 
+## Contributions
+
+- Contributions are welcome, just make a pull request
+
 ## Building and testing
 
 - To build the project run `npx @skulpture/serve build`

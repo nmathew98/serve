@@ -1,6 +1,6 @@
 export interface Sudoku {
 	validate: (puzzle: string) => boolean;
-	isCoordinateValid: (
+	isCoordinateValueValid: (
 		puzzle: string,
 		row: string,
 		column: number,
@@ -147,7 +147,7 @@ export default function buildMakeSudoku({ Graph }: { Graph: Graph }) {
 		const neighbors = Graph.neighbors(node, graph);
 
 		for (const neighbor of neighbors)
-			if (getNodeColor(neighbor) === color) return true;
+			if (getNodeColor(neighbor) === color) return false;
 
 		return true;
 	};
@@ -165,7 +165,7 @@ export default function buildMakeSudoku({ Graph }: { Graph: Graph }) {
 
 				return true;
 			},
-			isCoordinateValid(puzzle: string, row, column, value) {
+			isCoordinateValueValid(puzzle: string, row, column, value) {
 				this.validate(puzzle);
 
 				const getCharCode = (char: string) => char.toUpperCase().charCodeAt(0);
