@@ -16,9 +16,10 @@ import { Listener } from "../listeners";
 import { Colors } from "../../adapters/colors/colors";
 import { Emoji } from "../../adapters/emoji/emoji";
 import API from "../../routes/api/api";
-import StorageUpload from "../../routes/storage-upload/storage-upload";
-import StorageRemove from "../../routes/storage-remove/storage-remove";
-import { findOutputDirectory } from "../../utilities/directory/directory";
+import StorageUpload from "../../routes/storage/upload/upload";
+import StorageRemove from "../../routes/storage/remove/remove";
+import { findOutputDirectory, walk } from "../../utilities/directory/directory";
+import { BaseRoute } from "../../routes/route";
 
 export default function buildMakeH3Listener({
 	Logger,
@@ -32,17 +33,6 @@ export default function buildMakeH3Listener({
 	return function makeH3Listener(context: ServeContext): Listener {
 		const h3: H3 = createApp();
 		const router = createRouter();
-
-		let routeBlacklist: string[];
-
-		if (!context.has("configuration:route:blacklist")) routeBlacklist = [];
-		else routeBlacklist = context.get("configuration:route:blacklist");
-
-		if (!Array.isArray(routeBlacklist))
-			throw new Error("Route blacklist must be a string array");
-		if (Array.isArray(routeBlacklist) && routeBlacklist.length > 0)
-			if (!routeBlacklist.every(item => typeof item === "string"))
-				throw new Error("Route blacklist must be a string array");
 
 		const initializeRequestHandlers = async () => {
 			let corsConfiguration: Record<string, any> = Object.create(null);
@@ -75,7 +65,6 @@ export default function buildMakeH3Listener({
 		};
 
 		const initializeInternalRoutes = () => {
-			routeBlacklist.push(getApiRouteFolderName(context));
 			const apiRoute = new API();
 
 			(apiRoute as any).useRoute(h3, context);
@@ -102,15 +91,16 @@ export default function buildMakeH3Listener({
 					.filter(file => file.isDirectory())
 					.map(directory => directory.name);
 
-				for (const route of routes) {
-					if (!routeBlacklist.includes(route)) {
-						const routePath = getRoutePath(rootDirectory, route);
+				for (const parentRoute of routes) {
+					for await (const route of walk(`${rootDirectory}/${parentRoute}`)) {
+						const { default: importedRouteClass } = await import(route);
 
-						const { default: importedRouteClass } = await import(routePath);
+						if (importedRouteClass && isConstructor(importedRouteClass)) {
+							const importedRoute = new importedRouteClass(context);
 
-						const importedRoute = new importedRouteClass(context);
-
-						importedRoute.useRoute(router, context);
+							if (importedRoute instanceof BaseRoute)
+								(importedRoute as any).useRoute(router, context);
+						}
 					}
 				}
 
@@ -128,7 +118,6 @@ export default function buildMakeH3Listener({
 			listen: async () => {
 				const port = +(process.env.PORT ?? "3000");
 
-				context.set(`test:h3`, h3);
 				createServer(h3).listen(port);
 				Logger.log(
 					Colors.brightGreen(`[H3] Listening on port ${port}!`),
@@ -139,15 +128,11 @@ export default function buildMakeH3Listener({
 	};
 }
 
-function getRoutePath(base: string, folder: string) {
-	return `${base.toLowerCase()}/${folder.toLowerCase()}/${folder.toLowerCase()}`;
-}
-
-function getApiRouteFolderName(context: ServeContext) {
-	let path: string;
-	if (context.has("configuration:routes:api:path"))
-		path = context.get("configuration:routes:api:path");
-	else path = "/api";
-
-	return path.replaceAll("/", "");
+function isConstructor(f: any) {
+	try {
+		new f();
+		return true;
+	} catch (error: any) {
+		return false;
+	}
 }

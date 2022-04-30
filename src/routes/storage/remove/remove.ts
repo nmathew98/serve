@@ -1,8 +1,8 @@
 import { IncomingMessage, ServerResponse } from "h3";
-import { Upload } from "../../adapters/upload/upload";
-import { ServeContext } from "../../listeners/context/context";
-import { sendSuccess, sendError, VerifyAuthorization } from "../utilities";
-import { BaseRoute, Methods, Modules, Route } from "../route";
+import { Upload } from "../../../adapters/upload/upload";
+import { ServeContext } from "../../../listeners/context/context";
+import { sendSuccess, sendError, VerifyAuthorization } from "../../utilities";
+import { BaseRoute, Methods, Modules, Route } from "../../route";
 
 @Methods("post")
 @Modules("Upload")

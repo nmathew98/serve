@@ -34,7 +34,7 @@
 	},
 	"dependencies": {
 		"@aws-sdk/client-s3": "^3.80.0",
-		"@skulpture/serve": "^5.3.1",
+		"@skulpture/serve": "^5.4.0-dev-1",
 		"bcryptjs": "^2.4.3",
 		"busboy": "^1.6.0",
 		"dotenv": "^16.0.0",
