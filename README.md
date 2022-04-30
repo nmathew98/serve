@@ -10,6 +10,7 @@ It uses SWC under the hood for super fast build, run, and test times.
 
 - Minified builds for fast build, run and test times ✅
 - Auto loaded entities and adapters ✅
+- Auto loaded routes ✅
 - Auto imported composables for better code reuse ✅
 - Auto generated types for composables ✅
 - Quick test times ✅
@@ -25,6 +26,7 @@ It uses SWC under the hood for super fast build, run, and test times.
 ### Functionality demonstrated
 
 - Entity objects and adapters ✅
+- Auto loaded routes ✅
 - Composables ✅
 - GraphQL queries and mutations ✅
 - Authorized routes and unauthorized routes ✅
@@ -81,8 +83,13 @@ The reason for the strict directory structure is to insulate the core business r
 
   The names of the file must always be lowercase and if it is multi-word, the words are separated by a hyphen.
 
-- All routes must adhere to the `Route` interface.
-- Add your mutations, queries, subscriptions and types to `src/external/routes/api/mutations`, `src/external/routes/api/queries`, `src/external/routes/api/subscriptions` and `src/external/routes/api/types` respectively.
+- All routes must extend the `BaseRoute` abstract class and provide an implementation of the abstract `use` method.
+
+- The package comes with routes defined for the api and routes for uploading and removing files at `/api`, `/storage/upload` and `/storage/remove`.
+
+- The default `/api` route uses GraphQL.
+
+  Add your mutations, queries, subscriptions and types to `src/external/routes/api/mutations`, `src/external/routes/api/queries`, `src/external/routes/api/subscriptions` and `src/external/routes/api/types` respectively.
 
   Each GraphQL query, mutation, type or subscription must be in a folder with the same name as the file within it with a default function export.
 
