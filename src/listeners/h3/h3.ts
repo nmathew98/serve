@@ -99,7 +99,8 @@ export default function buildMakeH3Listener({
 							const importedRoute = new importedRouteClass(context);
 
 							if (importedRoute instanceof BaseRoute)
-								(importedRoute as any).useRoute(router, context);
+								if ((importedRoute as any).useRoute)
+									(importedRoute as any).useRoute(router, context);
 						}
 					}
 				}
