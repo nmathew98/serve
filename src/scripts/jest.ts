@@ -1,10 +1,8 @@
-/* eslint no-console: "off" */
-
 import { spawn } from "child_process";
 import { resolve } from "path";
-import CliColors from "../adapters/colors/colors";
 import { copyFile, unlink } from "fs/promises";
-import { findRootDirectory } from "../utilities/directory/directory";
+import Consola from "../adapters/logger/logger";
+import findRootDirectory from "../composables/find-root-directory";
 
 export default async function jest(args: string[]) {
 	const projectDirectory = await findRootDirectory();
@@ -28,9 +26,9 @@ export default async function jest(args: string[]) {
 	});
 
 	jest.on("error", error => {
-		console.error(CliColors.red("Error while running jest"));
-		console.error(CliColors.red(error.message));
+		Consola.error("Error while running jest");
+		Consola.error(error.message);
 
-		if (error.stack) console.error(CliColors.red(error.stack));
+		if (error.stack) Consola.error(error.stack);
 	});
 }

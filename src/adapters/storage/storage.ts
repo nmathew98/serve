@@ -1,24 +1,24 @@
 import { IncomingMessage, ServerResponse } from "h3";
 import { Readable } from "stream";
 
-export interface Upload {
+export interface Storage {
 	/**
 	 * Handle a file upload
 	 */
-	handle: UploadHandler;
+	upload: StorageHandler;
 
 	/**
 	 * Remove a file
 	 */
-	remove: UploadHandler;
+	remove: StorageHandler;
 
 	/**
 	 * Stream a file
 	 */
-	stream: UploadHandler;
+	stream: StorageHandler;
 }
 
-type UploadHandler = (
+type StorageHandler = (
 	request: IncomingMessage,
 	response: ServerResponse,
 ) => Promise<Record<string, any> | Readable>;

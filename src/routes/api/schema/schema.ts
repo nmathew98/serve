@@ -16,27 +16,25 @@ export default async function useSchema(
 	request: IncomingMessage,
 	response: ServerResponse,
 	context: ServeContext,
+	requiresSubscription: boolean = false,
 ) {
 	const configuration: GraphQLSchemaConfig = {
 		query: await createQuery(request, response, context, useQueries),
 		mutation: await createMutation(request, response, context, useMutations),
-		types: await useTypes(context),
+		types: await useTypes(),
 	};
 
-	if (context.has("configuration:graphql:subscription"))
-		if (context.get("configuration:graphql:subscription"))
-			configuration.subscription = await createSubscription(
-				request,
-				response,
-				context,
-				useSubscription,
-			);
+	if (requiresSubscription)
+		configuration.subscription = await createSubscription(
+			request,
+			response,
+			context,
+			useSubscription,
+		);
 
 	const schema = new GraphQLSchema(configuration);
 
-	if (context.has("configuration:graphql:subscription"))
-		if (context.get("configuration:graphql:subscription"))
-			context.set("configuration:graphql:schema", schema);
+	if (requiresSubscription) context.set("graphql:schema", schema);
 
 	return schema;
 }

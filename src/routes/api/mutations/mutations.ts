@@ -2,11 +2,10 @@ import { ServeContext } from "../../../listeners/context/context";
 import { ThunkObjMap, GraphQLFieldConfig } from "graphql";
 import { IncomingMessage, ServerResponse } from "h3";
 import { resolve } from "path/posix";
-import { readdir } from "fs/promises";
-import { getApiRouteFolderName } from "../../../routes/utilities";
-import { findOutputDirectory } from "../../../utilities/directory/directory";
-import Winston from "../../../adapters/logger/logger";
-import CliColors from "../../../adapters/colors/colors";
+import Consola from "../../../adapters/logger/logger";
+import findRootDirectory from "../../../composables/find-root-directory";
+import ls from "../../../composables/ls";
+import isJavaScript from "../../../composables/is-javascript";
 
 export default async function useMutations(
 	request: IncomingMessage,
@@ -16,33 +15,28 @@ export default async function useMutations(
 	let mutations: GraphQLField = Object.create(null);
 
 	try {
-		const apiRouteFolder = getApiRouteFolderName(context);
-		const sourceDirectory = await findOutputDirectory();
-		const rootDirectory = resolve(
-			sourceDirectory,
-			`./external/routes/${apiRouteFolder}/mutations`,
+		const rootDirectory = await findRootDirectory();
+		const mutationsDirectory = resolve(
+			rootDirectory,
+			"./external/routes/api/mutations",
 		);
-		const files = await readdir(rootDirectory, {
-			withFileTypes: true,
-		});
-		const folders = files
-			.filter(file => file.isDirectory())
-			.map(directory => directory.name);
 
-		for (const folder of folders) {
-			const mutationPath = resolve(rootDirectory, folder, folder);
+		for await (const file of ls(mutationsDirectory)) {
+			if (isJavaScript(file)) {
+				const imported = await import(file);
 
-			const { default: useMutation }: GraphQLMutationImport = await import(
-				mutationPath
-			);
+				if (imported.default && typeof imported.default === "function") {
+					const useMutation: GraphQLMutationHandler = imported.default;
 
-			mutations = {
-				...mutations,
-				...useMutation(context, request, response),
-			};
+					mutations = {
+						...mutations,
+						...useMutation(context, request, response),
+					};
+				}
+			}
 		}
 	} catch (error: any) {
-		Winston.error(CliColors.red("Unable to load GraphQL mutations"));
+		Consola.error("Unable to load GraphQL mutations");
 	}
 
 	return mutations;
@@ -54,4 +48,3 @@ export type GraphQLMutationHandler = (
 	response: ServerResponse,
 ) => GraphQLField;
 type GraphQLField = ThunkObjMap<GraphQLFieldConfig<any, any, any>>;
-type GraphQLMutationImport = { default: GraphQLMutationHandler };

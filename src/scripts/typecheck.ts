@@ -1,17 +1,14 @@
-/* eslint no-console: "off" */
-
 import { spawn } from "child_process";
-import { NodeEmoji } from "..";
-import CliColors from "../adapters/colors/colors";
-import generateComposableDeclarations from "../plugins/composables/composables";
-import { findRootDirectory } from "../utilities/directory/directory";
+import Consola from "../adapters/logger/logger";
+import findRootDirectory from "../composables/find-root-directory";
+import generateDeclarations from "../composables/generate-declarations";
 
 export default async function typecheck(args: string[]) {
 	const projectDirectory = await findRootDirectory();
 
-	console.log(CliColors.yellow("Checking types ..."), NodeEmoji.hourglass);
+	Consola.log("Checking types ...");
 
-	await generateComposableDeclarations();
+	await generateDeclarations();
 
 	const typecheck = spawn("npx tsc", ["--noEmit", ...args], {
 		stdio: "inherit",
@@ -20,20 +17,16 @@ export default async function typecheck(args: string[]) {
 	});
 
 	typecheck.on("error", error => {
-		console.error(CliColors.red("Error while checking types"));
-		console.error(CliColors.red(error.message));
+		Consola.error("Error while checking types");
 
-		if (error.stack) console.error(CliColors.red(error.stack));
+		if (error.stack) Consola.error(error.stack);
 	});
 
 	typecheck.on("close", async code => {
 		if (!code) {
-			await generateComposableDeclarations();
+			await generateDeclarations();
 
-			console.log(
-				CliColors.brightGreen("Looks good"),
-				NodeEmoji.whiteCheckMark,
-			);
+			Consola.success("Looks good");
 		}
 	});
 }

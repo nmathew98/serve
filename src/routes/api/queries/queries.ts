@@ -2,11 +2,10 @@ import { ServeContext } from "../../../listeners/context/context";
 import { ThunkObjMap, GraphQLFieldConfig } from "graphql";
 import { IncomingMessage, ServerResponse } from "h3";
 import { resolve } from "path/posix";
-import { readdir } from "fs/promises";
-import { getApiRouteFolderName } from "../../../routes/utilities";
-import { findOutputDirectory } from "../../../utilities/directory/directory";
-import Winston from "../../../adapters/logger/logger";
-import CliColors from "../../../adapters/colors/colors";
+import Consola from "../../../adapters/logger/logger";
+import findRootDirectory from "../../../composables/find-root-directory";
+import ls from "../../../composables/ls";
+import isJavaScript from "../../../composables/is-javascript";
 
 export default async function useQueries(
 	request: IncomingMessage,
@@ -16,31 +15,28 @@ export default async function useQueries(
 	let queries: GraphQLField = Object.create(null);
 
 	try {
-		const apiRouteFolder = getApiRouteFolderName(context);
-		const sourceDirectory = await findOutputDirectory();
-		const rootDirectory = resolve(
-			sourceDirectory,
-			`./external/routes/${apiRouteFolder}/queries`,
+		const rootDirectory = await findRootDirectory();
+		const queriesDirectory = resolve(
+			rootDirectory,
+			"./external/routes/api/queries",
 		);
-		const files = await readdir(rootDirectory, {
-			withFileTypes: true,
-		});
-		const folders = files
-			.filter(file => file.isDirectory())
-			.map(directory => directory.name);
 
-		for (const folder of folders) {
-			const queryPath = resolve(rootDirectory, folder, folder);
+		for await (const file of ls(queriesDirectory)) {
+			if (isJavaScript(file)) {
+				const imported = await import(file);
 
-			const { default: useQuery }: GraphQLQueryImport = await import(queryPath);
+				if (imported.default && typeof imported.default === "function") {
+					const useMutation: GraphQLQueryHandler = imported.default;
 
-			queries = {
-				...queries,
-				...useQuery(context, request, response),
-			};
+					queries = {
+						...queries,
+						...useMutation(context, request, response),
+					};
+				}
+			}
 		}
 	} catch (error: any) {
-		Winston.error(CliColors.red("Unable to load GraphQL queries"));
+		Consola.error("Unable to load GraphQL queries");
 	}
 
 	return queries;
@@ -52,4 +48,3 @@ export type GraphQLQueryHandler = (
 	response: ServerResponse,
 ) => GraphQLField;
 type GraphQLField = ThunkObjMap<GraphQLFieldConfig<any, any, any>>;
-type GraphQLQueryImport = { default: GraphQLQueryHandler };

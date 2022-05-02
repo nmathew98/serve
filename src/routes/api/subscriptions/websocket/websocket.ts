@@ -2,7 +2,7 @@ import { Server, WebSocketServer } from "ws";
 import { useServer } from "graphql-ws/lib/use/ws";
 import { GraphQLSchema } from "graphql";
 import { ServeContext } from "../../../../listeners/context/context";
-import { Listener } from "../../../../listeners/listeners";
+import { Listener } from "../../../../listeners/h3/h3";
 
 export default function makeSubscriptionListener(
 	context: ServeContext,
@@ -11,12 +11,9 @@ export default function makeSubscriptionListener(
 
 	return Object.freeze({
 		initialize: async () => {
-			if (!context.has("configuration:graphql:schema")) return;
+			if (!context.has("graphql:schema")) return;
 
-			let port: number;
-
-			if (!context.has("configuration:graphql:ws:port")) port = 4000;
-			else port = context.get("configuration:graphql:ws:port");
+			let port: number = +(process.env.WS_PORT ?? "5000");
 
 			if (typeof port !== "number")
 				throw new TypeError("WebSocket port is invalid!");
@@ -27,15 +24,15 @@ export default function makeSubscriptionListener(
 			});
 		},
 		listen: async () => {
-			if (!context.has("configuration:graphql:schema")) return;
+			if (!context.has("graphql:schema")) return;
 
 			if (!server) throw new Error("WebSocket server not initialized");
 
-			const schema: GraphQLSchema = context.get("configuration:graphql:schema");
+			const schema: GraphQLSchema = context.get("graphql:schema");
 
 			useServer({ schema }, server);
 
-			context.set("configuration:graphql:ws:listening", true);
+			context.set("graphql:ws:listening", true);
 		},
 	});
 }

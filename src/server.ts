@@ -1,17 +1,15 @@
-import Winston from "./adapters/logger/logger";
-import CliColors from "./adapters/colors/colors";
-import Emoji from "./adapters/emoji/emoji";
-import buildMakeListeners, {
-	Listener,
-	ListenerMaker,
-} from "./listeners/listeners";
+import Consola from "./adapters/logger/logger";
 import makeContext, { ServeContext } from "./listeners/context/context";
 import buildMakeModuleLoader, {
 	ModuleLoader,
 	ModuleLoaderMaker,
-} from "./plugins/module-loader/module-loader";
+} from "./plugins/module-loader";
+import makeH3 from "./listeners/h3/h3";
+import loadConfig from "./composables/load-config";
+import findRootDirectory from "./composables/find-root-directory";
 
 const hooks: ServeHooks = Object.create(null);
+let config: Record<string, any> = Object.create(null);
 
 export async function initialize() {
 	try {
@@ -22,7 +20,7 @@ export async function initialize() {
 		await initializeScripts(context);
 		await listen(context);
 	} catch (error: any) {
-		return Winston.error(CliColors.red(error));
+		return Consola.error(error);
 	}
 }
 
@@ -53,6 +51,9 @@ interface ServeHooks {
 
 async function initializeConfig() {
 	if (hooks.projectConfiguration) await hooks.projectConfiguration();
+
+	const rootDirectory = await findRootDirectory();
+	config = loadConfig(rootDirectory);
 }
 
 async function initializeContext() {
@@ -60,7 +61,7 @@ async function initializeContext() {
 
 	if (hooks.serveConfiguration) await hooks.serveConfiguration(context);
 
-	context.set("Logger", Winston);
+	context.set("Logger", Consola);
 
 	return context;
 }
@@ -71,9 +72,7 @@ async function initializeEntityConfiguration(context: ServeContext) {
 
 async function initializeModules(context: ServeContext) {
 	const makeModuleLoader: ModuleLoaderMaker = buildMakeModuleLoader({
-		Logger: Winston,
-		Colors: CliColors,
-		Emoji: Emoji,
+		Logger: Consola,
 	});
 	const moduleLoader: ModuleLoader = makeModuleLoader(context);
 
@@ -85,13 +84,8 @@ async function initializeScripts(context: ServeContext) {
 }
 
 async function listen(context: ServeContext) {
-	const makeListeners: ListenerMaker = buildMakeListeners({
-		Logger: Winston,
-		Colors: CliColors,
-		Emoji: Emoji,
-	});
-	const listeners: Listener = makeListeners(context);
+	const h3 = makeH3(context, config);
 
-	await listeners.initialize();
-	await listeners.listen();
+	await h3.initialize();
+	await h3.listen();
 }

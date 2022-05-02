@@ -1,5 +1,4 @@
-import { ServeContext } from "../listeners/context/context";
-import { IncomingMessage, ServerResponse } from "h3";
+import { ServerResponse } from "h3";
 
 /**
  * Send an error response
@@ -16,7 +15,7 @@ export function sendError(
 ) {
 	response.statusCode = statusCode;
 
-	return { error };
+	return response.end({ error });
 }
 
 /**
@@ -34,7 +33,7 @@ export function sendSuccess(
 ) {
 	response.statusCode = statusCode;
 
-	return { result };
+	return response.end({ result });
 }
 
 /**
@@ -46,45 +45,6 @@ export function sendSuccess(
 export function useProduction<T = any>(x: T, y: T) {
 	return process.env.NODE_ENV === "production" ? x : y;
 }
-
-/**
- * Get the name of the folder which contains the api route
- *
- * @param {ServeContext} context the ServeContext
- * @returns the folder which contains the api route
- */
-export function getApiRouteFolderName(context: ServeContext) {
-	let path: string;
-	if (context.has("configuration:routes:api:path"))
-		path = context.get("configuration:routes:api:path");
-	else path = "/api";
-
-	return path.replaceAll("/", "");
-}
-
-/**
- * To verify the authorization status of a user
- *
- * @param {IncomingMessage} request The request from h3
- * @param {Record<string, any> | undefined} payload any other options which are needed
- * @returns a string or void
- */
-export type VerifyAuthorization = (
-	request: IncomingMessage,
-	payload?: Record<string, any>,
-) => Promise<string | Record<string, any> | void>;
-
-/**
- * To get the authorization confirmation of a user
- *
- * @param {IncomingMessage} request The request from h3
- * @param {Record<string, any> | undefined} payload any other options which are needed
- * @returns a string
- */
-export type GetAuthorization = (
-	request: IncomingMessage,
-	payload?: Record<string, any>,
-) => Promise<string | Record<string, any>>;
 
 /**
  * HTTP success status codes

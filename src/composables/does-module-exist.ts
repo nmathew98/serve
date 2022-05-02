@@ -1,6 +1,6 @@
 import { ServeContext } from "../listeners/context/context";
 
-export function doesModuleExist(
+export default function doesModuleExist(
 	context: ServeContext,
 	...moduleNames: string[]
 ) {

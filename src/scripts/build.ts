@@ -1,16 +1,13 @@
-/* eslint no-console: "off" */
-
 import { spawn } from "child_process";
 import { resolve } from "path";
-import { NodeEmoji } from "..";
-import CliColors from "../adapters/colors/colors";
-import generateComposableDeclarations from "../plugins/composables/composables";
-import { findRootDirectory } from "../utilities/directory/directory";
+import Consola from "../adapters/logger/logger";
+import findRootDirectory from "../composables/find-root-directory";
+import generateDeclarations from "../composables/generate-declarations";
 
 export default async function build(args: string[]) {
 	const projectDirectory = await findRootDirectory();
 
-	const output = process.env.OUTPUT_DIRECTORY ?? "dist";
+	const output = "dist";
 
 	const swcConfigPath = resolve(__dirname, "../../.swcrc");
 
@@ -18,11 +15,7 @@ export default async function build(args: string[]) {
 		`${projectDirectory}/package.json`
 	);
 
-	console.log(
-		CliColors.green(
-			`Building ${projectDetails.name}@${projectDetails.version} ...`,
-		),
-	);
+	Consola.log(`Building ${projectDetails.name}@${projectDetails.version} ...`);
 
 	const build = spawn(
 		"npx swc",
@@ -35,32 +28,21 @@ export default async function build(args: string[]) {
 	);
 
 	build.on("error", error => {
-		console.error(
-			CliColors.red("Error while building project"),
-			NodeEmoji.hourglass,
-		);
-		console.error(CliColors.red(error.message));
+		Consola.error("Error while building project");
+		Consola.error(error.message);
 
-		if (error.stack) console.error(CliColors.red(error.stack));
+		if (error.stack) Consola.error(error.stack);
 
 		process.exit(1);
 	});
 
 	build.on("close", async code => {
 		if (!code) {
-			await generateComposableDeclarations();
+			await generateDeclarations();
 
-			console.log(
-				CliColors.brightGreen(
-					`Built ${projectDetails.name}@${projectDetails.version}`,
-				),
-				NodeEmoji.whiteCheckMark,
-			);
+			Consola.success(`Built ${projectDetails.name}@${projectDetails.version}`);
 
-			console.log(
-				CliColors.yellow("Copying project details ..."),
-				NodeEmoji.hourglass,
-			);
+			Consola.log("Copying project details ...");
 
 			const cp = spawn("cp", [`./package.json`, `./${output}/package.json`], {
 				stdio: "inherit",
@@ -70,21 +52,12 @@ export default async function build(args: string[]) {
 
 			cp.on("close", code => {
 				if (!code) {
-					console.log(
-						CliColors.brightGreen("Copied project details"),
-						NodeEmoji.whiteCheckMark,
-					);
+					Consola.success("Copied project details");
 
-					console.log(
-						CliColors.yellow("Running postinstall scripts ..."),
-						NodeEmoji.hourglass,
-					);
+					Consola.log("Running postinstall scripts ...");
 
 					args.forEach(script => {
-						console.log(
-							CliColors.yellow(`Running ${script} ...`),
-							NodeEmoji.hourglass,
-						);
+						Consola.log(`Running ${script} ...`);
 
 						const spawnedInstance = spawn(`node ${script}`, {
 							stdio: "inherit",
@@ -93,19 +66,14 @@ export default async function build(args: string[]) {
 						});
 
 						spawnedInstance.on("close", code => {
-							if (!code) {
-								console.log(
-									CliColors.brightGreen(`Ran script ${script}`),
-									NodeEmoji.whiteCheckMark,
-								);
-							}
+							if (!code) Consola.success(`Ran script ${script}`);
 						});
 
 						spawnedInstance.on("error", error => {
-							console.error(CliColors.red(`Error while running ${script}`));
-							console.error(CliColors.red(error.message));
+							Consola.error(`Error while running ${script}`);
+							Consola.error(error.message);
 
-							if (error.stack) console.error(CliColors.red(error.stack));
+							if (error.stack) Consola.error(error.stack);
 
 							process.exit(1);
 						});
@@ -114,10 +82,10 @@ export default async function build(args: string[]) {
 			});
 
 			cp.on("error", error => {
-				console.error(CliColors.red("Error copying project details"));
-				console.error(CliColors.red(error.message));
+				Consola.error("Error copying project details");
+				Consola.error(error.message);
 
-				if (error.stack) console.error(CliColors.red(error.stack));
+				if (error.stack) Consola.error(error.stack);
 
 				process.exit(1);
 			});

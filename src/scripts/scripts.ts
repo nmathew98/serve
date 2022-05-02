@@ -6,15 +6,18 @@ import typecheck from "./typecheck";
 
 const args = process.argv.slice(2);
 
-switch (args[0]) {
+const scriptName = args[0];
+const scriptArgs = args.slice(1);
+
+switch (scriptName) {
 	case "build":
-		build(args.slice(1));
+		build(scriptArgs);
 		break;
 	case "jest":
-		jest(args.slice(1));
+		jest(scriptArgs);
 		break;
 	case "typecheck":
-		typecheck(args.slice(1));
+		typecheck(scriptArgs);
 		break;
 	default:
 		break;
