@@ -6,6 +6,7 @@ import Consola from "../../../adapters/logger/logger";
 import findRootDirectory from "../../../composables/find-root-directory";
 import ls from "../../../composables/ls";
 import isJavaScript from "../../../composables/is-javascript";
+import isPathValid from "../../../composables/is-path-valid";
 
 export default async function useMutations(
 	request: IncomingMessage,
@@ -22,17 +23,19 @@ export default async function useMutations(
 			"./external/routes/api/mutations",
 		);
 
-		for await (const file of ls(mutationsDirectory)) {
-			if (isJavaScript(file)) {
-				const imported = await import(file);
+		if (await isPathValid(mutationsDirectory)) {
+			for await (const file of ls(mutationsDirectory)) {
+				if (isJavaScript(file)) {
+					const imported = await import(file);
 
-				if (imported.default && typeof imported.default === "function") {
-					const useMutation: GraphQLMutationHandler = imported.default;
+					if (imported.default && typeof imported.default === "function") {
+						const useMutation: GraphQLMutationHandler = imported.default;
 
-					mutations = {
-						...mutations,
-						...useMutation(context, request, response),
-					};
+						mutations = {
+							...mutations,
+							...useMutation(context, request, response),
+						};
+					}
 				}
 			}
 		}

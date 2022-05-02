@@ -6,6 +6,7 @@ import Consola from "../../../adapters/logger/logger";
 import findRootDirectory from "../../../composables/find-root-directory";
 import ls from "../../../composables/ls";
 import isJavaScript from "../../../composables/is-javascript";
+import isPathValid from "../../../composables/is-path-valid";
 
 export default async function useSubscription(
 	request: IncomingMessage,
@@ -22,17 +23,20 @@ export default async function useSubscription(
 			"./external/routes/api/subscriptions",
 		);
 
-		for await (const file of ls(subscriptionsDirectory)) {
-			if (isJavaScript(file)) {
-				const imported = await import(file);
+		if (await isPathValid(subscriptionsDirectory)) {
+			for await (const file of ls(subscriptionsDirectory)) {
+				if (isJavaScript(file)) {
+					const imported = await import(file);
 
-				if (imported.default && typeof imported.default === "function") {
-					const useSubscription: GraphQLSubscriptionHandler = imported.default;
+					if (imported.default && typeof imported.default === "function") {
+						const useSubscription: GraphQLSubscriptionHandler =
+							imported.default;
 
-					subscriptions = {
-						...subscriptions,
-						...useSubscription(context, request, response),
-					};
+						subscriptions = {
+							...subscriptions,
+							...useSubscription(context, request, response),
+						};
+					}
 				}
 			}
 		}

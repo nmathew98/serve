@@ -6,6 +6,7 @@ import Consola from "../../../adapters/logger/logger";
 import findRootDirectory from "../../../composables/find-root-directory";
 import ls from "../../../composables/ls";
 import isJavaScript from "../../../composables/is-javascript";
+import isPathValid from "../../../composables/is-path-valid";
 
 export default async function useQueries(
 	request: IncomingMessage,
@@ -22,17 +23,19 @@ export default async function useQueries(
 			"./external/routes/api/queries",
 		);
 
-		for await (const file of ls(queriesDirectory)) {
-			if (isJavaScript(file)) {
-				const imported = await import(file);
+		if (await isPathValid(queriesDirectory)) {
+			for await (const file of ls(queriesDirectory)) {
+				if (isJavaScript(file)) {
+					const imported = await import(file);
 
-				if (imported.default && typeof imported.default === "function") {
-					const useQuery: GraphQLQueryHandler = imported.default;
+					if (imported.default && typeof imported.default === "function") {
+						const useQuery: GraphQLQueryHandler = imported.default;
 
-					queries = {
-						...queries,
-						...useQuery(context, request, response),
-					};
+						queries = {
+							...queries,
+							...useQuery(context, request, response),
+						};
+					}
 				}
 			}
 		}
