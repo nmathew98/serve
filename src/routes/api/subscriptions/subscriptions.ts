@@ -18,7 +18,8 @@ export default async function useSubscription(
 		const rootDirectory = await findRootDirectory();
 		const subscriptionsDirectory = resolve(
 			rootDirectory,
-			"./external/routes/api/queries",
+			"./dist",
+			"./external/routes/api/subscriptions",
 		);
 
 		for await (const file of ls(subscriptionsDirectory)) {

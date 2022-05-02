@@ -2,7 +2,6 @@
 export {
 	initialize,
 	useProjectConfiguration,
-	useServeConfiguration,
 	useEntityConfiguration,
 	useScripts,
 } from "./server";
@@ -27,6 +26,7 @@ export { Modules } from "./composables/decorators/modules";
 export { Protected } from "./composables/decorators/protected";
 
 // Route utilities
+export { BaseRoute, RouteError } from "./routes/route";
 export {
 	sendError,
 	sendSuccess,
@@ -35,7 +35,9 @@ export {
 	HttpSuccessCodes,
 } from "./routes/utilities";
 
-// GraphQL types
+// GraphQL utilities and types
+import doesModuleExist from "./composables/does-module-exist";
+export { doesModuleExist };
 export { GraphQLQueryHandler } from "./routes/api/queries/queries";
 export { GraphQLMutationHandler } from "./routes/api/mutations/mutations";
 export { GraphQLSubscriptionHandler } from "./routes/api/subscriptions/subscriptions";

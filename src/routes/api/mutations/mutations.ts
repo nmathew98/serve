@@ -18,6 +18,7 @@ export default async function useMutations(
 		const rootDirectory = await findRootDirectory();
 		const mutationsDirectory = resolve(
 			rootDirectory,
+			"./dist",
 			"./external/routes/api/mutations",
 		);
 

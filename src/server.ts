@@ -28,10 +28,6 @@ export function useProjectConfiguration(hook: () => Promise<void>) {
 	hooks.projectConfiguration = hook;
 }
 
-export function useServeConfiguration(hook: ServeHook) {
-	hooks.serveConfiguration = hook;
-}
-
 export function useEntityConfiguration(hook: ServeHook) {
 	hooks.entityConfiguration = hook;
 }
@@ -44,7 +40,6 @@ type ServeHook = (context: ServeContext) => Promise<void>;
 
 interface ServeHooks {
 	projectConfiguration?: () => Promise<void>;
-	serveConfiguration?: ServeHook;
 	entityConfiguration?: ServeHook;
 	scripts?: ServeHook;
 }
@@ -53,13 +48,11 @@ async function initializeConfig() {
 	if (hooks.projectConfiguration) await hooks.projectConfiguration();
 
 	const rootDirectory = await findRootDirectory();
-	config = loadConfig(rootDirectory);
+	config = await loadConfig(rootDirectory);
 }
 
 async function initializeContext() {
 	const context = makeContext();
-
-	if (hooks.serveConfiguration) await hooks.serveConfiguration(context);
 
 	context.set("Logger", Consola);
 

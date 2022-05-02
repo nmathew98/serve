@@ -4,7 +4,6 @@ import Hasher from "../../adapters/hasher/hasher";
 import { User, UserRecord } from "../../../entities/user/user";
 import {
 	Route,
-	GetAuthorization,
 	sendError,
 	sendSuccess,
 	RouteError,
@@ -13,6 +12,7 @@ import {
 	BaseRoute,
 	Methods,
 	Modules,
+	Authorization,
 } from "@skulpture/serve";
 
 const LocalStategy = passportLocal.Strategy;
@@ -66,22 +66,7 @@ export default class Login extends BaseRoute {
 		response: H3.ServerResponse,
 		context: ServeContext,
 	) {
-		{
-			if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET)
-				return sendError(
-					response,
-					"Access and refresh token secrets are not set",
-				);
-
-			if (!context.has("configuration:routes:authorization:get"))
-				return sendError(response, "Routes configured incorrectly");
-		}
-
-		const getAuthorization: GetAuthorization = context.get(
-			"configuration:routes:authorization:get",
-		);
-		if (typeof getAuthorization !== "function")
-			return sendError(response, "Routes configured incorrectly");
+		const Authorization: Authorization = context.get("Authorization");
 
 		try {
 			const user = (await passportAuthenticatePromisified(
@@ -91,12 +76,12 @@ export default class Login extends BaseRoute {
 
 			const body = await H3.useBody(request);
 
-			const accessToken = (await getAuthorization(request, {
+			const accessToken = (await Authorization.get(request, {
 				sub: user.uuid,
 				secret: ACCESS_TOKEN_SECRET,
 				expiresIn: body.rememberMe ? "1 hour" : "7 days",
 			})) as string;
-			const refreshToken = (await getAuthorization(request, {
+			const refreshToken = (await Authorization.get(request, {
 				sub: user.uuid,
 				secret: REFRESH_TOKEN_SECRET,
 				expiresIn: "7 days",

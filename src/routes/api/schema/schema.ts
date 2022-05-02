@@ -16,7 +16,7 @@ export default async function useSchema(
 	request: IncomingMessage,
 	response: ServerResponse,
 	context: ServeContext,
-	requiresSubscription: boolean = false,
+	requiresSubscription = false,
 ) {
 	const configuration: GraphQLSchemaConfig = {
 		query: await createQuery(request, response, context, useQueries),

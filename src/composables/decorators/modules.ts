@@ -3,7 +3,7 @@
  *
  * Must be used before the `Route` decorator
  *
- * @param {string} modules the modules the route uses
+ * @param {string[]} modules the modules the route uses
  */
 export function Modules<
 	T extends { new (...args: any[]): Record<string, any> },

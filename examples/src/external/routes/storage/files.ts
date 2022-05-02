@@ -10,11 +10,8 @@ import {
 } from "@skulpture/serve";
 
 @Methods("get")
-@Modules("Upload")
-@Protected({
-	accessTokenSecret: process.env.ACCESS_TOKEN_SECRET,
-	refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET,
-})
+@Modules("Storage")
+@Protected()
 @Route("/storage/files/:folder/:file")
 export default class StorageFiles extends BaseRoute {
 	async use(
@@ -22,7 +19,7 @@ export default class StorageFiles extends BaseRoute {
 		response: H3.ServerResponse,
 		context: ServeContext,
 	) {
-		const Upload = context.get("Upload");
+		const Upload = context.get("Storage");
 
 		try {
 			const stream = await Upload.stream(request, response);

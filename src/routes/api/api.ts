@@ -2,7 +2,7 @@ import { IncomingMessage, ServerResponse, useBody } from "h3";
 import { graphql, GraphQLSchema } from "graphql";
 import { ServeContext } from "../../listeners/context/context";
 import { BaseRoute } from "../../routes/route";
-import { sendError, sendSuccess } from "../../routes/utilities";
+import { sendError } from "../../routes/utilities";
 import useSchema from "./schema/schema";
 import makeSubscriptionListener from "./subscriptions/websocket/websocket";
 import { Methods } from "../../composables/decorators/methods";
@@ -13,12 +13,15 @@ let schema: GraphQLSchema;
 @Methods("post")
 @Route("/api")
 export default class API extends BaseRoute {
-	private requiresSubscriptions: boolean = false;
+	private requiresSubscriptions = false;
+	// @ts-expect-error Only used by the decorator
+	private protected = true;
 
 	constructor(config: Record<string, any>) {
 		super();
 
 		this.requiresSubscriptions = !!config.routes.api.graphql.subscription;
+		this.protected = !!config.routes.api.protect;
 	}
 
 	async use(
@@ -54,7 +57,10 @@ export default class API extends BaseRoute {
 					await ws.listen();
 				}
 
-			return sendSuccess(response, result);
+			response.statusCode = 200;
+			response.setHeader("Content-Type", "application/json");
+
+			return response.end(JSON.stringify(result));
 		} catch (error: any) {
 			return sendError(response, { error: error.message, stack: error.stack });
 		}

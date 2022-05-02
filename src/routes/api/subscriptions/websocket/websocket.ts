@@ -13,7 +13,7 @@ export default function makeSubscriptionListener(
 		initialize: async () => {
 			if (!context.has("graphql:schema")) return;
 
-			let port: number = +(process.env.WS_PORT ?? "5000");
+			const port: number = +(process.env.WS_PORT ?? "5000");
 
 			if (typeof port !== "number")
 				throw new TypeError("WebSocket port is invalid!");

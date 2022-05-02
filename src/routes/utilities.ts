@@ -14,8 +14,9 @@ export function sendError(
 	statusCode: HttpErrorCodes = 500,
 ) {
 	response.statusCode = statusCode;
+	response.setHeader("Content-Type", "application/json");
 
-	return response.end({ error });
+	return response.end(JSON.stringify({ error }));
 }
 
 /**
@@ -32,8 +33,9 @@ export function sendSuccess(
 	statusCode: HttpSuccessCodes = 200,
 ) {
 	response.statusCode = statusCode;
+	response.setHeader("Content-Type", "application/json");
 
-	return response.end({ result });
+	return response.end(JSON.stringify({ result }));
 }
 
 /**

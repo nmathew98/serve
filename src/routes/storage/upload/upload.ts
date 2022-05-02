@@ -8,9 +8,18 @@ import { Modules } from "../../../composables/decorators/modules";
 import { Route } from "../../../composables/decorators/route";
 
 @Methods("post")
-@Modules("Upload")
+@Modules("Storage")
 @Route("/storage/upload")
 export default class StorageUpload extends BaseRoute {
+	// @ts-expect-error Only used by the decorator
+	private protected = true;
+
+	constructor(config: Record<string, any>) {
+		super();
+
+		this.protected = !!config.routes.api.protect;
+	}
+
 	async use(
 		request: IncomingMessage,
 		response: ServerResponse,

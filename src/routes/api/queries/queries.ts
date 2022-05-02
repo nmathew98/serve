@@ -18,6 +18,7 @@ export default async function useQueries(
 		const rootDirectory = await findRootDirectory();
 		const queriesDirectory = resolve(
 			rootDirectory,
+			"./dist",
 			"./external/routes/api/queries",
 		);
 
@@ -26,11 +27,11 @@ export default async function useQueries(
 				const imported = await import(file);
 
 				if (imported.default && typeof imported.default === "function") {
-					const useMutation: GraphQLQueryHandler = imported.default;
+					const useQuery: GraphQLQueryHandler = imported.default;
 
 					queries = {
 						...queries,
-						...useMutation(context, request, response),
+						...useQuery(context, request, response),
 					};
 				}
 			}

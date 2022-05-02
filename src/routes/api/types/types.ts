@@ -12,7 +12,8 @@ export default async function useTypes(): Promise<GraphQLInterfaceType[]> {
 		const rootDirectory = await findRootDirectory();
 		const subscriptionsDirectory = resolve(
 			rootDirectory,
-			"./external/routes/api/queries",
+			"./dist",
+			"./external/routes/api/types",
 		);
 
 		for await (const file of ls(subscriptionsDirectory)) {
@@ -29,7 +30,7 @@ export default async function useTypes(): Promise<GraphQLInterfaceType[]> {
 			}
 		}
 	} catch (error: any) {
-		Consola.error("Unable to load GraphQL subscriptions");
+		Consola.error("Unable to load GraphQL types");
 	}
 
 	return types;

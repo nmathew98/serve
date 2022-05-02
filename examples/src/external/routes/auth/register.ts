@@ -1,13 +1,13 @@
 import {
 	ServeContext,
 	Route,
-	GetAuthorization,
 	sendError,
 	sendSuccess,
 	H3,
 	BaseRoute,
 	Methods,
 	Modules,
+	Authorization,
 } from "@skulpture/serve";
 import { User, UserRecord } from "../../../entities/user/user";
 
@@ -23,22 +23,7 @@ export default class Register extends BaseRoute {
 		response: H3.ServerResponse,
 		context: ServeContext,
 	) {
-		{
-			if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET)
-				return sendError(
-					response,
-					"Access and refresh token secrets are not set",
-				);
-
-			if (!context.has("configuration:routes:authorization:get"))
-				return sendError(response, "Routes configured incorrectly");
-		}
-
-		const getAuthorization: GetAuthorization = context.get(
-			"configuration:routes:authorization:get",
-		);
-		if (typeof getAuthorization !== "function")
-			return sendError(response, "Routes configured incorrectly");
+		const Authorization: Authorization = context.get("Authorization");
 
 		try {
 			const User: User = context.get("User");
@@ -57,12 +42,12 @@ export default class Register extends BaseRoute {
 
 			const user = foundUsers.pop() as UserRecord;
 
-			const accessToken = (await getAuthorization(request, {
+			const accessToken = (await Authorization.get(request, {
 				sub: user.uuid,
 				secret: ACCESS_TOKEN_SECRET,
 				expiresIn: "1 hour",
 			})) as string;
-			const refreshToken = (await getAuthorization(request, {
+			const refreshToken = (await Authorization.get(request, {
 				sub: user.uuid,
 				secret: REFRESH_TOKEN_SECRET,
 				expiresIn: "7 days",

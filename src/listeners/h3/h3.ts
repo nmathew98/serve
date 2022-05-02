@@ -52,9 +52,9 @@ export default function makeH3(
 
 		(apiRoute as any).useRoute(h3, context);
 
-		if (config.routes.upload.enabled) {
-			const storageUploadRoute = new StorageUpload();
-			const storageRemoveRoute = new StorageRemove();
+		if (config.routes.storage.enabled) {
+			const storageUploadRoute = new StorageUpload(config);
+			const storageRemoveRoute = new StorageRemove(config);
 
 			(storageUploadRoute as any).useRoute(h3, context);
 			(storageRemoveRoute as any).useRoute(h3, context);

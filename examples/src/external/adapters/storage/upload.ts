@@ -6,11 +6,11 @@ import {
 	GetObjectCommand,
 } from "@aws-sdk/client-s3";
 import {
+	Consola,
 	H3,
 	RouteError,
-	Upload,
+	Storage,
 	useProduction,
-	Winston,
 } from "@skulpture/serve";
 import busboy from "busboy";
 import crypto from "crypto";
@@ -39,8 +39,8 @@ const Bucket = useProduction(
 	process.env.S3_BUCKET_DEV as string,
 );
 
-const Upload: Upload = {
-	handle: request => {
+const Storage: Storage = {
+	upload: request => {
 		return new Promise((resolve, reject) => {
 			const identifiers: Record<string, string> = Object.create(null);
 			const uploadedFile: {
@@ -120,7 +120,7 @@ const Upload: Upload = {
 						}),
 					)
 					.catch((error: any) => {
-						Winston.error(error.message);
+						Consola.error(error.message);
 					});
 			});
 
@@ -162,7 +162,7 @@ const Upload: Upload = {
 	},
 };
 
-export default Upload;
+export default Storage;
 
 function getFileUrl(folder: string, filename: string) {
 	const productionServerBase = process.env.PROD_SERVER_BASE as string;

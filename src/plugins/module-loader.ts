@@ -43,7 +43,6 @@ export default function buildMakeModuleLoader({
 
 					if (fileName) {
 						const adapterName = convertCase(fileName.replace(".js", ""));
-						Logger.log(`Loading adapter: ${adapterName}`);
 
 						const { default: adapterImport }: AdapterImport = await import(
 							file
@@ -63,16 +62,13 @@ export default function buildMakeModuleLoader({
 		const composables = await findComposables();
 
 		for (const composable of composables) {
-			Logger.log(`Loading composable: ${composable.name}`);
-
 			const { default: fn } = await import(composable.dist);
 
 			// @ts-expect-error The types for the composable will be generated
 			global[`build${composable.name}`] = fn;
 
-			Logger.log(`Loaded composable: ${composable.name}`);
+			Logger.success(`Loaded composable: ${composable.name}`);
 		}
-		Logger.log();
 	};
 
 	return function makeModuleLoader(context): ModuleLoader {
@@ -89,11 +85,10 @@ export default function buildMakeModuleLoader({
 					if (isJavaScript(file)) {
 						const filenameRegex = /[\w\d]*.js/;
 
-						if (filenameRegex.test(file)) {
+						if (isJavaScript(file)) {
 							const fileName = file.match(filenameRegex)?.pop();
 							if (fileName) {
 								const entityName = convertCase(fileName.replace(".js", ""));
-								Logger.log(`Loading adapter: ${entityName}`);
 
 								const { default: buildMakeEntity }: EntityImport = await import(
 									file

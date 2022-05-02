@@ -22,7 +22,7 @@ export async function findComposables(): Promise<Composable[]> {
 				foundComposables.push({
 					name: composableName,
 					src: file.replace(".ts", ""),
-					dist: file.replace(".ts", ""),
+					dist: file.replace("src", "dist").replace(".ts", ".js"),
 				});
 			}
 		}

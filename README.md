@@ -75,17 +75,11 @@ The reason for the strict directory structure is to insulate the core business r
 
   The builder function must be named in the format `buildMake${entity}` where `entity` is the name of the entity. Entities are accessible in the context which is provided to every route.
 
-  The entity `Test Entity` would have a builder function called `buildMakeTestEntity` and it will be accessible in the context by the key `TestEntity` while the entity `User` would have a builder function called `buildMakeUser` and it will be accessible in the context by the key `User`.
-
-- Entities and adapters must be placed in a file in a folder with the same name.
-
-  For example, the adapter `Test Adapter` would be placed in `src/external/adapters/test-adapter/test-adapter.ts` and the entity `User` would be placed in a folder called `src/entities/user/user.ts`.
-
-  The names of the file must always be lowercase and if it is multi-word, the words are separated by a hyphen.
+  Entities and adapters are available in the context that is provided to every route. Their names in context will be the pascal cased versions of their filenames, for example, the entity `test-entity.ts` would have the key `TestEntity`.
 
 - All routes must extend the `BaseRoute` abstract class and provide an implementation of the abstract `use` method.
 
-- The package comes with routes defined for the api and routes for uploading and removing files at `/api`, `/storage/upload` and `/storage/remove`.
+- The package comes with routes defined for the api and routes for uploading and removing files at `/api`, `/storage/upload` and `/storage/remove`. The storage routes require a `Storage` adapter.
 
 - The default `/api` route uses GraphQL.
 
