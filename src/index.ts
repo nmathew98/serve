@@ -43,3 +43,12 @@ export { GraphQLMutationHandler } from "./routes/api/mutations/mutations";
 export { GraphQLSubscriptionHandler } from "./routes/api/subscriptions/subscriptions";
 export { GraphQLTypeHandler } from "./routes/api/types/types";
 export { GraphQLField } from "./routes/api/schema/schema";
+
+// Other utlities
+// These utilities are provided because swc does not
+// preserve the directory structure
+import findRootDirectory from "./composables/find-root-directory";
+import createFolder from "./composables/create-folder";
+import isPathValid from "./composables/is-path-valid";
+import ls from "./composables/ls";
+export { findRootDirectory, createFolder, isPathValid, ls };
