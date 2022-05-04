@@ -50,5 +50,6 @@ export { GraphQLField } from "./routes/api/schema/schema";
 import findRootDirectory from "./composables/find-root-directory";
 import createFolder from "./composables/create-folder";
 import isPathValid from "./composables/is-path-valid";
+import useIn from "./composables/use-in";
 import ls from "./composables/ls";
-export { findRootDirectory, createFolder, isPathValid, ls };
+export { findRootDirectory, createFolder, isPathValid, ls, useIn };

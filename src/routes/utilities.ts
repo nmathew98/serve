@@ -1,4 +1,5 @@
 import { ServerResponse } from "h3";
+import useIn from "../composables/use-in";
 
 /**
  * Send an error response
@@ -45,7 +46,9 @@ export function sendSuccess(
  * @returns the appropriate value
  */
 export function useProduction<T = any>(x: T, y: T) {
-	return process.env.NODE_ENV === "production" ? x : y;
+	const useInProduction = useIn(process.env.NODE_ENV === "production");
+
+	return useInProduction(x, y);
 }
 
 /**

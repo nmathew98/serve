@@ -1,3 +1,5 @@
+import "module-alias/register";
+import moduleAlias from "module-alias";
 import Consola from "./adapters/logger/logger";
 import makeContext, { ServeContext } from "./listeners/context/context";
 import buildMakeModuleLoader, {
@@ -49,6 +51,13 @@ async function initializeConfig() {
 
 	const rootDirectory = await findRootDirectory();
 	config = await loadConfig(rootDirectory);
+
+	if (config.alias && typeof config.alias === "object")
+		for (const alias in config.alias) {
+			const path = config.alias[alias];
+			if (typeof path === "string")
+				moduleAlias.addAlias(alias, `${rootDirectory}/${path}`);
+		}
 }
 
 async function initializeContext() {
