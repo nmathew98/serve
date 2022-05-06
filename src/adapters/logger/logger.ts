@@ -43,14 +43,14 @@ const Consola: Logger = {
 
 			for (const arg of args)
 				if (typeof arg === "string") {
-					if (Sentry) Sentry.captureMessage(arg);
+					Sentry?.captureMessage(arg);
 					consola.error(arg);
 				} else if (arg instanceof Error) {
-					if (Sentry) Sentry.captureException(arg);
+					Sentry?.captureException(arg);
 					consola.error(arg.message);
 				}
 
-			if (transaction) transaction.finish();
+			transaction?.finish();
 		} catch (error: any) {
 			consola.error(error);
 		}
