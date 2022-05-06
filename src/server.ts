@@ -9,9 +9,12 @@ import buildMakeModuleLoader, {
 import makeH3 from "./listeners/h3/h3";
 import loadConfig from "./composables/load-config";
 import findRootDirectory from "./composables/find-root-directory";
+import isPackageInstalled from "./composables/is-package-installed";
+import installPackage from "./composables/install-package";
 
 const hooks: ServeHooks = Object.create(null);
 let config: Record<string, any> = Object.create(null);
+let Sentry: any;
 
 export async function initialize() {
 	try {
@@ -58,12 +61,35 @@ async function initializeConfig() {
 			if (typeof path === "string")
 				moduleAlias.addAlias(alias, `${rootDirectory}/${path}`);
 		}
+
+	if (config.sentry && typeof config.sentry === "object") {
+		const requiredPackages = ["@sentry/node", "@sentry/tracing"];
+
+		for (const pkg of requiredPackages) {
+			const isInstalled = await isPackageInstalled(pkg);
+
+			if (!isInstalled) await installPackage(pkg);
+		}
+
+		const sentry = requiredPackages[0] as string;
+		const sentryTracing = requiredPackages[1] as string;
+
+		Sentry = await import(sentry);
+
+		if (Sentry) {
+			await import(sentryTracing);
+
+			Sentry.init(config.sentry);
+		}
+	}
 }
 
 async function initializeContext() {
 	const context = makeContext();
 
 	context.set("Logger", Consola);
+
+	if (Sentry) context.set("Sentry", Sentry);
 
 	return context;
 }

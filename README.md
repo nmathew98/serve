@@ -18,6 +18,7 @@ It uses SWC under the hood for super fast build, run, and test times.
 - Static file serving routes already set up ✅
 - Sensible security headers set by default ✅
 - Lightweight and easy to extend ✅
+- Application monitoring with Sentry ✅
 
 ## Examples
 
