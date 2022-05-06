@@ -1,5 +1,6 @@
 import { ServerResponse } from "h3";
 import useIn from "../composables/use-in";
+import { ServeContext } from "../listeners/context/context";
 
 /**
  * Send an error response
@@ -13,9 +14,28 @@ export function sendError(
 	response: ServerResponse,
 	error: any,
 	statusCode: HttpErrorCodes = 500,
+	context?: ServeContext,
 ) {
 	response.statusCode = statusCode;
 	response.setHeader("Content-Type", "application/json");
+
+	if (context?.has("Sentry")) {
+		const currentDate = new Date();
+		const currentDateString = currentDate.toDateString();
+
+		const Sentry = context.get("Sentry");
+		const name = `${currentDateString} ${response.req.url} [${response.req.method}]`;
+
+		const transaction = Sentry.startTransaction({
+			op: "transaction",
+			name,
+		});
+
+		if (typeof error === "string") Sentry.captureMessage(error);
+		else if (error instanceof Error) Sentry.captureException(error);
+
+		transaction.finish();
+	}
 
 	return response.end(JSON.stringify({ error }));
 }

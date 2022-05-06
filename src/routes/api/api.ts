@@ -62,7 +62,12 @@ export default class API extends BaseRoute {
 
 			return response.end(JSON.stringify(result));
 		} catch (error: any) {
-			return sendError(response, { error: error.message, stack: error.stack });
+			return sendError(
+				response,
+				{ error: error.message, stack: error.stack },
+				undefined,
+				context,
+			);
 		}
 	}
 }

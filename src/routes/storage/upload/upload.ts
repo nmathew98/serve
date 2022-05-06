@@ -30,7 +30,7 @@ export default class StorageUpload extends BaseRoute {
 		try {
 			return sendSuccess(response, await Storage.upload(request, response));
 		} catch (error: any) {
-			return sendError(response, error.message, error?.statusCode);
+			return sendError(response, error.message, error?.statusCode, context);
 		}
 	}
 }
