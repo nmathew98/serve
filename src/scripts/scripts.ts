@@ -3,7 +3,6 @@
 import build from "./build";
 import jest from "./jest";
 import typecheck from "./typecheck";
-import update from "./update";
 
 const args = process.argv.slice(2);
 
@@ -19,9 +18,6 @@ switch (scriptName) {
 		break;
 	case "typecheck":
 		typecheck(scriptArgs);
-		break;
-	case "update":
-		update(scriptArgs);
 		break;
 	default:
 		break;
