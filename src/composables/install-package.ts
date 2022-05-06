@@ -6,7 +6,7 @@ import findRootDirectory from "./find-root-directory";
 export default async function installPackage({
 	name,
 	development = false,
-	internal = true,
+	internal = false,
 }: {
 	name: string;
 	development?: boolean;

@@ -12,14 +12,12 @@ export default async function jest(args: string[]) {
 	for (const pkg of requiredPackages) {
 		const isInstalled = await isPackageInstalled({
 			name: pkg,
-			internal: false,
 		});
 
 		if (!isInstalled)
 			await installPackage({
 				name: pkg,
 				development: true,
-				internal: false,
 			});
 	}
 

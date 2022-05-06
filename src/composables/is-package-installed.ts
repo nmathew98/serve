@@ -4,7 +4,7 @@ import isPathValid from "./is-path-valid";
 
 export default async function isPackageInstalled({
 	name,
-	internal = true,
+	internal = false,
 }: {
 	name: string;
 	internal?: boolean;
