@@ -23,11 +23,10 @@ const Consola: Logger = {
 	log: (...args: string[]) => consola.info(args.join(" ")),
 	error: async (...args: (string | Error)[]) => {
 		try {
-			const isSentryInstalled = await isPackageInstalled("@sentry/node");
-
 			const sentry = "@sentry/node";
 			let Sentry: any;
 
+			const isSentryInstalled = await isPackageInstalled({ name: sentry });
 			if (isSentryInstalled) Sentry = await import(sentry);
 
 			let transaction: any;

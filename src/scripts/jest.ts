@@ -10,9 +10,17 @@ export default async function jest(args: string[]) {
 	const requiredPackages = ["jest", "@swc/jest"];
 
 	for (const pkg of requiredPackages) {
-		const isInstalled = await isPackageInstalled(pkg);
+		const isInstalled = await isPackageInstalled({
+			name: pkg,
+			internal: false,
+		});
 
-		if (!isInstalled) await installPackage(pkg, true);
+		if (!isInstalled)
+			await installPackage({
+				name: pkg,
+				development: true,
+				internal: false,
+			});
 	}
 
 	const projectDirectory = await findRootDirectory();

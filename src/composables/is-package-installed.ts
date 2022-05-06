@@ -1,8 +1,18 @@
 import { resolve } from "path";
+import findRootDirectory from "./find-root-directory";
 import isPathValid from "./is-path-valid";
 
-export default async function isPackageInstalled(name: string) {
-	const rootDirectory = resolve(__dirname, "../../");
+export default async function isPackageInstalled({
+	name,
+	internal = true,
+}: {
+	name: string;
+	internal?: boolean;
+}) {
+	const projectDirectory = await findRootDirectory();
+	const serveDirectory = resolve(__dirname, "../../");
 
-	return await isPathValid(`${rootDirectory}/node_modules/${name}`);
+	return await isPathValid(
+		`${internal ? serveDirectory : projectDirectory}/node_modules/${name}`,
+	);
 }

@@ -66,9 +66,9 @@ async function initializeConfig() {
 		const requiredPackages = ["@sentry/node", "@sentry/tracing"];
 
 		for (const pkg of requiredPackages) {
-			const isInstalled = await isPackageInstalled(pkg);
+			const isInstalled = await isPackageInstalled({ name: pkg });
 
-			if (!isInstalled) await installPackage(pkg);
+			if (!isInstalled) await installPackage({ name: pkg });
 		}
 
 		const sentry = requiredPackages[0] as string;
