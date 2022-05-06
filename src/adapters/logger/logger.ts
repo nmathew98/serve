@@ -32,7 +32,7 @@ const Consola: Logger = {
 			let transaction: any;
 			if (Sentry) {
 				const currentDate = new Date();
-				const name = currentDate.toTimeString();
+				const name = currentDate.toDateString();
 
 				transaction = Sentry.startTransaction({
 					op: "transaction",
