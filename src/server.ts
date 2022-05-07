@@ -11,6 +11,8 @@ import loadConfig from "./composables/load-config";
 import findRootDirectory from "./composables/find-root-directory";
 import isPackageInstalled from "./composables/is-package-installed";
 import installPackage from "./composables/install-package";
+import { resolve } from "path";
+import dotenv from "dotenv";
 
 const hooks: ServeHooks = Object.create(null);
 let config: Record<string, any> = Object.create(null);
@@ -54,6 +56,10 @@ async function initializeConfig() {
 
 	const rootDirectory = await findRootDirectory();
 	config = await loadConfig(rootDirectory);
+	// While C12 loads .env files, it is loaded into the config object
+	// not into process.env and C12 is mainly used for Serve's
+	// configuration anyway
+	dotenv.config({ path: resolve(rootDirectory, "./.env") });
 
 	if (config.alias && typeof config.alias === "object")
 		for (const alias in config.alias) {
