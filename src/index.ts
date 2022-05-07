@@ -52,4 +52,5 @@ import createFolder from "./composables/create-folder";
 import isPathValid from "./composables/is-path-valid";
 import useIn from "./composables/use-in";
 import ls from "./composables/ls";
-export { findRootDirectory, createFolder, isPathValid, ls, useIn };
+import loadConfig from "./composables/load-config";
+export { findRootDirectory, createFolder, isPathValid, ls, useIn, loadConfig };

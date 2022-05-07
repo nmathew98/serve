@@ -48,9 +48,11 @@ export default function makeH3(
 	};
 
 	const initializeInternalRoutes = () => {
-		const apiRoute = new API(config);
+		if (config.routes.api.enabled) {
+			const apiRoute = new API(config);
 
-		(apiRoute as any).useRoute(h3, context);
+			(apiRoute as any).useRoute(h3, context);
+		}
 
 		if (config.routes.storage.enabled) {
 			const storageUploadRoute = new StorageUpload(config);

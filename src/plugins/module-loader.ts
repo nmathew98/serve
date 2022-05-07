@@ -7,6 +7,7 @@ import convertCase from "../composables/convert-case";
 import findRootDirectory from "../composables/find-root-directory";
 import getJavaScriptFilename from "../composables/get-js-filename";
 import { findComposables } from "../composables/find-composables";
+import isPathValid from "../composables/is-path-valid";
 
 export interface ModuleLoader {
 	/**
@@ -34,24 +35,26 @@ export default function buildMakeModuleLoader({
 	) => {
 		const adaptersPath = resolve(sourceDirectory, "./dist/external/adapters");
 
-		for await (const file of ls(adaptersPath)) {
-			if (isJavaScript(file)) {
-				const filenameRegex = /[\w\d]*.js/;
+		if (await isPathValid(adaptersPath)) {
+			for await (const file of ls(adaptersPath)) {
+				if (isJavaScript(file)) {
+					const filenameRegex = /[\w\d]*.js/;
 
-				if (filenameRegex.test(file)) {
-					const fileName = getJavaScriptFilename(file);
+					if (filenameRegex.test(file)) {
+						const fileName = getJavaScriptFilename(file);
 
-					if (fileName) {
-						const adapterName = convertCase(fileName.replace(".js", ""));
+						if (fileName) {
+							const adapterName = convertCase(fileName.replace(".js", ""));
 
-						const { default: adapterImport }: AdapterImport = await import(
-							file
-						);
+							const { default: adapterImport }: AdapterImport = await import(
+								file
+							);
 
-						adapters[adapterName] = adapterImport;
-						context.set(adapterName, adapterImport);
+							adapters[adapterName] = adapterImport;
+							context.set(adapterName, adapterImport);
 
-						Logger.success(`Loaded adapter: ${adapterName}`);
+							Logger.success(`Loaded adapter: ${adapterName}`);
+						}
 					}
 				}
 			}
@@ -81,38 +84,40 @@ export default function buildMakeModuleLoader({
 				await loadAdapters(rootDirectory, context);
 				await loadComposables();
 
-				for await (const file of ls(entitiesPath)) {
-					if (isJavaScript(file)) {
-						const filenameRegex = /[\w\d]*.js/;
-
+				if (await isPathValid(entitiesPath)) {
+					for await (const file of ls(entitiesPath)) {
 						if (isJavaScript(file)) {
-							const fileName = file.match(filenameRegex)?.pop();
-							if (fileName) {
-								const entityName = convertCase(fileName.replace(".js", ""));
+							const filenameRegex = /[\w\d]*.js/;
 
-								const { default: buildMakeEntity }: EntityImport = await import(
-									file
-								);
+							if (isJavaScript(file)) {
+								const fileName = file.match(filenameRegex)?.pop();
+								if (fileName) {
+									const entityName = convertCase(fileName.replace(".js", ""));
 
-								let entityConfiguration: any;
+									const { default: buildMakeEntity }: EntityImport =
+										await import(file);
 
-								const configurationKey = `configuration:${entityName}`;
+									let entityConfiguration: any;
 
-								if (!context.has(configurationKey))
-									entityConfiguration = Object.create(null);
-								else entityConfiguration = context.get(configurationKey);
+									const configurationKey = `configuration:${entityName}`;
 
-								if (typeof entityConfiguration !== "object")
-									throw new TypeError(
-										`Configuration for ${entityName} must be an object`,
-									);
+									if (!context.has(configurationKey))
+										entityConfiguration = Object.create(null);
+									else entityConfiguration = context.get(configurationKey);
 
-								const makeEntity: EntityMaker = buildMakeEntity(adapters);
-								const importedEntity: Entity = makeEntity(entityConfiguration);
+									if (typeof entityConfiguration !== "object")
+										throw new TypeError(
+											`Configuration for ${entityName} must be an object`,
+										);
 
-								context.set(entityName, importedEntity);
+									const makeEntity: EntityMaker = buildMakeEntity(adapters);
+									const importedEntity: Entity =
+										makeEntity(entityConfiguration);
 
-								Logger.success(`Loaded entity: ${entityName}`);
+									context.set(entityName, importedEntity);
+
+									Logger.success(`Loaded entity: ${entityName}`);
+								}
 							}
 						}
 					}

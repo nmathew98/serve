@@ -3,13 +3,20 @@ import { resolve } from "path";
 import Consola from "../adapters/logger/logger";
 import findRootDirectory from "../composables/find-root-directory";
 import generateDeclarations from "../composables/generate-declarations";
+import isPathValid from "../composables/is-path-valid";
 
 export default async function build(args: string[]) {
 	const projectDirectory = await findRootDirectory();
 
-	const output = "dist";
+	const projectSwcConfig = resolve(projectDirectory, "./.swcrc");
+	const localSwcConfig = resolve(__dirname, "../../.swcrc");
+	const doesProjectHaveSwcConfig = await isPathValid(projectSwcConfig);
 
-	const swcConfigPath = resolve(__dirname, "../../.swcrc");
+	const swcConfigPath = doesProjectHaveSwcConfig
+		? projectSwcConfig
+		: localSwcConfig;
+
+	const output = "dist";
 
 	const projectDetails: { name: string; version: string } = await import(
 		`${projectDirectory}/package.json`

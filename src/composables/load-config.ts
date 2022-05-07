@@ -1,9 +1,14 @@
 import { loadConfig as c12 } from "c12";
 
-export default async function loadConfig(cwd: string) {
-	const defaults = {
+export default async function loadConfig(
+	cwd: string,
+	name?: string,
+	defaults?: Record<string, any>,
+) {
+	const configDefaults = defaults ?? {
 		routes: {
 			api: {
+				enabled: true,
 				protect: true,
 				graphql: {
 					subscription: false,
@@ -18,9 +23,9 @@ export default async function loadConfig(cwd: string) {
 
 	const { config } = await c12({
 		cwd: cwd,
-		name: "serve",
+		name: name ?? "serve",
 		dotenv: true,
-		defaults,
+		defaults: configDefaults,
 	});
 
 	return config;
