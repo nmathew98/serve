@@ -1,5 +1,7 @@
 {
 	"minify": true,
+	"sourceMaps": true,
+	"inlineSourcesContent": true,
 	"jsc": {
 		"parser": {
 			"syntax": "typescript",

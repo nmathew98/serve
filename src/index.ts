@@ -53,4 +53,13 @@ import isPathValid from "./composables/is-path-valid";
 import useIn from "./composables/use-in";
 import ls from "./composables/ls";
 import loadConfig from "./composables/load-config";
-export { findRootDirectory, createFolder, isPathValid, ls, useIn, loadConfig };
+import decorateObject from "./composables/decorate-object";
+export {
+	findRootDirectory,
+	createFolder,
+	isPathValid,
+	ls,
+	useIn,
+	loadConfig,
+	decorateObject,
+};

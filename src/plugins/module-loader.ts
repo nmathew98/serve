@@ -46,9 +46,11 @@ export default function buildMakeModuleLoader({
 						if (fileName) {
 							const adapterName = convertCase(fileName.replace(".js", ""));
 
-							const { default: adapterImport }: AdapterImport = await import(
-								file
-							);
+							const adapterExports = await import(file);
+
+							if (!adapterExports.default) continue;
+
+							const adapterImport: Adapter = adapterExports.default;
 
 							adapters[adapterName] = adapterImport;
 							context.set(adapterName, adapterImport);
@@ -65,7 +67,11 @@ export default function buildMakeModuleLoader({
 		const composables = await findComposables();
 
 		for (const composable of composables) {
-			const { default: fn } = await import(composable.dist);
+			const composableExports = await import(composable.dist);
+
+			if (!composableExports.default) continue;
+
+			const fn = composableExports.default;
 
 			// @ts-expect-error The types for the composable will be generated
 			global[`build${composable.name}`] = fn;
@@ -94,8 +100,11 @@ export default function buildMakeModuleLoader({
 								if (fileName) {
 									const entityName = convertCase(fileName.replace(".js", ""));
 
-									const { default: buildMakeEntity }: EntityImport =
-										await import(file);
+									const entityExports = await import(file);
+
+									if (!entityExports.default) continue;
+
+									const buildMakeEntity: EntityBuilder = entityExports.default;
 
 									let entityConfiguration: any;
 
@@ -127,10 +136,8 @@ export default function buildMakeModuleLoader({
 	};
 }
 
-type EntityImport = { default: EntityBuilder };
 type EntityBuilder = (adapters: Record<string, any>) => EntityMaker;
 type EntityMaker = (configuration: Record<string, any>) => Entity;
 type Entity = Record<string, any>;
 
-type AdapterImport = { default: Adapter };
 type Adapter = Record<string, any>;

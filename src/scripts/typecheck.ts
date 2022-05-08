@@ -8,25 +8,33 @@ export default async function typecheck(args: string[]) {
 
 	Consola.log("Checking types ...");
 
-	await generateDeclarations();
+	try {
+		await generateDeclarations();
 
-	const typecheck = spawn("npx tsc", ["--noEmit", ...args], {
-		stdio: "inherit",
-		cwd: projectDirectory,
-		shell: true,
-	});
+		const typecheck = spawn("npx tsc", ["--noEmit", ...args], {
+			stdio: "inherit",
+			cwd: projectDirectory,
+			shell: true,
+		});
 
-	typecheck.on("error", error => {
-		Consola.error("Error while checking types");
+		typecheck.on("error", error => {
+			Consola.error("Error while checking types");
 
-		if (error.stack) Consola.error(error.stack);
-	});
+			if (error.stack) Consola.error(error.stack);
+		});
 
-	typecheck.on("close", async code => {
-		if (!code) {
-			await generateDeclarations();
+		typecheck.on("close", async code => {
+			if (!code) {
+				try {
+					await generateDeclarations();
+				} catch (error: any) {
+					Consola.error(error.message);
+				}
 
-			Consola.success("Looks good");
-		}
-	});
+				Consola.success("Looks good");
+			}
+		});
+	} catch (error: any) {
+		Consola.error(error.message);
+	}
 }

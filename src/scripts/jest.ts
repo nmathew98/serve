@@ -38,7 +38,11 @@ export default async function jest(args: string[]) {
 	);
 
 	jest.on("close", async () => {
-		await unlink(`${projectDirectory}/.jest.config.js`);
+		try {
+			await unlink(`${projectDirectory}/.jest.config.js`);
+		} catch (error: any) {
+			Consola.error(error.message);
+		}
 	});
 
 	jest.on("error", error => {

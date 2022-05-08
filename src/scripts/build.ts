@@ -26,7 +26,15 @@ export default async function build(args: string[]) {
 
 	const build = spawn(
 		"npx swc",
-		["./src", "-d", output, "--config-file", swcConfigPath],
+		[
+			"./src",
+			"-d",
+			output,
+			"--delete-dir-on-start",
+			"--copy-files",
+			"--config-file",
+			swcConfigPath,
+		],
 		{
 			stdio: "inherit",
 			cwd: projectDirectory,
@@ -61,30 +69,32 @@ export default async function build(args: string[]) {
 				if (!code) {
 					Consola.success("Copied project details");
 
-					Consola.log("Running postinstall scripts ...");
+					if (args && args.length) {
+						Consola.log("Running postinstall scripts ...");
 
-					args.forEach(script => {
-						Consola.log(`Running ${script} ...`);
+						args.forEach(script => {
+							Consola.log(`Running ${script} ...`);
 
-						const spawnedInstance = spawn(`node ${script}`, {
-							stdio: "inherit",
-							cwd: projectDirectory,
-							shell: true,
+							const spawnedInstance = spawn(`node ${script}`, {
+								stdio: "inherit",
+								cwd: projectDirectory,
+								shell: true,
+							});
+
+							spawnedInstance.on("close", code => {
+								if (!code) Consola.success(`Ran script ${script}`);
+							});
+
+							spawnedInstance.on("error", error => {
+								Consola.error(`Error while running ${script}`);
+								Consola.error(error.message);
+
+								if (error.stack) Consola.error(error.stack);
+
+								process.exit(1);
+							});
 						});
-
-						spawnedInstance.on("close", code => {
-							if (!code) Consola.success(`Ran script ${script}`);
-						});
-
-						spawnedInstance.on("error", error => {
-							Consola.error(`Error while running ${script}`);
-							Consola.error(error.message);
-
-							if (error.stack) Consola.error(error.stack);
-
-							process.exit(1);
-						});
-					});
+					}
 				}
 			});
 

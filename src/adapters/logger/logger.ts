@@ -1,4 +1,5 @@
 import consola from "consola";
+import decorateObject from "../../composables/decorate-object";
 import isPackageInstalled from "../../composables/is-package-installed";
 
 export interface Logger {
@@ -18,9 +19,13 @@ export interface Logger {
 	error: (...args: (string | Error)[]) => Promise<void>;
 }
 
-const Consola: Logger = {
-	success: (...args: string[]) => consola.success(args.join(" ")),
-	log: (...args: string[]) => consola.info(args.join(" ")),
+const Sentry: Logger = {
+	success: () => {
+		return;
+	},
+	log: () => {
+		return;
+	},
 	error: async (...args: (string | Error)[]) => {
 		try {
 			const sentry = "@sentry/node";
@@ -41,13 +46,8 @@ const Consola: Logger = {
 			}
 
 			for (const arg of args)
-				if (typeof arg === "string") {
-					Sentry?.captureMessage(arg);
-					consola.error(arg);
-				} else if (arg instanceof Error) {
-					Sentry?.captureException(arg);
-					consola.error(arg.message);
-				}
+				if (typeof arg === "string") Sentry?.captureMessage(arg);
+				else if (arg instanceof Error) Sentry?.captureException(arg);
 
 			transaction?.finish();
 		} catch (error: any) {
@@ -56,4 +56,16 @@ const Consola: Logger = {
 	},
 };
 
-export default Consola;
+const Consola: Logger = {
+	success: (...args: string[]) => consola.success(args.join(" ")),
+	log: (...args: string[]) => consola.info(args.join(" ")),
+	error: async (...args: (string | Error)[]) => {
+		for (const arg of args)
+			if (typeof arg === "string") consola.error(arg);
+			else if (arg instanceof Error) consola.error(arg.message);
+	},
+};
+
+const Logger: Logger = decorateObject<Logger>(Sentry, Consola);
+
+export default Logger;

@@ -18,6 +18,7 @@ import Consola from "../../adapters/logger/logger";
 import findRootDirectory from "../../composables/find-root-directory";
 import ls from "../../composables/ls";
 import isConstructor from "../../composables/is-constructor";
+import isJavaScript from "../../composables/is-javascript";
 
 export interface Listener {
 	initialize(): Promise<void>;
@@ -70,15 +71,21 @@ export default function makeH3(
 			const rootDirectory = await findRootDirectory();
 			const routes = resolve(rootDirectory, "./dist", "./external/routes/");
 
-			for await (const route of ls(routes)) {
-				const { default: importedRouteClass } = await import(route);
+			for await (const file of ls(routes)) {
+				if (isJavaScript(file)) {
+					const routeExports = await import(file);
 
-				if (importedRouteClass && isConstructor(importedRouteClass)) {
-					const importedRoute = new importedRouteClass(context);
+					if (!routeExports.default) continue;
 
-					if (importedRoute instanceof BaseRoute)
-						if ((importedRoute as any).useRoute)
-							(importedRoute as any).useRoute(router, context);
+					const importedRouteClass = routeExports.default;
+
+					if (importedRouteClass && isConstructor(importedRouteClass)) {
+						const importedRoute = new importedRouteClass(context);
+
+						if (importedRoute instanceof BaseRoute)
+							if ((importedRoute as any).useRoute)
+								(importedRoute as any).useRoute(router, context);
+					}
 				}
 			}
 
