@@ -9,7 +9,7 @@ import {
 	Modules,
 	Authorization,
 } from "@skulpture/serve";
-import { User, UserRecord } from "../../../entities/user/user";
+import { User, UserRecord } from "@entities/user/user";
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;

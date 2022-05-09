@@ -19,10 +19,10 @@ export default class StorageFiles extends BaseRoute {
 		response: H3.ServerResponse,
 		context: ServeContext,
 	) {
-		const Upload = context.get("Storage");
+		const Storage = context.get("Storage");
 
 		try {
-			const stream = await Upload.stream(request, response);
+			const stream = await Storage.stream(request, response);
 
 			return await H3.sendStream(response.event, stream);
 		} catch (error: any) {

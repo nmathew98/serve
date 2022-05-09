@@ -1,4 +1,4 @@
-import { Graph as SudokuGraph } from "../../../entities/sudoku/sudoku";
+import { Graph as SudokuGraph } from "@entities/sudoku/sudoku";
 import Graphology from "graphology";
 
 const Graph: SudokuGraph = {

@@ -1,11 +1,10 @@
 import mongoose, { Schema, Model } from "mongoose";
-import { Database as UserDatabase } from "../../../entities/user/user";
+import { Database as UserDatabase } from "@entities/user/user";
 
 const Database: UserDatabase = {
 	use: (schema: any, model: any) => {
 		return mongoose.model(model, schema as Schema);
 	},
-
 	create: async (document: any, model: Model<any>) => {
 		return model.create(document);
 	},

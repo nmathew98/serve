@@ -1,4 +1,4 @@
-import { Uuid as UserUuid } from "../../../entities/user/user";
+import { Uuid as UserUuid } from "@entities/user/user";
 import { v4 as uuidv4 } from "uuid";
 
 const Uuid: UserUuid = {

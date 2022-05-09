@@ -1,7 +1,7 @@
 import passport from "passport";
 import passportLocal from "passport-local";
-import Hasher from "../../adapters/hasher/hasher";
-import { User, UserRecord } from "../../../entities/user/user";
+import Hasher from "@adapters/hasher/hasher";
+import { User, UserRecord } from "@entities/user/user";
 import {
 	Route,
 	sendError,

@@ -1,47 +1,49 @@
 import dotenv from "dotenv";
-import {
-	initialize,
-	useEntityConfiguration,
-	useScripts,
-} from "@skulpture/serve";
+import { initialize, useEntityConfiguration } from "@skulpture/serve";
 import mongoose, { Schema } from "mongoose";
-import syncData from "./external/scripts/sync-data";
 
 initializeProjectConfiguration()
 	.then(initializeEntityConfiguration)
-	.then(initializeScripts)
 	.then(listen);
 
 async function initializeProjectConfiguration() {
 	dotenv.config();
 
-	const connectionUri: string = process.env.MONGO_URI || "";
-
-	await mongoose.connect(connectionUri);
+	if (process.env.MONGO_URI) {
+		const connectionUri: string = process.env.MONGO_URI || "";
+		await mongoose.connect(connectionUri);
+	}
 }
 
 async function initializeEntityConfiguration() {
 	useEntityConfiguration(async context => {
-		const sudokuSchema = new Schema({});
-		const puzzleSchema = new Schema({});
+		const userSchema = new Schema({
+			uuid: {
+				type: String,
+				required: true,
+				unique: true,
+			},
+			email: {
+				type: String,
+				required: true,
+				unique: true,
+			},
+			password: {
+				type: String,
+				required: true,
+			},
+			puzzle: {
+				type: [String],
+				required: true,
+			},
+		});
 
-		const sudokuConfiguration = {
-			schema: sudokuSchema,
-			model: "Sudoku",
+		const userConfiguration = {
+			schema: userSchema,
+			model: "User",
 		};
-		const puzzleConfiguration = {
-			schema: puzzleSchema,
-			model: "Puzzle",
-		};
 
-		context.set("configuration:Sudoku", sudokuConfiguration);
-		context.set("configuration:Puzzle", puzzleConfiguration);
-	});
-}
-
-async function initializeScripts() {
-	useScripts(async context => {
-		await syncData(context);
+		context.set("configuration:User", userConfiguration);
 	});
 }
 

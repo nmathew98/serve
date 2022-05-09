@@ -38,6 +38,7 @@ export default function buildMakeUser({
 					email: document.email,
 					password: document.password,
 					uuid: document.uuid,
+					puzzle: [],
 				}));
 			},
 			save: async user => {
@@ -100,6 +101,7 @@ export interface UserRecord {
 	_id: string;
 	email: string;
 	password: string;
+	puzzle: string[];
 	uuid?: string;
 }
 

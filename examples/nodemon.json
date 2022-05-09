@@ -2,5 +2,5 @@
 	"watch": ["src"],
 	"ext": "ts,json",
 	"ignore": ["src/**/*.spec.ts", "src/serve/**/*"],
-	"exec": "npx @skulpture/serve build ./postinstall/postinstall.js && node ./dist/index.js"
+	"exec": "npx @skulpture/serve build && node ./dist/index.js"
 }

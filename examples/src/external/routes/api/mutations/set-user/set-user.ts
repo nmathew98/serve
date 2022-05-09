@@ -1,4 +1,4 @@
-import { User, UserRecord } from "../../../../../entities/user/user";
+import { User, UserRecord } from "@entities/user/user";
 import { ServeContext, Logger, doesModuleExist } from "@skulpture/serve";
 import {
 	GraphQLBoolean,

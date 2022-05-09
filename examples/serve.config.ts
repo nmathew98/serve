@@ -1,4 +1,8 @@
 export default {
+	sentry: {
+		dsn: "",
+		tracesSampleRate: 1.0,
+	},
 	cors: {
 		origin: (
 			origin: string,
@@ -11,9 +15,9 @@ export default {
 		},
 		credentials: true,
 	},
-	helmet: {
-		crossOriginResourcePolicy: {
-			policy: "same-site",
-		},
+	alias: {
+		"@composables": "dist/composables",
+		"@entities": "dist/entities",
+		"@adapters": "dist/external/adapters",
 	},
 };

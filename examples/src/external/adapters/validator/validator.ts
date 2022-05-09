@@ -1,4 +1,4 @@
-import { Validator as UserValidator } from "../../../entities/user/user";
+import { Validator as UserValidator } from "@entities/user/user";
 import * as EmailValidator from "email-validator";
 import PasswordValidator from "password-validator";
 import mongoose from "mongoose";

@@ -20,7 +20,10 @@
 		"outDir": "dist",
 		"baseUrl": ".",
 		"paths": {
-			"*": ["node_modules/*"]
+			"*": ["node_modules/*"],
+			"@composables/*": ["src/composables/*"],
+			"@entities/*": ["src/entities/*"],
+			"@adapters/*": ["src/external/adapters/*"]
 		}
 	},
 	"include": ["src"]
