@@ -15,11 +15,12 @@ export function sendError(
 	error: any,
 	statusCode: HttpErrorCodes = 500,
 	context?: ServeContext,
+	capture?: boolean,
 ) {
 	response.statusCode = statusCode;
 	response.setHeader("Content-Type", "application/json");
 
-	if (context?.has("Sentry")) {
+	if (capture && context?.has("Sentry")) {
 		const currentDate = new Date();
 		const currentDateString = currentDate.toDateString();
 

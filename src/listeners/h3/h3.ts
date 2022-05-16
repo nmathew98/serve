@@ -37,6 +37,28 @@ export default function makeH3(
 		h3.use(cors(config.cors ?? Object.create(null)));
 		h3.use(helmet(config.helmet ?? Object.create(null)) as Middleware);
 
+		{
+			const rootDirectory = await findRootDirectory();
+			const middlewares = resolve(
+				rootDirectory,
+				"./dist",
+				"./external/middleware/",
+			);
+
+			for await (const file of ls(middlewares)) {
+				if (isJavaScript(file)) {
+					const middlewareExport = await import(file);
+
+					if (!middlewareExport.default) continue;
+
+					const importedMiddleware = middlewareExport.default;
+
+					if (importedMiddleware && typeof importedMiddleware === "function")
+						h3.use(importedMiddleware);
+				}
+			}
+		}
+
 		h3.use(async (request: IncomingMessage) => {
 			const information = {
 				method: request.method,
