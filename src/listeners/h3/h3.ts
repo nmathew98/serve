@@ -19,6 +19,7 @@ import findRootDirectory from "../../composables/find-root-directory";
 import ls from "../../composables/ls";
 import isConstructor from "../../composables/is-constructor";
 import isJavaScript from "../../composables/is-javascript";
+import isPathValid from "../../composables/is-path-valid";
 
 export interface Listener {
 	initialize(): Promise<void>;
@@ -45,18 +46,19 @@ export default function makeH3(
 				"./external/middleware/",
 			);
 
-			for await (const file of ls(middlewares)) {
-				if (isJavaScript(file)) {
-					const middlewareExport = await import(file);
+			if (await isPathValid(middlewares))
+				for await (const file of ls(middlewares)) {
+					if (isJavaScript(file)) {
+						const middlewareExport = await import(file);
 
-					if (!middlewareExport.default) continue;
+						if (!middlewareExport.default) continue;
 
-					const importedMiddleware = middlewareExport.default;
+						const importedMiddleware = middlewareExport.default;
 
-					if (importedMiddleware && typeof importedMiddleware === "function")
-						h3.use(importedMiddleware);
+						if (importedMiddleware && typeof importedMiddleware === "function")
+							h3.use(importedMiddleware);
+					}
 				}
-			}
 		}
 
 		h3.use(async (request: IncomingMessage) => {
@@ -93,23 +95,24 @@ export default function makeH3(
 			const rootDirectory = await findRootDirectory();
 			const routes = resolve(rootDirectory, "./dist", "./external/routes/");
 
-			for await (const file of ls(routes)) {
-				if (isJavaScript(file)) {
-					const routeExports = await import(file);
+			if (await isPathValid(routes))
+				for await (const file of ls(routes)) {
+					if (isJavaScript(file)) {
+						const routeExports = await import(file);
 
-					if (!routeExports.default) continue;
+						if (!routeExports.default) continue;
 
-					const importedRouteClass = routeExports.default;
+						const importedRouteClass = routeExports.default;
 
-					if (importedRouteClass && isConstructor(importedRouteClass)) {
-						const importedRoute = new importedRouteClass(context);
+						if (importedRouteClass && isConstructor(importedRouteClass)) {
+							const importedRoute = new importedRouteClass(context);
 
-						if (importedRoute instanceof BaseRoute)
-							if ((importedRoute as any).useRoute)
-								(importedRoute as any).useRoute(router, context);
+							if (importedRoute instanceof BaseRoute)
+								if ((importedRoute as any).useRoute)
+									(importedRoute as any).useRoute(router, context);
+						}
 					}
 				}
-			}
 
 			h3.use(router);
 		} catch (error: any) {
