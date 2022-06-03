@@ -8,6 +8,7 @@ It uses SWC under the hood for super fast build, run, and test times.
 
 ## Features
 
+- HTTP 2.0 support with fallback to HTTP 1.1 ✅
 - Minified builds for fast build, run and test times ✅
 - Auto loaded entities and adapters ✅
 - Auto loaded routes ✅

@@ -7,8 +7,10 @@ import {
 	IncomingMessage,
 	createRouter,
 } from "h3";
-import { createServer } from "http";
+import { createServer as createLegacyServer } from "http";
+import { createServer } from "spdy";
 import { resolve } from "path/posix";
+import { readFile } from "fs/promises";
 import { ServeContext } from "../context/context";
 import API from "../../routes/api/api";
 import StorageUpload from "../../routes/storage/upload/upload";
@@ -31,6 +33,21 @@ export default function makeH3(
 	context: ServeContext,
 	config: Record<string, any>,
 ): Listener {
+	let isLegacyServer = false;
+
+	if (!config?.server?.spdy?.key || !config?.server?.spdy?.cert) {
+		isLegacyServer = true;
+		Consola.error("No SSL certificate specified, creating legacy server");
+	}
+
+	if (
+		typeof config.server.spdy.key !== "string" ||
+		typeof config.server.spdy.cert !== "string"
+	) {
+		isLegacyServer = true;
+		Consola.error("Invalid SSL certificate specified, creating legacy server");
+	}
+
 	const h3: H3 = createApp();
 	const router = createRouter();
 
@@ -128,7 +145,29 @@ export default function makeH3(
 		listen: async () => {
 			const port = +(process.env.PORT ?? "4000");
 
-			createServer(h3).listen(port);
+			if (
+				!(await isPathValid(config.server.spdy.key)) ||
+				!(await isPathValid(config.server.spdy.cert))
+			) {
+				Consola.error("Unable to find SSL certificate, creating legacy server");
+				isLegacyServer = true;
+			}
+
+			if (!isLegacyServer) {
+				const key = await readFile(config.server.spdy.key);
+				const cert = await readFile(config.server.spdy.cert);
+
+				const spdyOptions = {
+					...config.server.spdy,
+					key,
+					cert,
+				};
+
+				createServer(spdyOptions, h3).listen(port);
+			} else {
+				createLegacyServer(h3).listen(port);
+			}
+
 			Consola.log(`Listening on port ${port}!`);
 		},
 	});
