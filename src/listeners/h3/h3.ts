@@ -40,12 +40,16 @@ export default function makeH3(
 		Consola.error("No SSL certificate specified, creating legacy server");
 	}
 
-	if (
-		typeof config.server.spdy.key !== "string" ||
-		typeof config.server.spdy.cert !== "string"
-	) {
-		isLegacyServer = true;
-		Consola.error("Invalid SSL certificate specified, creating legacy server");
+	if (!isLegacyServer) {
+		if (
+			typeof config.server.spdy.key !== "string" ||
+			typeof config.server.spdy.cert !== "string"
+		) {
+			isLegacyServer = true;
+			Consola.error(
+				"Invalid SSL certificate specified, creating legacy server",
+			);
+		}
 	}
 
 	const h3: H3 = createApp();
@@ -145,12 +149,16 @@ export default function makeH3(
 		listen: async () => {
 			const port = +(process.env.PORT ?? "4000");
 
-			if (
-				!(await isPathValid(config.server.spdy.key)) ||
-				!(await isPathValid(config.server.spdy.cert))
-			) {
-				Consola.error("Unable to find SSL certificate, creating legacy server");
-				isLegacyServer = true;
+			if (!isLegacyServer) {
+				if (
+					!(await isPathValid(config.server.spdy.key)) ||
+					!(await isPathValid(config.server.spdy.cert))
+				) {
+					Consola.error(
+						"Unable to find SSL certificate, creating legacy server",
+					);
+					isLegacyServer = true;
+				}
 			}
 
 			if (!isLegacyServer) {
