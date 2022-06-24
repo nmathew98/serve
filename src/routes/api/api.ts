@@ -37,7 +37,7 @@ export default class API extends BaseRoute {
 
 			if (!schema) schema = await useSchema(request, response, context);
 
-			if (option === "subscription") {
+			if (option === "subscriptions") {
 				if (!subscriptionHandler)
 					subscriptionHandler = createSubscriptionHandler({
 						schema,
