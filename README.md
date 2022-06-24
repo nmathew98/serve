@@ -15,7 +15,7 @@ It uses SWC under the hood for super fast build, run, and test times.
 - Auto imported composables for better code reuse ✅
 - Auto generated types for composables ✅
 - Quick test times ✅
-- GraphQL set up and ready to go with support for subscriptions using WebSockets ✅
+- GraphQL set up and ready to go with support for subscriptions using SSE ✅
 - Static file serving routes already set up ✅
 - Sensible security headers set by default ✅
 - Lightweight and easy to extend ✅

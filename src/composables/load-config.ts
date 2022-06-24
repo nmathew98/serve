@@ -10,9 +10,6 @@ export default async function loadConfig(
 			api: {
 				enabled: true,
 				protect: true,
-				graphql: {
-					subscription: false,
-				},
 			},
 			storage: {
 				enabled: true,

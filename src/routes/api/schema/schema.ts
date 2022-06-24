@@ -34,8 +34,6 @@ export default async function useSchema(
 
 	const schema = new GraphQLSchema(configuration);
 
-	if (requiresSubscription) context.set("graphql:schema", schema);
-
 	return schema;
 }
 
