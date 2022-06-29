@@ -1,17 +1,19 @@
-import { IncomingMessage, ServerResponse, useBody } from "h3";
-import { graphql, GraphQLSchema } from "graphql";
-import { ServeContext } from "../../listeners/context/context";
-import { BaseRoute } from "../../routes/route";
-import { sendError } from "../../routes/utilities";
 import useSchema from "./schema/schema";
 import { Methods } from "../../composables/decorators/methods";
 import { Route } from "../../composables/decorators/route";
+import { createHandler as createSubscriptionHandler } from "graphql-sse";
+import { GraphQLSchema } from "graphql";
+import { BaseRoute } from "../route";
+import { IncomingMessage, ServerResponse, useBody } from "h3";
+import { ServeContext } from "../../listeners/context/context";
+import { sendError } from "../utilities";
 
 let schema: GraphQLSchema;
+let subscriptionHandler: ReturnType<typeof createSubscriptionHandler>;
 
 @Methods("post")
-@Route("/api")
-export default class API extends BaseRoute {
+@Route("/api/:option")
+export default class ApiOption extends BaseRoute {
 	// @ts-expect-error Only used by the decorator
 	private protected = true;
 
@@ -27,6 +29,7 @@ export default class API extends BaseRoute {
 		context: ServeContext,
 	) {
 		try {
+			const option = request.context?.params?.option;
 			const body = await useBody(request);
 
 			if (typeof body !== "object" || !body.query)
@@ -34,16 +37,18 @@ export default class API extends BaseRoute {
 
 			if (!schema) schema = await useSchema(request, response, context);
 
-			const result = await graphql({
-				schema,
-				source: body.query,
-				variableValues: body.variables,
-			});
+			switch (option) {
+				case "subscriptions": {
+					if (!subscriptionHandler)
+						subscriptionHandler = createSubscriptionHandler({
+							schema,
+						});
 
-			response.statusCode = 200;
-			response.setHeader("Content-Type", "application/json");
-
-			return response.end(JSON.stringify(result));
+					return subscriptionHandler(request, response);
+				}
+				default:
+					throw new Error("Invalid option");
+			}
 		} catch (error: any) {
 			return sendError(
 				response,

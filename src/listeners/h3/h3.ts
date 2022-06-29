@@ -13,6 +13,7 @@ import { resolve } from "path/posix";
 import { readFile } from "fs/promises";
 import { ServeContext } from "../context/context";
 import API from "../../routes/api/api";
+import ApiOption from "../../routes/api/option";
 import StorageUpload from "../../routes/storage/upload/upload";
 import StorageRemove from "../../routes/storage/remove/remove";
 import { BaseRoute } from "../../routes/route";
@@ -96,8 +97,10 @@ export default function makeH3(
 	const initializeInternalRoutes = () => {
 		if (config.routes.api.enabled) {
 			const apiRoute = new API(config);
+			const apiOptionRoute = new ApiOption(config);
 
 			(apiRoute as any).useRoute(h3, context);
+			(apiOptionRoute as any).useRoute(h3, context);
 		}
 
 		if (config.routes.storage.enabled) {
