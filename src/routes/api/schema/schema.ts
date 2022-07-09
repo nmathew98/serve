@@ -1,17 +1,18 @@
 import { ServeContext } from "../../../listeners/context/context";
-import useSubscriptions from "../subscriptions/subscriptions";
 import { IncomingMessage, ServerResponse } from "h3";
-import useQueries from "../queries/queries";
-import useMutations from "../mutations/mutations";
-import useTypes from "../types/types";
-import {
-	GraphQLSchemaDefinition,
-	GraphQLSchemaHandlerAggregator,
-} from "../api";
 import { makeExecutableSchema } from "graphql-tools";
 import { GraphQLSchema } from "graphql";
+import useGqlSchemaDefinition, {
+	GraphQLSchemaDefinition,
+} from "../../../composables/use-gql-schema-definition";
 
 let schema: GraphQLSchema;
+const useQueries = useGqlSchemaDefinition("./external/routes/api/queries");
+const useMutations = useGqlSchemaDefinition("./external/routes/api/mutations");
+const useSubscriptions = useGqlSchemaDefinition(
+	"./external/routes/api/subscriptions",
+);
+const useTypes = useGqlSchemaDefinition("./external/routes/api/types");
 
 export default async function useSchema(
 	request: IncomingMessage,
@@ -99,3 +100,9 @@ interface CollateDefinitionsArguments {
 	context: ServeContext;
 	aggregator: GraphQLSchemaHandlerAggregator;
 }
+
+type GraphQLSchemaHandlerAggregator = (
+	request: IncomingMessage,
+	response: ServerResponse,
+	context: ServeContext,
+) => Promise<GraphQLSchemaDefinition[]>;

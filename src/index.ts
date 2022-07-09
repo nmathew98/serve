@@ -41,7 +41,7 @@ export { doesModuleExist };
 export {
 	GraphQLSchemaHandler,
 	GraphQLSchemaDefinition,
-} from "./routes/api/api";
+} from "./composables/use-gql-schema-definition";
 
 // Other utlities
 // These utilities are provided because swc does not
