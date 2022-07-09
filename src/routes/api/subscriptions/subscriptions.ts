@@ -1,5 +1,4 @@
 import { ServeContext } from "../../../listeners/context/context";
-import { ThunkObjMap, GraphQLFieldConfig } from "graphql";
 import { IncomingMessage, ServerResponse } from "h3";
 import { resolve } from "path/posix";
 import Consola from "../../../adapters/logger/logger";
@@ -7,13 +6,18 @@ import findRootDirectory from "../../../composables/find-root-directory";
 import ls from "../../../composables/ls";
 import isJavaScript from "../../../composables/is-javascript";
 import isPathValid from "../../../composables/is-path-valid";
+import {
+	GraphQLSchemaDefinition,
+	GraphQLSchemaHandler,
+	isGraphQLSchemaDefinition,
+} from "../api";
 
-export default async function useSubscription(
+export default async function useSubscriptions(
 	request: IncomingMessage,
 	response: ServerResponse,
 	context: ServeContext,
-): Promise<GraphQLField> {
-	let subscriptions: GraphQLField = Object.create(null);
+): Promise<GraphQLSchemaDefinition[]> {
+	const subscriptions: GraphQLSchemaDefinition[] = [];
 
 	try {
 		const rootDirectory = await findRootDirectory();
@@ -29,13 +33,12 @@ export default async function useSubscription(
 					const imported = await import(file);
 
 					if (imported.default && typeof imported.default === "function") {
-						const useSubscription: GraphQLSubscriptionHandler =
-							imported.default;
+						const useSubscription: GraphQLSchemaHandler = imported.default;
 
-						subscriptions = {
-							...subscriptions,
-							...useSubscription(context, request, response),
-						};
+						const subscription = useSubscription(context, request, response);
+
+						if (isGraphQLSchemaDefinition(subscription))
+							subscriptions.push(subscription);
 					}
 				}
 			}
@@ -46,10 +49,3 @@ export default async function useSubscription(
 
 	return subscriptions;
 }
-
-export type GraphQLSubscriptionHandler = (
-	context: ServeContext,
-	request: IncomingMessage,
-	response: ServerResponse,
-) => GraphQLField;
-type GraphQLField = ThunkObjMap<GraphQLFieldConfig<any, any, any>>;

@@ -1,13 +1,11 @@
 import { IncomingMessage, ServerResponse, useBody } from "h3";
-import { graphql, GraphQLSchema } from "graphql";
+import { graphql } from "graphql";
 import { ServeContext } from "../../listeners/context/context";
 import { BaseRoute } from "../../routes/route";
 import { sendError } from "../../routes/utilities";
 import useSchema from "./schema/schema";
 import { Methods } from "../../composables/decorators/methods";
 import { Route } from "../../composables/decorators/route";
-
-let schema: GraphQLSchema;
 
 @Methods("post")
 @Route("/api")
@@ -32,7 +30,7 @@ export default class API extends BaseRoute {
 			if (typeof body !== "object" || !body.query)
 				return sendError(response, "Invalid request");
 
-			if (!schema) schema = await useSchema(request, response, context);
+			const schema = await useSchema(request, response, context);
 
 			const result = await graphql({
 				schema,
@@ -54,4 +52,42 @@ export default class API extends BaseRoute {
 			);
 		}
 	}
+}
+
+export interface GraphQLSchemaDefinition {
+	definition?: string;
+	types?: string;
+	resolve?: { [key: string]: AnyFunction };
+}
+
+type AnyFunction = (...args: any[]) => any;
+
+export type GraphQLSchemaHandler = (
+	context: ServeContext,
+	request: IncomingMessage,
+	response: ServerResponse,
+) => GraphQLSchemaDefinition;
+
+export type GraphQLSchemaHandlerAggregator = (
+	request: IncomingMessage,
+	response: ServerResponse,
+	context: ServeContext,
+) => Promise<GraphQLSchemaDefinition[]>;
+
+export function isGraphQLSchemaDefinition(
+	o: any,
+): o is GraphQLSchemaDefinition {
+	if (typeof o !== "object") return false;
+
+	if (!o.types) return false;
+
+	if (o.definition) if (typeof o.definition !== "string") return false;
+
+	if (o.types) if (typeof o.types !== "string") return false;
+
+	if (o.resolve) if (typeof o.resolve !== "function") return false;
+
+	if (o.resolvers) if (!Array.isArray(o.resolvers)) return false;
+
+	return true;
 }

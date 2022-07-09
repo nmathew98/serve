@@ -38,11 +38,10 @@ export {
 // GraphQL utilities and types
 import doesModuleExist from "./composables/does-module-exist";
 export { doesModuleExist };
-export { GraphQLQueryHandler } from "./routes/api/queries/queries";
-export { GraphQLMutationHandler } from "./routes/api/mutations/mutations";
-export { GraphQLSubscriptionHandler } from "./routes/api/subscriptions/subscriptions";
-export { GraphQLTypeHandler } from "./routes/api/types/types";
-export { GraphQLField } from "./routes/api/schema/schema";
+export {
+	GraphQLSchemaHandler,
+	GraphQLSchemaDefinition,
+} from "./routes/api/api";
 
 // Other utlities
 // These utilities are provided because swc does not

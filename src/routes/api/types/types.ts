@@ -1,13 +1,23 @@
-import { GraphQLInterfaceType } from "graphql";
 import { resolve } from "path/posix";
 import Consola from "../../../adapters/logger/logger";
 import findRootDirectory from "../../../composables/find-root-directory";
 import ls from "../../../composables/ls";
 import isJavaScript from "../../../composables/is-javascript";
 import isPathValid from "../../../composables/is-path-valid";
+import {
+	GraphQLSchemaDefinition,
+	GraphQLSchemaHandler,
+	isGraphQLSchemaDefinition,
+} from "../api";
+import { IncomingMessage, ServerResponse } from "h3";
+import { ServeContext } from "../../../listeners/context/context";
 
-export default async function useTypes(): Promise<GraphQLInterfaceType[]> {
-	const types: GraphQLInterfaceType[] = [];
+export default async function useTypes(
+	request: IncomingMessage,
+	response: ServerResponse,
+	context: ServeContext,
+): Promise<GraphQLSchemaDefinition[]> {
+	const types: GraphQLSchemaDefinition[] = [];
 
 	try {
 		const rootDirectory = await findRootDirectory();
@@ -23,11 +33,11 @@ export default async function useTypes(): Promise<GraphQLInterfaceType[]> {
 					const imported = await import(file);
 
 					if (imported.default && typeof imported.default === "function") {
-						const useType: GraphQLTypeHandler = imported.default;
-						const importedTypes = useType();
+						const useType: GraphQLSchemaHandler = imported.default;
 
-						if (Array.isArray(importedTypes)) types.push(...importedTypes);
-						else types.push(importedTypes);
+						const type = useType(context, request, response);
+
+						if (isGraphQLSchemaDefinition(type)) types.push(type);
 					}
 				}
 			}
@@ -38,7 +48,3 @@ export default async function useTypes(): Promise<GraphQLInterfaceType[]> {
 
 	return types;
 }
-
-export type GraphQLTypeHandler = () =>
-	| GraphQLInterfaceType
-	| GraphQLInterfaceType[];

@@ -2,13 +2,11 @@ import useSchema from "./schema/schema";
 import { Methods } from "../../composables/decorators/methods";
 import { Route } from "../../composables/decorators/route";
 import { createHandler as createSubscriptionHandler } from "graphql-sse";
-import { GraphQLSchema } from "graphql";
 import { BaseRoute } from "../route";
 import { IncomingMessage, ServerResponse, useBody } from "h3";
 import { ServeContext } from "../../listeners/context/context";
 import { sendError } from "../utilities";
 
-let schema: GraphQLSchema;
 let subscriptionHandler: ReturnType<typeof createSubscriptionHandler>;
 
 @Methods("post")
@@ -35,7 +33,7 @@ export default class ApiOption extends BaseRoute {
 			if (typeof body !== "object" || !body.query)
 				return sendError(response, "Invalid request");
 
-			if (!schema) schema = await useSchema(request, response, context);
+			const schema = await useSchema(request, response, context);
 
 			switch (option) {
 				case "subscriptions": {

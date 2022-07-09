@@ -1,5 +1,4 @@
 import { ServeContext } from "../../../listeners/context/context";
-import { ThunkObjMap, GraphQLFieldConfig } from "graphql";
 import { IncomingMessage, ServerResponse } from "h3";
 import { resolve } from "path/posix";
 import Consola from "../../../adapters/logger/logger";
@@ -7,13 +6,18 @@ import findRootDirectory from "../../../composables/find-root-directory";
 import ls from "../../../composables/ls";
 import isJavaScript from "../../../composables/is-javascript";
 import isPathValid from "../../../composables/is-path-valid";
+import {
+	GraphQLSchemaDefinition,
+	GraphQLSchemaHandler,
+	isGraphQLSchemaDefinition,
+} from "../api";
 
 export default async function useQueries(
 	request: IncomingMessage,
 	response: ServerResponse,
 	context: ServeContext,
-): Promise<GraphQLField> {
-	let queries: GraphQLField = Object.create(null);
+): Promise<GraphQLSchemaDefinition[]> {
+	const queries: GraphQLSchemaDefinition[] = [];
 
 	try {
 		const rootDirectory = await findRootDirectory();
@@ -29,12 +33,12 @@ export default async function useQueries(
 					const imported = await import(file);
 
 					if (imported.default && typeof imported.default === "function") {
-						const useQuery: GraphQLQueryHandler = imported.default;
+						const useQuery: GraphQLSchemaHandler = imported.default;
 
-						queries = {
-							...queries,
-							...useQuery(context, request, response),
-						};
+						const query = useQuery(context, request, response);
+
+						if (isGraphQLSchemaDefinition(query))
+							queries.push(useQuery(context, request, response));
 					}
 				}
 			}
@@ -45,10 +49,3 @@ export default async function useQueries(
 
 	return queries;
 }
-
-export type GraphQLQueryHandler = (
-	context: ServeContext,
-	request: IncomingMessage,
-	response: ServerResponse,
-) => GraphQLField;
-type GraphQLField = ThunkObjMap<GraphQLFieldConfig<any, any, any>>;
