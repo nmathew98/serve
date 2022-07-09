@@ -1,6 +1,6 @@
 import { ServeContext } from "../../../listeners/context/context";
 import { IncomingMessage, ServerResponse } from "h3";
-import { makeExecutableSchema } from "graphql-tools";
+import { makeExecutableSchema } from "@graphql-tools/schema";
 import { GraphQLSchema } from "graphql";
 import useGqlSchemaDefinitions, {
 	GraphQLSchemaDefinition,
@@ -59,6 +59,8 @@ async function collateDefinitions({
 }: CollateDefinitionsArguments): Promise<GraphQLSchemaDefinition> {
 	const aggregated = await aggregator(request, response, context);
 
+	const hasDefinitions = aggregated.some(handler => !!handler.definition);
+
 	const types = aggregated
 		.filter(handler => !!handler.types)
 		.map(handler => handler.types)
@@ -66,26 +68,30 @@ async function collateDefinitions({
 
 	if (!root) return { types };
 
-	const fields = [
-		`type ${root} {`,
-		aggregated
-			.filter(handler => !!handler.definition)
-			.map(handler => `\t${handler.definition}`)
-			.join("\n"),
-		`}`,
-	].join("\n");
+	let fields = "";
+	if (hasDefinitions)
+		fields = [
+			`type ${root} {`,
+			aggregated
+				.filter(handler => !!handler.definition)
+				.map(handler => `\t${handler.definition}`)
+				.join("\n"),
+			`}`,
+		].join("\n");
 
-	const resolvers = {
-		[root]: aggregated
-			.filter(handler => !!handler.resolve)
-			.reduce(
-				(accumulator, handler) => ({
-					...accumulator,
-					...handler.resolve,
-				}),
-				Object.create(null),
-			),
-	};
+	let resolvers = Object.create(null);
+	if (hasDefinitions)
+		resolvers = {
+			[root]: aggregated
+				.filter(handler => !!handler.resolve)
+				.reduce(
+					(accumulator, handler) => ({
+						...accumulator,
+						...handler.resolve,
+					}),
+					Object.create(null),
+				),
+		};
 
 	return {
 		types: [types, fields].join("\n"),

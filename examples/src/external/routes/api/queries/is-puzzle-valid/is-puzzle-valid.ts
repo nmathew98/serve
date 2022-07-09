@@ -1,11 +1,4 @@
-import { ServeContext, doesModuleExist } from "@skulpture/serve";
-import {
-	GraphQLBoolean,
-	GraphQLInt,
-	GraphQLNonNull,
-	GraphQLObjectType,
-	GraphQLString,
-} from "graphql";
+import { ServeContext, doesModuleExist, gql } from "@skulpture/serve";
 import { Sudoku } from "@entities/sudoku/sudoku";
 
 export default function setUser(context: ServeContext) {
@@ -16,34 +9,17 @@ export default function setUser(context: ServeContext) {
 	const isPlacementValid = buildIsPlacementValid({ Sudoku });
 	const isPuzzleValid = buildIsPuzzleValid({ Sudoku });
 
-	return Object.freeze({
-		isPuzzleValid: {
-			type: new GraphQLObjectType({
-				name: "IsPuzzleValid",
-				fields: () => ({
-					placement: {
-						type: GraphQLBoolean,
-					},
-					puzzle: {
-						type: GraphQLBoolean,
-					},
-				}),
-			}),
-			args: {
-				row: {
-					type: GraphQLString,
-				},
-				column: {
-					type: GraphQLInt,
-				},
-				value: {
-					type: GraphQLInt,
-				},
-				puzzle: {
-					type: new GraphQLNonNull(GraphQLString),
-				},
-			},
-			resolve: async (
+	return {
+		definition:
+			"isPuzzleValid(row: String, column: Int, value: Int, puzzle: String!): IsPuzzleValid",
+		types: gql`
+			type IsPuzzleValid {
+				placement: Boolean
+				puzzle: Boolean
+			}
+		`,
+		resolve: {
+			isPuzzleValid: async (
 				_: any,
 				{ puzzle, row, column, value }: IsPuzzleValidArguments,
 			) => {
@@ -60,7 +36,7 @@ export default function setUser(context: ServeContext) {
 				};
 			},
 		},
-	});
+	};
 }
 
 interface IsPuzzleValidArguments {
