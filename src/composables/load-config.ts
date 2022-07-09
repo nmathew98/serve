@@ -25,5 +25,5 @@ export default async function loadConfig(
 		defaults: configDefaults,
 	});
 
-	return config;
+	return config as Record<string, any>;
 }

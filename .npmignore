@@ -8,3 +8,5 @@ coverage/**
 .prettierignore
 .prettierrc.json
 .vscode
+.github
+.husky

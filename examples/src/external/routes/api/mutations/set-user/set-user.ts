@@ -1,12 +1,5 @@
 import { User, UserRecord } from "@entities/user/user";
-import { ServeContext, Logger, doesModuleExist } from "@skulpture/serve";
-import {
-	GraphQLBoolean,
-	GraphQLID,
-	GraphQLInputObjectType,
-	GraphQLNonNull,
-	GraphQLString,
-} from "graphql";
+import { ServeContext, Logger, doesModuleExist, gql } from "@skulpture/serve";
 
 export default function setUser(context: ServeContext) {
 	doesModuleExist(context, "Logger", "User");
@@ -16,15 +9,17 @@ export default function setUser(context: ServeContext) {
 
 	const updateUser = buildUpdateUser({ User });
 
-	return Object.freeze({
-		setUser: {
-			type: GraphQLBoolean,
-			args: {
-				user: {
-					type: UserUpdateInput,
-				},
-			},
-			resolve: async (_: any, { user }: SetUserArguments) => {
+	return {
+		definition: "createUser(name: String!): Boolean!",
+		types: gql`
+			input UserUpdateInput {
+				uuid: ID!
+				password: String
+				email: String
+			}
+		`,
+		resolve: {
+			createUser: async (_: any, { user }: SetUserArguments) => {
 				try {
 					return await updateUser({ uuid: user.uuid }, user);
 				} catch (error: any) {
@@ -34,25 +29,9 @@ export default function setUser(context: ServeContext) {
 				}
 			},
 		},
-	});
+	};
 }
 
 interface SetUserArguments {
 	user: Partial<UserRecord>;
 }
-
-const UserUpdateInput = new GraphQLInputObjectType({
-	name: "UserUpdateInput",
-	description: "User update input",
-	fields: () => ({
-		uuid: {
-			type: new GraphQLNonNull(GraphQLID),
-		},
-		password: {
-			type: GraphQLString,
-		},
-		email: {
-			type: GraphQLString,
-		},
-	}),
-});

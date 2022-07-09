@@ -1,11 +1,4 @@
-import { doesModuleExist, ServeContext } from "@skulpture/serve";
-import {
-	GraphQLID,
-	GraphQLList,
-	GraphQLNonNull,
-	GraphQLObjectType,
-	GraphQLString,
-} from "graphql";
+import { doesModuleExist, gql, ServeContext } from "@skulpture/serve";
 import { User } from "@entities/user/user";
 
 export default function whoami(context: ServeContext) {
@@ -15,44 +8,23 @@ export default function whoami(context: ServeContext) {
 
 	const findUser = buildFindUser({ User });
 
-	return Object.freeze({
-		whoami: {
-			type: new GraphQLNonNull(UserDetails),
-			args: {
-				uuid: {
-					type: new GraphQLNonNull(GraphQLID),
-					description: "The user's uuid",
-				},
-			},
-			resolve: async (_: any, { uuid }: WhoAmIArguments) =>
+	return {
+		definition: "whoami(uuid: ID!): UserDetails!",
+		types: gql`
+			type UserDetails {
+				uuid: ID!
+				email: String!
+				password: String!
+				puzzle: String!
+			}
+		`,
+		resolve: {
+			whoami: async (_: any, { uuid }: WhoAmIArguments) =>
 				(await findUser({ uuid }))?.pop(),
 		},
-	});
+	};
 }
 
 interface WhoAmIArguments {
 	uuid: string;
 }
-
-const UserDetails = new GraphQLObjectType({
-	name: "UserDetails",
-	description: "A user record",
-	fields: () => ({
-		uuid: {
-			type: new GraphQLNonNull(GraphQLID),
-			description: "The uuid of the user",
-		},
-		email: {
-			type: new GraphQLNonNull(GraphQLString),
-			description: "The user's email",
-		},
-		password: {
-			type: new GraphQLNonNull(GraphQLString),
-			description: "The user's password",
-		},
-		puzzle: {
-			type: new GraphQLNonNull(new GraphQLList(GraphQLString)),
-			description: "The user's solved puzzles",
-		},
-	}),
-});
