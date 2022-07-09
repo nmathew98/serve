@@ -8,8 +8,9 @@ export {
 
 // Core
 export { App } from "./listeners/app/app";
-export * as H3 from "h3";
 export { ServeContext } from "./listeners/context/context";
+import * as H3 from "h3";
+export { H3 };
 
 // Adapters
 import Consola from "./adapters/logger/logger";
