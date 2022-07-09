@@ -2,17 +2,17 @@ import { ServeContext } from "../../../listeners/context/context";
 import { IncomingMessage, ServerResponse } from "h3";
 import { makeExecutableSchema } from "graphql-tools";
 import { GraphQLSchema } from "graphql";
-import useGqlSchemaDefinition, {
+import useGqlSchemaDefinitions, {
 	GraphQLSchemaDefinition,
-} from "../../../composables/use-gql-schema-definition";
+} from "../../../composables/use-gql-schema-definitions";
 
 let schema: GraphQLSchema;
-const useQueries = useGqlSchemaDefinition("./external/routes/api/queries");
-const useMutations = useGqlSchemaDefinition("./external/routes/api/mutations");
-const useSubscriptions = useGqlSchemaDefinition(
+const useQueries = useGqlSchemaDefinitions("./external/routes/api/queries");
+const useMutations = useGqlSchemaDefinitions("./external/routes/api/mutations");
+const useSubscriptions = useGqlSchemaDefinitions(
 	"./external/routes/api/subscriptions",
 );
-const useTypes = useGqlSchemaDefinition("./external/routes/api/types");
+const useTypes = useGqlSchemaDefinitions("./external/routes/api/types");
 
 export default async function useSchema(
 	request: IncomingMessage,
@@ -70,8 +70,8 @@ async function collateDefinitions({
 		`type ${root} {`,
 		aggregated
 			.filter(handler => !!handler.definition)
-			.map(handler => handler.definition)
-			.join("\t"),
+			.map(handler => `\t${handler.definition}`)
+			.join("\n"),
 		`}`,
 	].join("\n");
 

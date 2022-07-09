@@ -41,7 +41,8 @@ export { doesModuleExist };
 export {
 	GraphQLSchemaHandler,
 	GraphQLSchemaDefinition,
-} from "./composables/use-gql-schema-definition";
+} from "./composables/use-gql-schema-definitions";
+export { gql } from "graphql-tag";
 
 // Other utlities
 // These utilities are provided because swc does not
