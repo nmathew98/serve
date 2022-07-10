@@ -6,7 +6,7 @@ import findRootDirectory from "./find-root-directory";
 import isJavaScript from "./is-javascript";
 import isPathValid from "./is-path-valid";
 import ls from "./ls";
-import { DocumentNode, GraphQLFieldResolver, print } from "graphql";
+import { GraphQLFieldResolver } from "graphql";
 
 export default function useGqlSchemaDefinitions(directory: string) {
 	return async (
@@ -34,17 +34,6 @@ export default function useGqlSchemaDefinitions(directory: string) {
 								response,
 							);
 
-							// Allow for it to be gql tagged but if it is we need a string back
-							if (schemaDefinition.definition)
-								if (typeof schemaDefinition.definition !== "string")
-									schemaDefinition.definition = print(
-										schemaDefinition.definition,
-									);
-
-							if (schemaDefinition.types)
-								if (typeof schemaDefinition.types !== "string")
-									schemaDefinition.types = print(schemaDefinition.types);
-
 							if (isGraphQLSchemaDefinition(schemaDefinition))
 								definitions.push(schemaDefinition);
 						}
@@ -71,7 +60,7 @@ export interface GraphQLSchemaDefinition {
 	 * For example:
 	 * `createUser(name: String!): User!`
 	 */
-	definition?: DocumentNode | string;
+	definition?: string;
 	/**
 	 * Any types required for the field definition
 	 *
@@ -85,7 +74,7 @@ export interface GraphQLSchemaDefinition {
 	 * }
 	 * ```
 	 */
-	types?: DocumentNode | string;
+	types?: string;
 	/**
 	 * The resolver for the field
 	 *
