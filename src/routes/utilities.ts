@@ -73,6 +73,14 @@ export function useProduction<T = any>(x: T, y: T) {
 }
 
 /**
+ * Provides syntax highlighting for GraphQL strings
+ *
+ * @param {string} x a template string
+ * @returns a string
+ */
+export const gql = String.raw;
+
+/**
  * HTTP success status codes
  */
 export type HttpSuccessCodes =
