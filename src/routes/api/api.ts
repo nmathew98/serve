@@ -1,5 +1,5 @@
 import { IncomingMessage, ServerResponse, useBody } from "h3";
-import { graphql, print } from "graphql";
+import { graphql, GraphQLSchema, print } from "graphql";
 import { ServeContext } from "../../listeners/context/context";
 import { BaseRoute } from "../../routes/route";
 import { sendError } from "../../routes/utilities";
@@ -14,6 +14,8 @@ import {
 import { introspectSchema } from "@graphql-tools/wrap";
 import { stitchSchemas } from "@graphql-tools/stitch";
 
+let schema: GraphQLSchema;
+
 @Methods("post")
 @Route("/api")
 export default class API extends BaseRoute {
@@ -26,25 +28,25 @@ export default class API extends BaseRoute {
 
 		this.protected = !!config.routes.api.protect;
 
-		const createRemoteExecuter =
-			(location: string, headers = Object.create(null)) =>
-			async ({ document, variables }: any) => {
-				const query = print(document);
-
-				const fetchResult = await fetch(location, {
-					method: "POST",
-					headers: {
-						...headers,
-						"Content-Type": "application/json",
-						body: JSON.stringify({ query, variables }),
-					},
-				});
-
-				return fetchResult.json();
-			};
-
 		if (config.routes.api.subgraphs) {
 			if (Array.isArray(config.routes.api.subgraphs)) {
+				const createRemoteExecuter =
+					(location: string, headers = Object.create(null)) =>
+					async ({ document, variables }: any) => {
+						const query = print(document);
+
+						const fetchResult = await fetch(location, {
+							method: "POST",
+							headers: {
+								...headers,
+								"Content-Type": "application/json",
+								body: JSON.stringify({ query, variables }),
+							},
+						});
+
+						return fetchResult.json();
+					};
+
 				this.subgraphs = config.routes.api.subgraphs
 					.filter((subgraph: any) => isGraphQLSubgraph(subgraph))
 					.map(async (subgraph: GraphQLSubgraph) => {
@@ -73,15 +75,17 @@ export default class API extends BaseRoute {
 			if (typeof body !== "object" || !body.query)
 				return sendError(response, "Invalid request");
 
-			const localSchema = await useSchema(request, response, context);
+			if (!schema) {
+				const localSchema = await useSchema(request, response, context);
 
-			let schema = localSchema;
-			if (this.subgraphs.length > 0) {
-				this.subgraphs = await Promise.all(this.subgraphs);
+				schema = localSchema;
+				if (this.subgraphs.length > 0) {
+					this.subgraphs = await Promise.all(this.subgraphs);
 
-				schema = stitchSchemas({
-					subschemas: [...this.subgraphs, { schema: localSchema }],
-				});
+					schema = stitchSchemas({
+						subschemas: [...this.subgraphs, { schema: localSchema }],
+					});
+				}
 			}
 
 			const result = await graphql({
