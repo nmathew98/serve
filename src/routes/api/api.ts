@@ -31,7 +31,7 @@ export default class API extends BaseRoute {
 		if (config.routes.api.subgraphs) {
 			if (Array.isArray(config.routes.api.subgraphs)) {
 				const createRemoteExecuter =
-					(location: string, headers = Object.create(null)) =>
+					(location: string, headers: Record<string, any>) =>
 					async ({ document, variables }: any) => {
 						const query = print(document);
 
@@ -52,7 +52,7 @@ export default class API extends BaseRoute {
 					.map(async (subgraph: GraphQLSubgraph) => {
 						const remoteExecutor = createRemoteExecuter(
 							subgraph.location,
-							subgraph.headers,
+							subgraph?.headers ?? Object.create(null),
 						);
 
 						return {
