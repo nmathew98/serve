@@ -1,3 +1,4 @@
+import { Transform } from "@graphql-tools/delegate";
 import { loadConfig as c12 } from "c12";
 
 export default async function loadConfig(
@@ -106,6 +107,7 @@ export interface GraphQLSubgraph {
 	 * A record of the headers if any are required for authorization
 	 */
 	headers?: Record<string, any>;
+	transforms?: Transform[];
 }
 
 export function isGraphQLSubgraph(o: any): o is GraphQLSubgraph {

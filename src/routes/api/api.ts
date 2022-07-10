@@ -13,6 +13,7 @@ import {
 } from "../../composables/load-config";
 import { introspectSchema } from "@graphql-tools/wrap";
 import { stitchSchemas } from "@graphql-tools/stitch";
+import { SubschemaConfig } from "@graphql-tools/delegate";
 
 let schema: GraphQLSchema;
 
@@ -49,7 +50,7 @@ export default class API extends BaseRoute {
 
 				this.subgraphs = config.routes.api.subgraphs
 					.filter((subgraph: any) => isGraphQLSubgraph(subgraph))
-					.map(async (subgraph: GraphQLSubgraph) => {
+					.map(async (subgraph: GraphQLSubgraph): Promise<SubschemaConfig> => {
 						const remoteExecutor = createRemoteExecuter(
 							subgraph.location,
 							subgraph?.headers ?? Object.create(null),
@@ -58,6 +59,7 @@ export default class API extends BaseRoute {
 						return {
 							schema: await introspectSchema(remoteExecutor),
 							executor: remoteExecutor,
+							transforms: subgraph?.transforms ?? [],
 						};
 					});
 			}
