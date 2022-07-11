@@ -3,6 +3,7 @@ import { IncomingMessage, ServerResponse } from "h3";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { GraphQLSchema } from "graphql";
 import useGqlSchemaDefinitions, {
+	DirectiveResolver,
 	GraphQLSchemaDefinition,
 } from "../../../composables/use-gql-schema-definitions";
 import { Consola } from "../../..";
@@ -63,9 +64,10 @@ export default async function useSchema(
 
 	// For reference on how directives should be defined
 	// https://www.graphql-tools.com/docs/schema-directives
-	Object.keys(directives).forEach(directive => {
-		schema = directives[directive](directive)(schema);
-	});
+	schema = Object.keys(directives).reduce(
+		(updated, directive) => directives[directive](updated),
+		schema,
+	);
 
 	return schema;
 }
@@ -77,13 +79,15 @@ async function collateDirectives({
 	aggregator,
 }: Omit<CollateDefinitionsArguments, "root">) {
 	const isPromise = (o: any) =>
-		typeof o === "object" && o.then && typeof o.then === "function";
+		typeof o === "object" && !!o.then && typeof o.then === "function";
 
 	const aggregated = await aggregator(request, response, context);
 
 	const hasDefinitions = aggregated.every(handler => !!handler.definition);
-	const hasResolver = aggregated.every(handler => !!handler.resolve);
-	const returnsPromise = aggregated
+	const hasResolver = aggregated.every(
+		handler => !!handler.resolve && typeof handler.resolve === "function",
+	);
+	const hasPromises = aggregated
 		.filter(handler => !!handler.resolve)
 		.some(handler => isPromise(handler.resolve));
 
@@ -95,13 +99,15 @@ async function collateDirectives({
 	if (!hasResolver)
 		return Consola.error("Every directive must provide a resolver");
 
-	if (returnsPromise)
-		return Consola.error("Directive definitions cannot return a Promise");
+	if (hasPromises)
+		return Consola.error("Directive resolvers cannot return Promises");
 
 	return aggregated.reduce(
 		(accumulator, directive) => ({
 			...accumulator,
-			[directive.definition as string]: directive.resolve,
+			[directive.definition as string]: (
+				directive.resolve as unknown as DirectiveResolver
+			)(),
 		}),
 		Object.create(null),
 	);
