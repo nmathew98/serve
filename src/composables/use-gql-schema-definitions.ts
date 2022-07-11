@@ -101,7 +101,11 @@ export type GraphQLSchemaHandler = (
 	response: ServerResponse,
 ) => GraphQLSchemaDefinition;
 
-type GraphQLResolver = { [key: string]: GraphQLFieldResolver<any, any> };
+type GraphQLResolver = {
+	[key: string]: GraphQLFieldResolver<any, any> | DirectiveResolver;
+};
+
+type DirectiveResolver = (directiveName: string) => Promise<any>;
 
 function isGraphQLSchemaDefinition(o: any): o is GraphQLSchemaDefinition {
 	if (typeof o !== "object") return false;

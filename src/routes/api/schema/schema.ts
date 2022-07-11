@@ -5,14 +5,21 @@ import { GraphQLSchema } from "graphql";
 import useGqlSchemaDefinitions, {
 	GraphQLSchemaDefinition,
 } from "../../../composables/use-gql-schema-definitions";
+import { Consola } from "../../..";
 
 let schema: GraphQLSchema;
-const useQueries = useGqlSchemaDefinitions("./external/routes/api/queries");
-const useMutations = useGqlSchemaDefinitions("./external/routes/api/mutations");
-const useSubscriptions = useGqlSchemaDefinitions(
-	"./external/routes/api/subscriptions",
+const schemaDefinitionsRoot = "./external/routes/api";
+const useQueries = useGqlSchemaDefinitions(`${schemaDefinitionsRoot}/queries`);
+const useMutations = useGqlSchemaDefinitions(
+	`${schemaDefinitionsRoot}/mutations`,
 );
-const useTypes = useGqlSchemaDefinitions("./external/routes/api/types");
+const useSubscriptions = useGqlSchemaDefinitions(
+	`${schemaDefinitionsRoot}/subscriptions`,
+);
+const useTypes = useGqlSchemaDefinitions(`${schemaDefinitionsRoot}/types`);
+const useDirectives = useGqlSchemaDefinitions(
+	`${schemaDefinitionsRoot}/directives`,
+);
 
 export default async function useSchema(
 	request: IncomingMessage,
@@ -34,6 +41,13 @@ export default async function useSchema(
 		await collate(useSubscriptions, "Subscription"),
 	];
 
+	const directives = await collateDirectives({
+		request,
+		response,
+		context,
+		aggregator: useDirectives,
+	});
+
 	const configuration = {
 		typeDefs: schemaDefinitions.map(definition => definition.types).join("\n"),
 		resolvers: schemaDefinitions.reduce(
@@ -47,7 +61,50 @@ export default async function useSchema(
 
 	schema = makeExecutableSchema(configuration);
 
+	// For reference on how directives should be defined
+	// https://www.graphql-tools.com/docs/schema-directives
+	Object.keys(directives).forEach(directive => {
+		schema = directives[directive](directive)(schema);
+	});
+
 	return schema;
+}
+
+async function collateDirectives({
+	request,
+	response,
+	context,
+	aggregator,
+}: Omit<CollateDefinitionsArguments, "root">) {
+	const isPromise = (o: any) =>
+		typeof o === "object" && o.then && typeof o.then === "function";
+
+	const aggregated = await aggregator(request, response, context);
+
+	const hasDefinitions = aggregated.every(handler => !!handler.definition);
+	const hasResolver = aggregated.every(handler => !!handler.resolve);
+	const returnsPromise = aggregated
+		.filter(handler => !!handler.resolve)
+		.some(handler => isPromise(handler.resolve));
+
+	if (!hasDefinitions)
+		return Consola.error(
+			"Every directive must provide its name in the definition",
+		);
+
+	if (!hasResolver)
+		return Consola.error("Every directive must provide a resolver");
+
+	if (returnsPromise)
+		return Consola.error("Directive definitions cannot return a Promise");
+
+	return aggregated.reduce(
+		(accumulator, directive) => ({
+			...accumulator,
+			[directive.definition as string]: directive.resolve,
+		}),
+		Object.create(null),
+	);
 }
 
 async function collateDefinitions({
