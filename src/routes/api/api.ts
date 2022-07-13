@@ -106,8 +106,6 @@ export default class API extends BaseRoute {
 					process.env.APOLLO_GRAPH_REF &&
 					process.env.APOLLO_SCHEMA_REPORTING
 				) {
-					// We need to do this twice because the final schema
-					// can be composed of multiple other subschemas
 					const normalizeSchema = (schema: GraphQLSchema) =>
 						stripIgnoredCharacters(
 							printSchema(lexicographicSortSchema(schema)),
@@ -129,7 +127,6 @@ export default class API extends BaseRoute {
 						coreSchemaHash: schemaHash,
 						graphRef,
 					};
-					let withSchema = false;
 
 					const reportSchema = async (
 						coreSchema: string | null,
@@ -179,15 +176,18 @@ export default class API extends BaseRoute {
 						);
 					};
 
-					const sendReport = async () => {
+					const sendReport = async (withSchema = false) => {
 						const coreSchema = withSchema ? schemaString : null;
 
 						try {
 							const response = await reportSchema(coreSchema, report);
 
-							withSchema = response.withExecutableSchema;
+							const withSchema = response.withExecutableSchema;
 
-							setTimeout(sendReport, response.inSeconds);
+							setTimeout(
+								() => sendReport.apply(null, [withSchema]),
+								response.inSeconds,
+							);
 						} catch (error: any) {
 							Consola.error("Unable to report schema to Apollo Studio");
 						}
