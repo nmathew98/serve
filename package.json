@@ -35,6 +35,7 @@
 		"@types/module-alias": "^2.0.1",
 		"@types/node": "^18.0.3",
 		"@types/spdy": "^3.4.5",
+		"@types/uuid": "^8.3.4",
 		"@typescript-eslint/eslint-plugin": "^5.30.5",
 		"@typescript-eslint/parser": "^5.30.5",
 		"eslint": "^8.19.0",
@@ -62,6 +63,7 @@
 		"module-alias": "^2.2.2",
 		"scule": "^0.2.1",
 		"spdy": "^4.0.2",
-		"typescript": "^4.7.4"
+		"typescript": "^4.7.4",
+		"uuid": "^8.3.2"
 	}
 }

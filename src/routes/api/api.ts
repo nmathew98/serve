@@ -1,8 +1,15 @@
 import { IncomingMessage, ServerResponse, useBody } from "h3";
-import { graphql, GraphQLSchema, print } from "graphql";
+import {
+	graphql,
+	GraphQLSchema,
+	lexicographicSortSchema,
+	print,
+	printSchema,
+	stripIgnoredCharacters,
+} from "graphql";
 import { ServeContext } from "../../listeners/context/context";
 import { BaseRoute } from "../../routes/route";
-import { sendError } from "../../routes/utilities";
+import { gql, sendError } from "../../routes/utilities";
 import useSchema from "./schema/schema";
 import { Methods } from "../../composables/decorators/methods";
 import { Route } from "../../composables/decorators/route";
@@ -14,6 +21,9 @@ import {
 import { introspectSchema } from "@graphql-tools/wrap";
 import { stitchSchemas } from "@graphql-tools/stitch";
 import { SubschemaConfig } from "@graphql-tools/delegate";
+import { v4 as uuid } from "uuid";
+import crypto from "crypto";
+import { Consola } from "../..";
 
 let schema: GraphQLSchema;
 
@@ -87,6 +97,103 @@ export default class API extends BaseRoute {
 					schema = stitchSchemas({
 						subschemas: [...this.subgraphs, { schema: localSchema }],
 					});
+				}
+
+				// Implementation of schema reporting from
+				// https://www.apollographql.com/docs/studio/schema/schema-reporting-protocol
+				if (
+					process.env.APOLLO_KEY &&
+					process.env.APOLLO_GRAPH_REF &&
+					process.env.APOLLO_SCHEMA_REPORTING
+				) {
+					// We need to do this twice because the final schema
+					// can be composed of multiple other subschemas
+					const normalizeSchema = (schema: GraphQLSchema) =>
+						stripIgnoredCharacters(
+							printSchema(lexicographicSortSchema(schema)),
+						);
+
+					const schemaReporting =
+						"https://schema-reporting.api.apollographql.com/api/graphql";
+					const variant = process.env?.APOLLO_GRAPH_VARIANT ?? "current";
+					const graphRef = `${process.env.APOLLO_GRAPH_REF}@${variant}`;
+					const bootID = uuid();
+
+					const schemaString = normalizeSchema(schema);
+					const schemaHash = crypto
+						.createHash("sha256")
+						.update(schemaString)
+						.digest("hex");
+					const report = {
+						bootID,
+						coreSchemaHash: schemaHash,
+						graphRef,
+					};
+					let withSchema = false;
+
+					const reportSchema = async (
+						coreSchema: string | null,
+						report: {
+							bootID: string;
+							coreSchemaHash: string;
+							graphRef: string;
+						},
+					) => {
+						const reportSchemaMutation = stripIgnoredCharacters(gql`
+							mutation ReportSchemaMutation(
+								$coreSchema: String
+								$report: SchemaReport!
+							) {
+								reportSchema(coreSchema: $coreSchema, report: $report) {
+									inSeconds
+									withCoreSchema
+									... on ReportSchemaError {
+										code
+										message
+									}
+								}
+							}
+						`);
+
+						const result = await fetch(schemaReporting, {
+							headers: new Headers({
+								"X-API-Key": process.env.APOLLO_KEY as string,
+							}),
+							body: JSON.stringify({
+								query: reportSchemaMutation,
+								variables: {
+									coreSchema,
+									report,
+								},
+							}),
+						});
+
+						if (result.status >= 200 && result.status < 300)
+							return await result.json();
+
+						// If reportSchema fails with a non-2xx response
+						// then retry after 20 seconds
+						setTimeout(
+							() => reportSchema(coreSchema, report),
+							20 * Math.pow(10, 3),
+						);
+					};
+
+					const sendReport = async () => {
+						const coreSchema = withSchema ? schemaString : null;
+
+						try {
+							const response = await reportSchema(coreSchema, report);
+
+							withSchema = response.withExecutableSchema;
+
+							setTimeout(sendReport, response.inSeconds);
+						} catch (error: any) {
+							Consola.error("Unable to report schema to Apollo Studio");
+						}
+					};
+
+					sendReport();
 				}
 			}
 

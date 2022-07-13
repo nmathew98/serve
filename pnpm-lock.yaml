@@ -13,6 +13,7 @@ specifiers:
   '@types/module-alias': ^2.0.1
   '@types/node': ^18.0.3
   '@types/spdy': ^3.4.5
+  '@types/uuid': ^8.3.4
   '@typescript-eslint/eslint-plugin': ^5.30.5
   '@typescript-eslint/parser': ^5.30.5
   c12: ^0.2.8
@@ -33,6 +34,7 @@ specifiers:
   scule: ^0.2.1
   spdy: ^4.0.2
   typescript: ^4.7.4
+  uuid: ^8.3.2
 
 dependencies:
   '@graphql-tools/delegate': 8.8.0_graphql@16.5.0
@@ -53,6 +55,7 @@ dependencies:
   scule: 0.2.1
   spdy: 4.0.2
   typescript: 4.7.4
+  uuid: 8.3.2
 
 devDependencies:
   '@swc/jest': 0.2.21_@swc+core@1.2.213
@@ -61,6 +64,7 @@ devDependencies:
   '@types/module-alias': 2.0.1
   '@types/node': 18.0.3
   '@types/spdy': 3.4.5
+  '@types/uuid': 8.3.4
   '@typescript-eslint/eslint-plugin': 5.30.6_d567d64e305900596f70368277b02083
   '@typescript-eslint/parser': 5.30.6_eslint@8.19.0+typescript@4.7.4
   eslint: 8.19.0
@@ -1081,6 +1085,10 @@ packages:
 
   /@types/stack-utils/2.0.1:
     resolution: {integrity: sha512-Hl219/BT5fLAaz6NDkSuhzasy49dwQS/DSdu4MdggFB8zcXv7vflBI3xp7FEmkmdDkBUI2bPUNeMttp2knYdxw==}
+    dev: true
+
+  /@types/uuid/8.3.4:
+    resolution: {integrity: sha512-c/I8ZRb51j+pYGAu5CrFMRxqZ2ke4y2grEBO5AUjgSkSk+qT2Ea+OdWElz/OiMf5MNpn2b17kuVBwZLQJXzihw==}
     dev: true
 
   /@types/yargs-parser/21.0.0:
@@ -3495,6 +3503,11 @@ packages:
 
   /util-deprecate/1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
+    dev: false
+
+  /uuid/8.3.2:
+    resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
+    hasBin: true
     dev: false
 
   /v8-compile-cache/2.3.0:
