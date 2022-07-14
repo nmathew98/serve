@@ -8,5 +8,5 @@ export type ServePlugin = (
 ) => Promise<void>;
 
 export const definePlugin = (plugin: ServePlugin) => async (serve: Serve) => {
-	serve.hooks.hook("plugins", plugin);
+	serve.hooks.hookOnce("plugins", plugin);
 };

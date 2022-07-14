@@ -1,20 +1,20 @@
 import type {
-	RouterMethod,
-	Middleware,
-	Router,
 	IncomingMessage,
 	ServerResponse,
+	CompatibilityEventHandler,
+	RouterMethod,
 } from "h3";
+import type { Router } from "h3";
 
 import type { StoreGetter } from "../utilities/store";
 import type { ServeConfig } from "../serve/serve";
-import { Serve } from "../serve/serve";
+import type { Serve } from "../serve/serve";
 
 export interface Route {
 	route: string;
 	method: RouterMethod[];
-	middleware: Middleware[];
-	protected: boolean;
+	middleware?: CompatibilityEventHandler[];
+	protected?: boolean;
 	enabled?: boolean; // To allow disabling internal routes
 	setup: (config: ServeConfig) => Promise<void>;
 	use: (
@@ -28,15 +28,20 @@ export const defineRoute = (route: Route) => async (serve: Serve) => {
 	const category = route.protected ? "protected" : "unprotected";
 
 	if (route.enabled)
-		serve.hooks.hook(
+		serve.hooks.hookOnce(
 			`routes:${category}`,
-			async (router: Router, useModule: StoreGetter, config: ServeConfig) => {
+			async (router: Router, config: ServeConfig, useModule: StoreGetter) => {
 				await route.setup(config);
 
-				const _handler = (request: IncomingMessage, response: ServerResponse) =>
-					route.use(request, response, useModule);
+				const _handlers = [
+					...(route?.middleware ?? []),
+					(request: IncomingMessage, response: ServerResponse) =>
+						route.use(request, response, useModule),
+				];
 
-				router.use(route.route, _handler, route.method);
+				route.method.forEach(method =>
+					_handlers.forEach(handler => router[method](route.route, handler)),
+				);
 			},
 		);
 };

@@ -4,11 +4,8 @@ import type { Server } from "http";
 import type { CorsOptions } from "cors";
 import type { HelmetOptions } from "helmet";
 import type { Hookable } from "hookable";
-import type { IncomingMessage, Middleware, ServerResponse } from "h3";
 import { createApp, createRouter } from "h3";
 import { createHooks } from "hookable";
-import cors from "cors";
-import helmet from "helmet";
 import { createSecureServer } from "http2";
 import { createServer as createLegacyServer } from "http";
 
@@ -20,20 +17,25 @@ export interface Serve {
 	initialize: () => Promise<void>;
 	listen: () => void;
 }
+
 export interface ServeConfig {
 	server: {
-		cors?: CorsOptions;
-		helmet?: HelmetOptions;
 		ssl?: {
 			key: string;
 			cert: string;
 		};
 	};
+	middleware: {
+		cors?: CorsOptions;
+		helmet?: HelmetOptions;
+		[key: string]: any;
+	};
 	routes: {
-		[key: string]: string;
+		[key: string]: any;
 	};
 	adapters: {
 		sentry?: SentryOptions;
+		[key: string]: any;
 	};
 	alias: {
 		[key: string]: string;
@@ -44,30 +46,24 @@ export const createServe = (config: Partial<ServeConfig>) => {
 	const app = createApp();
 	const router = createRouter();
 	const useModule = (key: string | symbol) => useStore(key, moduleStore);
-	// TODO: Implement this and move it into middleware directory
-	/*eslint @typescript-eslint/no-empty-function: "off"*/
-	const authorizationMiddleware = (
-		request: IncomingMessage,
-		response: ServerResponse,
-	) => {};
-
-	app.use(cors(config?.server?.cors));
-	app.use(helmet(config?.server?.helmet) as Middleware);
 
 	const hooks: Hookable<any, any> = createHooks();
 
-	const routeArguments = [config, router, useModule];
+	const handlerArguments = [router, config, useModule];
 
 	return Object.freeze({
 		hooks,
 		initialize: async () => {
 			await hooks.callHookParallel("plugins", config, app, router);
-			await hooks.callHookParallel("middleware", app);
 
-			await hooks.callHookParallel("routes:unprotected", ...routeArguments);
-			// TODO: Uncomment after implementation
-			app.use(authorizationMiddleware);
-			await hooks.callHookParallel("routes:protected", ...routeArguments);
+			await hooks.callHookParallel(
+				"middleware:unprotected",
+				...handlerArguments,
+			);
+			await hooks.callHookParallel("routes:unprotected", ...handlerArguments);
+
+			await hooks.callHookParallel("middleware:protected", ...handlerArguments);
+			await hooks.callHookParallel("routes:protected", ...handlerArguments);
 		},
 		listen: async () => {
 			let server: Http2SecureServer | Server;
