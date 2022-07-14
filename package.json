@@ -50,6 +50,7 @@
 		"@graphql-tools/schema": "^8.5.0",
 		"@graphql-tools/stitch": "^8.7.0",
 		"@graphql-tools/wrap": "^8.5.0",
+		"@sentry/node": "^7.6.0",
 		"@swc/cli": "^0.1.57",
 		"@swc/core": "^1.2.210",
 		"c12": "^0.2.8",
@@ -60,10 +61,16 @@
 		"graphql-sse": "^1.2.4",
 		"h3": "^0.7.10",
 		"helmet": "^5.1.0",
+		"hookable": "^5.1.1",
 		"module-alias": "^2.2.2",
+		"pathe": "^0.3.2",
 		"scule": "^0.2.1",
 		"spdy": "^4.0.2",
+		"std-env": "^3.1.1",
 		"typescript": "^4.7.4",
-		"uuid": "^8.3.2"
+		"unenv": "^0.5.2",
+		"unplugin": "^0.7.2",
+		"uuid": "^8.3.2",
+		"vite": "^3.0.0"
 	}
 }
