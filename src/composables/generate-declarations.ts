@@ -2,7 +2,7 @@ import { writeFile } from "fs/promises";
 import createFolder from "./create-folder";
 import { findComposables } from "./find-composables";
 import findRootDirectory from "./find-root-directory";
-import Consola from "../adapters/logger/logger";
+import { Logger as Consola } from "../adapters/logger/logger";
 
 export default async function generateDeclarations() {
 	Consola.log(`Generating composable declarations ...`);

@@ -1,7 +1,7 @@
 import { spawn } from "child_process";
 import { resolve } from "path";
 import { copyFile, unlink } from "fs/promises";
-import Consola from "../adapters/logger/logger";
+import { Logger as Consola } from "../adapters/logger/logger";
 import findRootDirectory from "../composables/find-root-directory";
 import isPackageInstalled from "../composables/is-package-installed";
 import installPackage from "../composables/install-package";

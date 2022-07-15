@@ -13,7 +13,7 @@ import * as H3 from "h3";
 export { H3 };
 
 // Adapters
-import Consola from "./adapters/logger/logger";
+import { Logger as Consola } from "./adapters/logger/logger";
 export { Consola };
 export { Authorization } from "./adapters/authorization/authorization";
 export { Logger } from "./adapters/logger/logger";

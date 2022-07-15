@@ -1,5 +1,5 @@
 import { spawn } from "child_process";
-import Consola from "../adapters/logger/logger";
+import { Logger as Consola } from "../adapters/logger/logger";
 import findRootDirectory from "../composables/find-root-directory";
 import generateDeclarations from "../composables/generate-declarations";
 

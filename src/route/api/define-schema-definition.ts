@@ -47,10 +47,6 @@ export const defineDirective = (
 	directives.push(defineSchemaDefinition(definition));
 };
 
-export const clearSchemaDefinitions = () => {
-	schemaDefinitionStore.clear();
-};
-
 export interface GraphQLSchemaDefinition {
 	definition: string;
 	types: string;

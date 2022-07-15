@@ -17,6 +17,7 @@ import { defineRoute } from "../route";
 import { GraphQLSubgraph } from "../../composables/load-config";
 import { Logger } from "../../adapters/logger/logger";
 import { gql } from "../utilities";
+import { useSchema } from "../api/use-schema-definition";
 
 export default defineRoute({
 	route: "/api",
@@ -66,8 +67,7 @@ export default defineRoute({
 			);
 		}
 
-		// TO DO: This needs to be updated
-		const localSchema = new GraphQLSchema(Object.create(null));
+		const localSchema = useSchema();
 
 		schema = stitchSchemas({
 			subschemas: [...subgraphs, { schema: localSchema }],
@@ -87,7 +87,7 @@ export default defineRoute({
 			schema,
 			source: body.query,
 			variableValues: body.variables,
-			contextValue: { useModule },
+			contextValue: { request, response, useModule },
 		});
 
 		response.statusCode = 200;

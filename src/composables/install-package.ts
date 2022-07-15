@@ -1,5 +1,5 @@
 import { spawn } from "child_process";
-import Consola from "../adapters/logger/logger";
+import { Logger as Consola } from "../adapters/logger/logger";
 import { resolve as resolvePath } from "path";
 import findRootDirectory from "./find-root-directory";
 

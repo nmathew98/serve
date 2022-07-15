@@ -17,7 +17,7 @@ import ApiOption from "../../routes/api/option";
 import StorageUpload from "../../routes/storage/upload/upload";
 import StorageRemove from "../../routes/storage/remove/remove";
 import { BaseRoute } from "../../routes/route";
-import Consola from "../../adapters/logger/logger";
+import { Logger as Consola } from "../../adapters/logger/logger";
 import findRootDirectory from "../../composables/find-root-directory";
 import ls from "../../composables/ls";
 import isConstructor from "../../composables/is-constructor";
