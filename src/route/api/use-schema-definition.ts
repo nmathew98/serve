@@ -31,8 +31,6 @@ export const useSchema = () => {
 
 	schema = makeExecutableSchema(configuration);
 
-	schema = makeExecutableSchema(configuration);
-
 	// For reference on how directives should be defined
 	// https://www.graphql-tools.com/docs/schema-directives
 	schema = Object.keys(directives).reduce(

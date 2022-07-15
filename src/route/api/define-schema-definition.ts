@@ -5,10 +5,7 @@ export const defineSchemaDefinition = (
 	definition: Partial<GraphQLSchemaDefinition>,
 ) => Object.freeze(definition);
 
-export const defineQuery = (
-	definition: Omit<GraphQLSchemaDefinition, "types"> &
-		Partial<Pick<GraphQLSchemaDefinition, "types">>,
-) => {
+export const defineQuery = (definition: GraphQLQueryDefinition) => {
 	let queries = useStore("queries", schemaDefinitionStore);
 
 	if (!queries) queries = [];
@@ -16,10 +13,7 @@ export const defineQuery = (
 	queries.push(defineSchemaDefinition(definition));
 };
 
-export const defineMutation = (
-	definition: Omit<GraphQLSchemaDefinition, "types"> &
-		Partial<Pick<GraphQLSchemaDefinition, "types">>,
-) => {
+export const defineMutation = (definition: GraphQLMutationDefinition) => {
 	let mutations = useStore("mutations", schemaDefinitionStore);
 
 	if (!mutations) mutations = [];
@@ -27,9 +21,7 @@ export const defineMutation = (
 	mutations.push(defineSchemaDefinition(definition));
 };
 
-export const defineType = (
-	definition: Pick<GraphQLSchemaDefinition, "types">,
-) => {
+export const defineType = (definition: GraphQLTypeDefinition) => {
 	let types = useStore("types", schemaDefinitionStore);
 
 	if (!types) types = [];
@@ -37,9 +29,7 @@ export const defineType = (
 	types.push(defineSchemaDefinition(definition));
 };
 
-export const defineDirective = (
-	definition: Omit<GraphQLSchemaDefinition, "definition">,
-) => {
+export const defineDirective = (definition: GraphQLDirectiveDefinition) => {
 	let directives = useStore("directives", schemaDefinitionStore);
 
 	if (!directives) directives = [];
@@ -52,3 +42,10 @@ export interface GraphQLSchemaDefinition {
 	types: string;
 	resolve: GraphQLFieldResolver<any, any> | (() => any);
 }
+
+type GraphQLQueryDefinition = Omit<GraphQLSchemaDefinition, "types"> &
+	Partial<Pick<GraphQLSchemaDefinition, "types">>;
+type GraphQLMutationDefinition = Omit<GraphQLSchemaDefinition, "types"> &
+	Partial<Pick<GraphQLSchemaDefinition, "types">>;
+type GraphQLDirectiveDefinition = Omit<GraphQLSchemaDefinition, "definition">;
+type GraphQLTypeDefinition = Pick<GraphQLSchemaDefinition, "types">;
