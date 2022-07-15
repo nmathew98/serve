@@ -1,12 +1,8 @@
-import { IncomingMessage } from "h3";
+import type { IncomingMessage } from "h3";
 
 export interface Authorization {
-	get: (
-		request: IncomingMessage,
-		options?: Record<string, any>,
-	) => Promise<string | Record<string, any>>;
-	verify: (
-		request: IncomingMessage,
-		options?: Record<string, any>,
-	) => Promise<string | Record<string, any> | void>;
+	get: (req: IncomingMessage, options?: Record<string, any>) => Promise<any>;
+	verify: (req: IncomingMessage, options?: Record<string, any>) => Promise<any>;
 }
+
+export const SymbolAuthorization = Symbol("Authorization");

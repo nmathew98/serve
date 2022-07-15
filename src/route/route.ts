@@ -35,8 +35,8 @@ export const defineRoute = (route: Route) => async (serve: Serve) => {
 
 				const _handlers = [
 					...(route?.middleware ?? []),
-					(request: IncomingMessage, response: ServerResponse) =>
-						route.use(request, response, useModule),
+					(req: IncomingMessage, res: ServerResponse) =>
+						route.use(req, res, useModule),
 				];
 
 				route.method.forEach(method =>

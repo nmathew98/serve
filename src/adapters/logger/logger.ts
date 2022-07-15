@@ -66,6 +66,6 @@ const Consola: Logger = {
 	},
 };
 
-const Logger: Logger = decorateObject<Logger>(Sentry, Consola);
+export const Logger: Logger = decorateObject<Logger>(Sentry, Consola);
 
-export default Logger;
+export const SymbolLogger = Symbol("Logger");

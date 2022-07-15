@@ -1,5 +1,4 @@
-import { IncomingMessage, ServerResponse } from "h3";
-import { Readable } from "stream";
+import type { IncomingMessage, ServerResponse } from "h3";
 
 export interface Storage {
 	/**
@@ -19,6 +18,8 @@ export interface Storage {
 }
 
 type StorageHandler = (
-	request: IncomingMessage,
-	response: ServerResponse,
-) => Promise<Record<string, any> | Readable>;
+	req: IncomingMessage,
+	res: ServerResponse,
+) => Promise<any>;
+
+export const SymbolStorage = Symbol("Storage");

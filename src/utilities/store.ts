@@ -1,6 +1,7 @@
 export const createStore = () => new Map();
 export const moduleStore = createStore();
 export const moduleConfigStore = createStore();
+export const schemaDefinitionStore = createStore();
 
 export const useStore = (key: string | symbol, store = serveStore) => {
 	const handler: ProxyHandler<any> = {

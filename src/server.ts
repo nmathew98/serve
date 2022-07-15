@@ -1,6 +1,6 @@
 import "module-alias/register";
 import moduleAlias from "module-alias";
-import Consola from "./adapters/logger/logger";
+import { Logger } from "./adapters/logger/logger";
 import makeContext, { ServeContext } from "./listeners/context/context";
 import buildMakeModuleLoader, {
 	ModuleLoader,
@@ -25,7 +25,7 @@ export async function initialize() {
 		await initializeScripts(context);
 		await listen(context);
 	} catch (error: any) {
-		return Consola.error(error);
+		return Logger.error(error);
 	}
 }
 
@@ -87,7 +87,7 @@ async function initializeConfig() {
 async function initializeContext() {
 	const context = makeContext();
 
-	context.set("Logger", Consola);
+	context.set("Logger", Logger);
 
 	if (Sentry) context.set("Sentry", Sentry);
 
@@ -100,7 +100,7 @@ async function initializeEntityConfiguration(context: ServeContext) {
 
 async function initializeModules(context: ServeContext) {
 	const makeModuleLoader: ModuleLoaderMaker = buildMakeModuleLoader({
-		Logger: Consola,
+		Logger,
 	});
 	const moduleLoader: ModuleLoader = makeModuleLoader(context);
 
