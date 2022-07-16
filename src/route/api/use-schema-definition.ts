@@ -2,7 +2,7 @@ import type { GraphQLSchema } from "graphql";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 
 import type { GraphQLSchemaDefinition } from "./define-schema-definition";
-import { Logger } from "../../adapters/logger/logger";
+import { Logger } from "../../adapter/internal/logger/logger";
 import { schemaDefinitionStore, useStore } from "../../utilities/store";
 
 export const useSchema = () => {

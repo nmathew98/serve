@@ -3,10 +3,9 @@ import * as H3 from "h3";
 export { H3 };
 
 // Adapters
-import { Logger as Consola } from "./adapters/logger/logger";
+import { Logger as Consola } from "./adapter/internal/logger/logger";
 export { Consola };
-export { Authorization } from "./adapters/authorization/authorization";
-export { Logger } from "./adapters/logger/logger";
+export { Authorization } from "./adapter/types/authorization/authorization";
 
 // GraphQL utilities and types
 import {

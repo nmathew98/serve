@@ -43,8 +43,8 @@ export interface ServeConfig {
 }
 
 export const createServe = (config: Partial<ServeConfig>) => {
-	const app = createApp();
 	const router = createRouter();
+	const app = createApp().use(router);
 	const useModule = (key: string | symbol) => useStore(key, moduleStore);
 
 	const hooks: Hookable<any, any> = createHooks();

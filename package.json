@@ -29,6 +29,8 @@
 	"author": "Naveen Mathew",
 	"license": "MIT",
 	"devDependencies": {
+		"@parcel/config-default": "^2.6.2",
+		"@parcel/core": "^2.6.2",
 		"@types/cors": "^2.8.12",
 		"@types/csurf": "^1.11.2",
 		"@types/node": "^18.0.5",
@@ -56,8 +58,6 @@
 		"graphql-sse": "^1.2.4",
 		"h3": "^0.7.10",
 		"helmet": "^5.1.0",
-		"hookable": "^5.1.1",
-		"pathe": "^0.3.2",
-		"unenv": "^0.5.2"
+		"hookable": "^5.1.1"
 	}
 }

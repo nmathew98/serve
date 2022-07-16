@@ -1,9 +1,7 @@
 import type { IncomingMessage } from "h3";
 
-import {
-	Authorization,
-	SymbolAuthorization,
-} from "../../adapters/authorization/authorization";
+import type { Authorization } from "../../adapter/types/authorization/authorization";
+import { SymbolAuthorization } from "../../adapter/types/authorization/authorization";
 import { defineMiddleware } from "../middleware";
 
 export default defineMiddleware({

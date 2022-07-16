@@ -1,7 +1,7 @@
 import Sentry from "@sentry/node";
 import consola from "consola";
 
-import { decorateObject } from "../../utilities/decorate-object";
+import { decorateObject } from "../../../utilities/decorate-object";
 
 export interface Logger {
 	/**
@@ -58,5 +58,7 @@ const Consola: Logger = {
 	},
 };
 
-export const Logger: Logger = decorateObject<Logger>(SentryLogger, Consola);
-export const SymbolLogger = Symbol("Logger");
+export const Logger = decorateObject<Logger>(SentryLogger, Consola);
+
+const buildLogger = () => Logger;
+export default buildLogger;

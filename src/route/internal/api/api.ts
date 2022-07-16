@@ -1,11 +1,11 @@
 import type { Transform } from "@graphql-tools/delegate";
 import type { SubschemaConfig } from "@graphql-tools/delegate";
 import type { IncomingMessage, ServerResponse } from "h3";
+import type { GraphQLSchema } from "graphql";
 import { useBody, useCookies } from "h3";
 import csrf from "csurf";
 import {
 	graphql,
-	GraphQLSchema,
 	lexicographicSortSchema,
 	print,
 	printSchema,
@@ -15,9 +15,9 @@ import { introspectSchema } from "@graphql-tools/wrap";
 import { stitchSchemas } from "@graphql-tools/stitch";
 import { randomBytes, createHash } from "crypto";
 
+import { Logger } from "../../../adapter/internal/logger/logger";
 import { useStore } from "../../../utilities/store";
 import { defineRoute } from "../../route";
-import { Logger } from "../../../adapters/logger/logger";
 import { gql, sendError } from "../../utilities";
 import { useSchema } from "../../api/use-schema-definition";
 
