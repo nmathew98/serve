@@ -1,4 +1,3 @@
-import type { GraphQLSchema } from "graphql";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 
 import type { GraphQLSchemaDefinition } from "./define-schema-definition";
@@ -6,7 +5,7 @@ import { Logger } from "../../adapter/internal/logger/logger";
 import { schemaDefinitionStore, useStore } from "../../utilities/store";
 
 export const useSchema = () => {
-	let schema: GraphQLSchema | undefined = useStore("schema");
+	const [schema, setSchema] = useStore("schema");
 
 	if (schema) return schema;
 
@@ -29,15 +28,16 @@ export const useSchema = () => {
 			Object.create(null),
 		),
 	};
+	{
+		// For reference on how directives should be defined
+		// https://www.graphql-tools.com/docs/schema-directives
+		const schema = Object.keys(directives).reduce(
+			(updated, directive) => directives[directive](updated),
+			makeExecutableSchema(configuration),
+		);
 
-	schema = makeExecutableSchema(configuration);
-
-	// For reference on how directives should be defined
-	// https://www.graphql-tools.com/docs/schema-directives
-	schema = Object.keys(directives).reduce(
-		(updated, directive) => directives[directive](updated),
-		schema,
-	);
+		setSchema(schema);
+	}
 
 	clearSchemaDefinitions();
 
@@ -52,7 +52,8 @@ const collateDirectives = () => {
 	const isPromise = (o: any): o is Promise<any> =>
 		typeof o === "object" && !!o.then && typeof o.then === "function";
 
-	const schemaDefs: Partial<GraphQLSchemaDefinition>[] = useStore("directives");
+	const [schemaDefs] =
+		useStore<Partial<GraphQLSchemaDefinition>[]>("directives");
 
 	if (!schemaDefs) return;
 
@@ -87,7 +88,7 @@ const collateDirectives = () => {
 };
 
 const collateFields = (root?: string) => {
-	const schemaDefs: Partial<GraphQLSchemaDefinition>[] = useStore(
+	const [schemaDefs] = useStore<Partial<GraphQLSchemaDefinition>[]>(
 		root || "types",
 	);
 

@@ -7,35 +7,27 @@ export const defineSchemaDefinition = (
 ) => Object.freeze(definition);
 
 export const defineQuery = (definition: GraphQLQueryDefinition) => {
-	let queries = useStore("queries", schemaDefinitionStore);
+	const [, setQueries] = useStore("queries", schemaDefinitionStore);
 
-	if (!queries) queries = [];
-
-	queries.push(defineSchemaDefinition(definition));
+	setQueries([defineSchemaDefinition(definition)]);
 };
 
 export const defineMutation = (definition: GraphQLMutationDefinition) => {
-	let mutations = useStore("mutations", schemaDefinitionStore);
+	const [, setMutations] = useStore("mutations", schemaDefinitionStore);
 
-	if (!mutations) mutations = [];
-
-	mutations.push(defineSchemaDefinition(definition));
+	setMutations([defineSchemaDefinition(definition)]);
 };
 
 export const defineType = (definition: GraphQLTypeDefinition) => {
-	let types = useStore("types", schemaDefinitionStore);
+	const [, setTypes] = useStore("types", schemaDefinitionStore);
 
-	if (!types) types = [];
-
-	types.push(defineSchemaDefinition(definition));
+	setTypes([defineSchemaDefinition(definition)]);
 };
 
 export const defineDirective = (definition: GraphQLDirectiveDefinition) => {
-	let directives = useStore("directives", schemaDefinitionStore);
+	const [, setDirectives] = useStore("directives", schemaDefinitionStore);
 
-	if (!directives) directives = [];
-
-	directives.push(defineSchemaDefinition(definition));
+	setDirectives([defineSchemaDefinition(definition)]);
 };
 
 export interface GraphQLSchemaDefinition {

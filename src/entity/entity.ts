@@ -21,7 +21,7 @@ export const defineEntity = (builder: EntityBuilder) => async () => {
 			.map(dep => dep.trim()) || [];
 
 	const adapters = deps.reduce((acc, dep) => {
-		const adapter = useStore(dep, moduleStore);
+		const [adapter] = useStore(dep, moduleStore);
 
 		return {
 			...acc,
@@ -29,24 +29,22 @@ export const defineEntity = (builder: EntityBuilder) => async () => {
 		};
 	}, Object.create(null));
 
-	// @ts-expect-error: its still being used as it will be set in the store
-	let entity = useStore(entityName, moduleStore);
+	const [, setEntity] = useStore(entityName, moduleStore);
 	const entityConfiguration = useStore(entityName, moduleConfigStore);
 
 	const intermediate = builder(adapters);
 	if (typeof intermediate === "function")
-		entity = intermediate(entityConfiguration);
-	else entity = intermediate;
+		setEntity(intermediate(entityConfiguration));
+	else setEntity(intermediate);
 
 	Logger.success(`✅ Loaded entity ${entityName}`);
 };
 
 export const defineEntityConfiguration =
 	(name: string, configuration: Record<string, any>) => async () => {
-		// @ts-expect-error: its still being used as it will be set in the store
-		let entityConfiguration = useStore(name, moduleConfigStore);
+		const [, setEntityConfiguration] = useStore(name, moduleConfigStore);
 
-		entityConfiguration = configuration;
+		setEntityConfiguration(configuration);
 	};
 
 type EntityBuilder = (

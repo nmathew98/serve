@@ -3,21 +3,20 @@ export const moduleStore = createStore();
 export const moduleConfigStore = createStore();
 export const schemaDefinitionStore = createStore();
 
-export const useStore = (key: string | symbol, store = serveStore) => {
-	const handler: ProxyHandler<any> = {
-		get: () => store.get(key),
-		set: (value: any) => {
-			store.set(key, value);
+export const useStore = <T = any>(
+	key: string | symbol,
+	store = serveStore,
+): [T, (value?: T) => T] => {
+	return [
+		store.get(key),
+		(value?: T) => {
+			if (value) store.set(key, value);
 
-			return true;
+			return store.get(key);
 		},
-	};
-
-	const proxy = new Proxy(Object.create(null), handler);
-
-	return proxy[key];
+	];
 };
 
-export type StoreGetter = (key: string | symbol) => any;
+export type Store = <T = any>(key: string | symbol) => [T, () => T];
 
 const serveStore: Map<string | symbol, any> = createStore();

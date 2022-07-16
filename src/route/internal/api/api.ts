@@ -57,7 +57,7 @@ export default defineRoute({
 						this.middleware?.push(...config.routes.api.middleware);
 		}
 
-		let schema = useStore("schema");
+		const [, setSchema] = useStore("schema");
 
 		let subgraphs = [];
 		if (config?.routes?.api?.subgraphs) {
@@ -100,15 +100,17 @@ export default defineRoute({
 
 		const localSchema = useSchema();
 
-		schema = stitchSchemas({
-			subschemas: [...subgraphs, { schema: localSchema }],
-		});
+		const schema = setSchema(
+			stitchSchemas({
+				subschemas: [...subgraphs, { schema: localSchema }],
+			}),
+		);
 
 		registerSchema(schema);
 	},
 	use: async (e, useModule) => {
 		try {
-			const schema = useStore("schema");
+			const [schema] = useStore("schema");
 
 			const body = await useBody(e.req);
 

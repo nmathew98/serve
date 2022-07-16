@@ -30,7 +30,7 @@ export default defineRoute({
 
 		// Assuming schema has already been stiched together here
 		// The API route must be initialized first before the subscription route
-		const schema = useStore("schema");
+		const [schema] = useStore("schema");
 		subscriptionHandler = createHandler({ schema });
 	},
 	use: async e => subscriptionHandler(e.req, e.res),

@@ -7,7 +7,7 @@ import { defineMiddleware } from "../middleware";
 export default defineMiddleware({
 	protected: true,
 	use: (config, useModule) => async (req: IncomingMessage) => {
-		const Authorization: Authorization = useModule(SymbolAuthorization);
+		const [Authorization] = useModule<Authorization>(SymbolAuthorization);
 
 		if (!Authorization) return;
 

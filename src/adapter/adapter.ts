@@ -4,10 +4,9 @@ import { moduleStore, useStore } from "../utilities/store";
 export const defineAdapter = (builder: AdapterBuilder) => async () => {
 	const adapterName = builder.name.replaceAll(/buildMake|build/g, "");
 
-	// @ts-expect-error: its still being used as it will be set in the store
-	let adapter = useStore(adapterName, moduleStore);
+	const [, setAdapter] = useStore(adapterName, moduleStore);
 
-	adapter = builder();
+	setAdapter(builder());
 
 	Logger.success(`✅ Loaded adapter ${adapterName}`);
 };

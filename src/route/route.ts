@@ -5,7 +5,7 @@ import type {
 } from "h3";
 import type { Router } from "h3";
 
-import type { StoreGetter } from "../utilities/store";
+import type { Store } from "../utilities/store";
 import type { ServeConfig } from "../serve/serve";
 import type { Serve } from "../serve/serve";
 
@@ -16,7 +16,7 @@ export interface Route {
 	protected?: boolean;
 	enabled?: boolean; // To allow disabling internal routes
 	setup: (config: ServeConfig) => Promise<void>;
-	use: (e: CompatibilityEvent, useModule: StoreGetter) => Promise<any>;
+	use: (e: CompatibilityEvent, useModule: Store) => Promise<any>;
 }
 
 export const defineRoute = (route: Route) => async (serve: Serve) => {
@@ -25,7 +25,7 @@ export const defineRoute = (route: Route) => async (serve: Serve) => {
 	if (route.enabled)
 		serve.hooks.hookOnce(
 			`routes:${category}`,
-			async (router: Router, config: ServeConfig, useModule: StoreGetter) => {
+			async (router: Router, config: ServeConfig, useModule: Store) => {
 				await route.setup(config);
 
 				const _handlers = [
