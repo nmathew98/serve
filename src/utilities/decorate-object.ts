@@ -7,9 +7,9 @@
  *
  * @param {Record<string, AnyFunction>} o n number of objects
  */
-export default function decorateObject<
-	T = unknown & Record<string, AnyFunction>,
->(...o: T[]): T {
+export const decorateObject = <T = unknown & Record<string, AnyFunction>>(
+	...o: T[]
+): T => {
 	const composed = Object.create(null);
 
 	if (!o.length) return composed;
@@ -42,6 +42,6 @@ export default function decorateObject<
 	}
 
 	return composed;
-}
+};
 
 type AnyFunction = (...args: any[]) => any;

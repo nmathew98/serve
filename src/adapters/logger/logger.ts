@@ -1,6 +1,7 @@
+import Sentry from "@sentry/node";
 import consola from "consola";
-import decorateObject from "../../composables/decorate-object";
-import isPackageInstalled from "../../composables/is-package-installed";
+
+import { decorateObject } from "../../utilities/decorate-object";
 
 export interface Logger {
 	/**
@@ -19,7 +20,7 @@ export interface Logger {
 	error: (...args: (string | Error)[]) => Promise<void>;
 }
 
-const Sentry: Logger = {
+const SentryLogger: Logger = {
 	success: () => {
 		return;
 	},
@@ -27,32 +28,23 @@ const Sentry: Logger = {
 		return;
 	},
 	error: async (...args: (string | Error)[]) => {
-		try {
-			const sentry = "@sentry/node";
-			let Sentry: any;
+		const currentDate = new Date();
+		const name = currentDate.toDateString();
 
-			const isSentryInstalled = await isPackageInstalled({ name: sentry });
-			if (isSentryInstalled) Sentry = await import(sentry);
+		const transaction = Sentry.startTransaction({
+			op: "transaction",
+			name,
+		});
 
-			let transaction: any;
-			if (Sentry) {
-				const currentDate = new Date();
-				const name = currentDate.toDateString();
+		args.forEach(arg => {
+			if (arg instanceof Error) Sentry.captureException(arg);
+			else Sentry.captureMessage(JSON.stringify(arg));
+		});
+		for (const arg of args)
+			if (typeof arg === "string") Sentry?.captureMessage(arg);
+			else if (arg instanceof Error) Sentry?.captureException(arg);
 
-				transaction = Sentry.startTransaction({
-					op: "transaction",
-					name,
-				});
-			}
-
-			for (const arg of args)
-				if (typeof arg === "string") Sentry?.captureMessage(arg);
-				else if (arg instanceof Error) Sentry?.captureException(arg);
-
-			transaction?.finish();
-		} catch (error: any) {
-			consola.error(error);
-		}
+		transaction.finish();
 	},
 };
 
@@ -66,6 +58,5 @@ const Consola: Logger = {
 	},
 };
 
-export const Logger: Logger = decorateObject<Logger>(Sentry, Consola);
-
+export const Logger: Logger = decorateObject<Logger>(SentryLogger, Consola);
 export const SymbolLogger = Symbol("Logger");

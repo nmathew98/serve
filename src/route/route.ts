@@ -1,8 +1,7 @@
 import type {
-	IncomingMessage,
-	ServerResponse,
 	CompatibilityEventHandler,
 	RouterMethod,
+	CompatibilityEvent,
 } from "h3";
 import type { Router } from "h3";
 
@@ -17,11 +16,7 @@ export interface Route {
 	protected?: boolean;
 	enabled?: boolean; // To allow disabling internal routes
 	setup: (config: ServeConfig) => Promise<void>;
-	use: (
-		request: IncomingMessage,
-		response: ServerResponse,
-		useModule: StoreGetter,
-	) => Promise<any>;
+	use: (e: CompatibilityEvent, useModule: StoreGetter) => Promise<any>;
 }
 
 export const defineRoute = (route: Route) => async (serve: Serve) => {
@@ -35,8 +30,7 @@ export const defineRoute = (route: Route) => async (serve: Serve) => {
 
 				const _handlers = [
 					...(route?.middleware ?? []),
-					(req: IncomingMessage, res: ServerResponse) =>
-						route.use(req, res, useModule),
+					(e: CompatibilityEvent) => route.use(e, useModule),
 				];
 
 				route.method.forEach(method =>

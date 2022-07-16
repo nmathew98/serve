@@ -1,4 +1,5 @@
-import { GraphQLFieldResolver } from "graphql";
+import type { GraphQLFieldResolver } from "graphql";
+
 import { schemaDefinitionStore, useStore } from "../../utilities/store";
 
 export const defineSchemaDefinition = (

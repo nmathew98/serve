@@ -1,8 +1,9 @@
+import type { GraphQLSchema } from "graphql";
 import { makeExecutableSchema } from "@graphql-tools/schema";
-import { GraphQLSchema } from "graphql";
+
+import type { GraphQLSchemaDefinition } from "./define-schema-definition";
 import { Logger } from "../../adapters/logger/logger";
 import { schemaDefinitionStore, useStore } from "../../utilities/store";
-import { GraphQLSchemaDefinition } from "./define-schema-definition";
 
 export const useSchema = () => {
 	let schema: GraphQLSchema | undefined = useStore("schema");

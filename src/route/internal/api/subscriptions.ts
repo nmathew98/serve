@@ -16,7 +16,8 @@ export default defineRoute({
 			if (config?.routes?.api?.protected)
 				this.protected = !!config.routes.api.protected;
 			if (config?.routes?.api?.subscriptions)
-				this.enabled = !!config.routes.api.subscriptions;
+				this.enabled =
+					!!config?.routes?.api?.enabled && !!config.routes.api.subscriptions;
 			if (config?.routes?.api?.middleware)
 				if (Array.isArray(config.routes.api.middleware))
 					if (
@@ -32,5 +33,5 @@ export default defineRoute({
 		const schema = useStore("schema");
 		subscriptionHandler = createHandler({ schema });
 	},
-	use: async (request, response) => subscriptionHandler(request, response),
+	use: async e => subscriptionHandler(e.req, e.res),
 });

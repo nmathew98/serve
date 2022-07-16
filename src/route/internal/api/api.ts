@@ -1,5 +1,6 @@
-import type { IncomingMessage, ServerResponse } from "h3";
 import type { Transform } from "@graphql-tools/delegate";
+import type { SubschemaConfig } from "@graphql-tools/delegate";
+import type { IncomingMessage, ServerResponse } from "h3";
 import { useBody, useCookies } from "h3";
 import csrf from "csurf";
 import {
@@ -10,7 +11,6 @@ import {
 	printSchema,
 	stripIgnoredCharacters,
 } from "graphql";
-import { SubschemaConfig } from "@graphql-tools/delegate";
 import { introspectSchema } from "@graphql-tools/wrap";
 import { stitchSchemas } from "@graphql-tools/stitch";
 import { randomBytes, createHash } from "crypto";
@@ -18,7 +18,7 @@ import { randomBytes, createHash } from "crypto";
 import { useStore } from "../../../utilities/store";
 import { defineRoute } from "../../route";
 import { Logger } from "../../../adapters/logger/logger";
-import { gql } from "../../utilities";
+import { gql, sendError } from "../../utilities";
 import { useSchema } from "../../api/use-schema-definition";
 
 const csrfProtection = (
@@ -106,25 +106,29 @@ export default defineRoute({
 
 		registerSchema(schema);
 	},
-	use: async (request, response, useModule) => {
-		const schema = useStore("schema");
+	use: async (e, useModule) => {
+		try {
+			const schema = useStore("schema");
 
-		const body = await useBody(request);
+			const body = await useBody(e.req);
 
-		if (typeof body !== "object" || !body.query)
-			throw new Error("Invalid request");
+			if (typeof body !== "object" || !body.query)
+				throw new Error("Invalid request");
 
-		const result = await graphql({
-			schema,
-			source: body.query,
-			variableValues: body.variables,
-			contextValue: { request, response, useModule },
-		});
+			const result = await graphql({
+				schema,
+				source: body.query,
+				variableValues: body.variables,
+				contextValue: { req: e.req, res: e.res, useModule },
+			});
 
-		response.statusCode = 200;
-		response.setHeader("Content-Type", "application/json");
+			e.req.statusCode = 200;
+			e.res.setHeader("Content-Type", "application/json");
 
-		return response.end(JSON.stringify(result));
+			return e.res.end(JSON.stringify(result));
+		} catch (error: any) {
+			return sendError(e, error);
+		}
 	},
 });
 
