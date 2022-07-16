@@ -3,7 +3,7 @@ import { resolve } from "path";
 import { useStore } from "./store";
 
 export const findRootDir = () => {
-	const [rootDir, setRootDir] = useStore("root-dir");
+	const [rootDir, setRootDir] = useStore<string>("root-dir");
 
 	if (rootDir) return rootDir;
 
@@ -19,5 +19,5 @@ export const findRootDir = () => {
 
 	setRootDir(possibleRootDir);
 
-	return rootDir;
+	return possibleRootDir;
 };

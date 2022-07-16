@@ -1,14 +1,16 @@
 import { Logger } from "./internal/logger/logger";
 import { moduleStore, useStore } from "../utilities/store";
+import { ServeConfig } from "../serve/serve";
 
-export const defineAdapter = (builder: AdapterBuilder) => async () => {
-	const adapterName = builder.name.replaceAll(/buildMake|build/g, "");
+export const defineAdapter =
+	(builder: AdapterBuilder) => async (config: ServeConfig) => {
+		const adapterName = builder.name.replaceAll(/buildMake|build/g, "");
 
-	const [, setAdapter] = useStore(adapterName, moduleStore);
+		const [, setAdapter] = useStore(adapterName, moduleStore);
 
-	setAdapter(builder());
+		setAdapter(builder(config));
 
-	Logger.success(`✅ Loaded adapter ${adapterName}`);
-};
+		Logger.success(`✅ Loaded adapter ${adapterName}`);
+	};
 
-type AdapterBuilder = () => Record<string, any>;
+type AdapterBuilder = (config: ServeConfig) => Record<string, any>;

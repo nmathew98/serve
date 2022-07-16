@@ -2,11 +2,12 @@ import { Logger } from "../adapter/internal/logger/logger";
 import { moduleConfigStore, moduleStore, useStore } from "../utilities/store";
 
 export const defineEntity = (builder: EntityBuilder) => async () => {
-	const entityName = builder.name.replaceAll(/buildMake/g, "");
+	const entityName = builder.name.replaceAll(/buildMake|build/g, "");
 
 	if (builder.arguments.length > 1) {
 		Logger.log(`${builder.name} should accept an object of its dependencies`);
 		Logger.error(`❌ Invalid entity: ${entityName}`);
+
 		return;
 	}
 

@@ -1,7 +1,8 @@
-import Sentry from "@sentry/node";
+import pSentry from "@sentry/node";
 import consola from "consola";
 
 import { decorateObject } from "../../../utilities/decorate-object";
+import { useProduction } from "../../../utilities/use-in";
 
 export interface Logger {
 	/**
@@ -20,7 +21,7 @@ export interface Logger {
 	error: (...args: (string | Error)[]) => Promise<void>;
 }
 
-const SentryLogger: Logger = {
+const Sentry: Logger = {
 	success: () => {
 		return;
 	},
@@ -31,18 +32,18 @@ const SentryLogger: Logger = {
 		const currentDate = new Date();
 		const name = currentDate.toDateString();
 
-		const transaction = Sentry.startTransaction({
+		const transaction = pSentry.startTransaction({
 			op: "transaction",
 			name,
 		});
 
 		args.forEach(arg => {
-			if (arg instanceof Error) Sentry.captureException(arg);
-			else Sentry.captureMessage(JSON.stringify(arg));
+			if (arg instanceof Error) pSentry.captureException(arg);
+			else pSentry.captureMessage(JSON.stringify(arg));
 		});
 		for (const arg of args)
-			if (typeof arg === "string") Sentry?.captureMessage(arg);
-			else if (arg instanceof Error) Sentry?.captureException(arg);
+			if (typeof arg === "string") pSentry?.captureMessage(arg);
+			else if (arg instanceof Error) pSentry?.captureException(arg);
 
 		transaction.finish();
 	},
@@ -58,7 +59,8 @@ const Consola: Logger = {
 	},
 };
 
-export const Logger = decorateObject<Logger>(SentryLogger, Consola);
+const buildLogger = () =>
+	useProduction(decorateObject<Logger>(Sentry, Consola), Consola);
 
-const buildLogger = () => Logger;
+export const Logger = buildLogger();
 export default buildLogger;
