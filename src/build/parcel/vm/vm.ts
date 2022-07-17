@@ -35,8 +35,6 @@ export default new Resolver({
 		const adapterTransformer = (code: string) =>
 			transformForVm(code, "adapter");
 		const entityTransformer = (code: string) => transformForVm(code, "entity");
-		const composableTransformer = (code: string) =>
-			transformForVm(code, "composable");
 		const pluginTransformer = (code: string) => transformForVm(code, "plugin");
 		const middlewareTransformer = (code: string) =>
 			transformForVm(code, "middleware");
@@ -56,14 +54,6 @@ export default new Resolver({
 					code: await traverseDirs(
 						`${projectRoot}/src/entities`,
 						entityTransformer,
-					),
-				};
-			case "#composables":
-				return {
-					filePath: `${projectRoot}/src/composables/composables.ts`,
-					code: await traverseDirs(
-						`${projectRoot}/src/composables`,
-						composableTransformer,
 					),
 				};
 			case "#plugins":
