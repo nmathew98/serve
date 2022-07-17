@@ -24,6 +24,13 @@ export default new Resolver({
 			resolve(currentDir, "./middleware/internal"),
 			`${projectRoot}/src/external/middleware`,
 		];
+		const allSchemaDefs = [
+			`${projectRoot}/src/external/routes/api/queries`,
+			`${projectRoot}/src/external/routes/api/mutations`,
+			`${projectRoot}/src/external/routes/api/subscriptions`,
+			`${projectRoot}/src/external/routes/api/types`,
+			`${projectRoot}/src/external/routes/api/directives`,
+		];
 
 		const transform = (code: string) => transformForVm(code, "default", "");
 
@@ -55,6 +62,11 @@ export default new Resolver({
 				return {
 					filePath: `${projectRoot}/src/external/middleware/middleware.ts`,
 					code: await traverseDirs(allMiddleware, transform),
+				};
+			case "#schemaDefs":
+				return {
+					filePath: `${projectRoot}/src/external/routes/api/schema.ts`,
+					code: await traverseDirs(allSchemaDefs, transform),
 				};
 			case "#routes":
 				return {

@@ -98,7 +98,7 @@ export default defineRoute({
 			}
 		}
 
-		const localSchema = useSchema();
+		const localSchema = await useSchema();
 
 		const schema = setSchema(
 			stitchSchemas({

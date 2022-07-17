@@ -1,10 +1,23 @@
 import { makeExecutableSchema } from "@graphql-tools/schema";
+// @ts-expect-error: This is a virtual module
+import * as defs from "#schemaDefs";
 
 import type { GraphQLSchemaDefinition } from "./define-schema-definition";
 import { Logger } from "../../adapter/internal/logger/logger";
 import { schemaDefinitionStore, useStore } from "../../utilities/store";
 
-export const useSchema = () => {
+export const useSchema = async () => {
+	// Not 100% sure if this (the imports) will get shaken out
+	// I think not as we are importing everything
+	await Promise.all(
+		Object.keys(defs)
+			.filter(
+				def =>
+					typeof defs[def] === "object" && typeof defs[def].then === "function",
+			)
+			.map(async def => await defs[def]()),
+	);
+
 	const [schema, setSchema] = useStore("schema");
 
 	if (schema) return schema;
