@@ -1,4 +1,5 @@
 import { Transformer } from "@parcel/plugin";
+
 import { createComposablesPreset } from "./presets/composables";
 import { createServePreset } from "./presets/serve";
 
@@ -12,12 +13,11 @@ export default new Transformer({
 
 		presets.forEach(preset =>
 			preset.forEach((es, loc) => {
-				es.forEach(e => {
-					if (code.includes(e))
-						asset.addDependency({
-							specifier: `import {${e}} from "${loc}"`,
-							specifierType: "esm",
-						});
+				es.filter(e => code.includes(e)).forEach(e => {
+					asset.addDependency({
+						specifier: `import {${e}} from "${loc}"`,
+						specifierType: "esm",
+					});
 				});
 			}),
 		);
