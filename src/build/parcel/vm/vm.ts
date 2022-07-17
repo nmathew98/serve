@@ -32,46 +32,62 @@ export default new Resolver({
 			`${projectRoot}/src/external/routes/api/directives`,
 		];
 
-		const transform = (code: string) => transformForVm(code, "default", "");
+		const adapterTransformer = (code: string) =>
+			transformForVm(code, "adapter");
+		const entityTransformer = (code: string) => transformForVm(code, "entity");
+		const composableTransformer = (code: string) =>
+			transformForVm(code, "composable");
+		const pluginTransformer = (code: string) => transformForVm(code, "plugin");
+		const middlewareTransformer = (code: string) =>
+			transformForVm(code, "middleware");
+		const schemaDefTransformer = (code: string) =>
+			transformForVm(code, "schemaDef");
+		const routeTransformer = (code: string) => transformForVm(code, "route");
 
 		switch (specifier) {
 			case "#adapters":
 				return {
 					filePath: `${projectRoot}/src/external/adapters/adapters.ts`,
-					code: await traverseDirs(allAdapters, transform),
+					code: await traverseDirs(allAdapters, adapterTransformer),
 				};
 			case "#entities":
 				return {
 					filePath: `${projectRoot}/src/entities/entities.ts`,
-					code: await traverseDirs(`${projectRoot}/src/entities`, transform),
+					code: await traverseDirs(
+						`${projectRoot}/src/entities`,
+						entityTransformer,
+					),
 				};
 			case "#composables":
 				return {
 					filePath: `${projectRoot}/src/composables/composables.ts`,
-					code: await traverseDirs(`${projectRoot}/src/composables`, transform),
+					code: await traverseDirs(
+						`${projectRoot}/src/composables`,
+						composableTransformer,
+					),
 				};
 			case "#plugins":
 				return {
 					filePath: `${projectRoot}/src/external/plugins/plugins.ts`,
 					code: await traverseDirs(
 						`${projectRoot}/src/external/plugins`,
-						transform,
+						pluginTransformer,
 					),
 				};
 			case "#middleware":
 				return {
 					filePath: `${projectRoot}/src/external/middleware/middleware.ts`,
-					code: await traverseDirs(allMiddleware, transform),
+					code: await traverseDirs(allMiddleware, middlewareTransformer),
 				};
 			case "#schemaDefs":
 				return {
 					filePath: `${projectRoot}/src/external/routes/api/schema.ts`,
-					code: await traverseDirs(allSchemaDefs, transform),
+					code: await traverseDirs(allSchemaDefs, schemaDefTransformer),
 				};
 			case "#routes":
 				return {
 					filePath: `${projectRoot}/src/external/routes/routes.ts`,
-					code: await traverseDirs(allRoutes, transform),
+					code: await traverseDirs(allRoutes, routeTransformer),
 				};
 			default:
 				return null;

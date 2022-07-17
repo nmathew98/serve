@@ -7,20 +7,11 @@ import { Logger } from "../../adapter/internal/logger/logger";
 import { schemaDefinitionStore, useStore } from "../../utilities/store";
 
 export const useSchema = async () => {
-	// Not 100% sure if this (the imports) will get shaken out
-	// I think not as we are importing everything
-	await Promise.all(
-		Object.keys(defs)
-			.filter(
-				def =>
-					typeof defs[def] === "object" && typeof defs[def].then === "function",
-			)
-			.map(async def => await defs[def]()),
-	);
-
 	const [schema, setSchema] = useStore("schema");
 
 	if (schema) return schema;
+
+	await loadSchemaDefs();
 
 	const schemaDefinitions = [
 		collateFields(),
@@ -55,6 +46,16 @@ export const useSchema = async () => {
 	clearSchemaDefinitions();
 
 	return schema;
+};
+
+const loadSchemaDefs = async () => {
+	// Not 100% sure if this (the imports) will get shaken out
+	// I think not as we are importing everything
+	await Promise.all(
+		Object.keys(defs)
+			.filter(def => def.includes("SCHEMADEF_"))
+			.map(async def => await defs[def]()),
+	);
 };
 
 const clearSchemaDefinitions = () => {
