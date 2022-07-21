@@ -2,7 +2,7 @@ import { Resolver } from "@parcel/plugin";
 import { resolve } from "path";
 
 import { findRootDir } from "../../../utilities/root-dir";
-import { traverseDirsAndRexport } from "../../code-gen/export/export";
+import { traverseDirsAndReexport } from "../../code-gen/export/export";
 
 export default new Resolver({
 	resolve: async ({ specifier }) => {
@@ -33,12 +33,12 @@ export default new Resolver({
 			case "#adapters":
 				return {
 					filePath: `${projectRoot}/src/external/adapters/adapters.ts`,
-					code: await traverseDirsAndRexport(allAdapters, "adapter"),
+					code: await traverseDirsAndReexport(allAdapters, "adapter"),
 				};
 			case "#entities":
 				return {
 					filePath: `${projectRoot}/src/entities/entities.ts`,
-					code: await traverseDirsAndRexport(
+					code: await traverseDirsAndReexport(
 						`${projectRoot}/src/entities`,
 						"entity",
 					),
@@ -46,7 +46,7 @@ export default new Resolver({
 			case "#plugins":
 				return {
 					filePath: `${projectRoot}/src/external/plugins/plugins.ts`,
-					code: await traverseDirsAndRexport(
+					code: await traverseDirsAndReexport(
 						`${projectRoot}/src/external/plugins`,
 						"plugin",
 					),
@@ -54,17 +54,17 @@ export default new Resolver({
 			case "#middleware":
 				return {
 					filePath: `${projectRoot}/src/external/middleware/middleware.ts`,
-					code: await traverseDirsAndRexport(allMiddleware, "middleware"),
+					code: await traverseDirsAndReexport(allMiddleware, "middleware"),
 				};
 			case "#schemaDefs":
 				return {
 					filePath: `${projectRoot}/src/external/routes/api/schema.ts`,
-					code: await traverseDirsAndRexport(allSchemaDefs, "schemaDef"),
+					code: await traverseDirsAndReexport(allSchemaDefs, "schemaDef"),
 				};
 			case "#routes":
 				return {
 					filePath: `${projectRoot}/src/external/routes/routes.ts`,
-					code: await traverseDirsAndRexport(allRoutes, "route"),
+					code: await traverseDirsAndReexport(allRoutes, "route"),
 				};
 			default:
 				return null;

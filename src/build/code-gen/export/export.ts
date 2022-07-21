@@ -3,7 +3,7 @@ import { readFile } from "fs/promises";
 import { isImportable } from "../../../utilities/is-importable";
 import { ls } from "../../../utilities/ls";
 
-export const traverseDirsAndRexport = async (
+export const traverseDirsAndReexport = async (
 	path: string | string[],
 	format: ExportFormat,
 ) => {
@@ -25,13 +25,12 @@ export const traverseDirsAndRexport = async (
 		})),
 	);
 
-	let id = 0;
 	const exportDefault = /export\s+default\s+/gim;
 	const filesWithDefaultExports = pathAndContents
 		.filter(x => exportDefault.test(x.code))
 		.map(
-			x =>
-				`export { default as ${format.toUpperCase()}_${++id} } from "${
+			(x, index) =>
+				`export { default as ${format.toUpperCase()}_${index} } from "${
 					x.path
 				}"`,
 		)

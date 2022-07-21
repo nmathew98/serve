@@ -24,6 +24,7 @@ export interface ServeConfig {
 			key: string;
 			cert: string;
 		};
+		parcel?: Record<string, any>;
 	};
 	middleware: {
 		cors?: CorsOptions;
