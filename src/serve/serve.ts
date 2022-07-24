@@ -19,26 +19,26 @@ export interface Serve {
 }
 
 export interface ServeConfig {
-	server: {
+	server?: {
 		ssl?: {
 			key: string;
 			cert: string;
 		};
 		parcel?: Record<string, any>;
 	};
-	middleware: {
+	middleware?: {
 		cors?: CorsOptions;
 		helmet?: HelmetOptions;
 		[key: string]: any;
 	};
-	routes: {
+	routes?: {
 		[key: string]: any;
 	};
-	adapters: {
+	adapters?: {
 		sentry?: SentryOptions;
 		[key: string]: any;
 	};
-	alias: {
+	alias?: {
 		[key: string]: string;
 	};
 }
@@ -47,6 +47,9 @@ export const createServe = (config: Partial<ServeConfig>) => {
 	const router = createRouter();
 	const app = createApp().use(router);
 	const useModule = (key: string | symbol) => useStore(key, moduleStore);
+	const [, setApp] = useStore("app");
+
+	setApp(app);
 
 	const hooks: Hookable<any, any> = createHooks();
 

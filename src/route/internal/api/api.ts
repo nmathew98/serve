@@ -1,7 +1,7 @@
 import type { Transform } from "@graphql-tools/delegate";
 import type { SubschemaConfig } from "@graphql-tools/delegate";
-import type { IncomingMessage, ServerResponse } from "h3";
 import type { GraphQLSchema } from "graphql";
+import type { IncomingMessage, ServerResponse } from "h3";
 import { useBody, useCookies } from "h3";
 import csrf from "csurf";
 import {

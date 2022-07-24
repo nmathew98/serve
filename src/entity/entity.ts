@@ -41,7 +41,7 @@ export const defineEntity = (builder: EntityBuilder) => async () => {
 	Logger.success(`✅ Loaded entity ${entityName}`);
 };
 
-export const defineEntityConfiguration =
+export const defineEntityConfig =
 	(name: string, configuration: Record<string, any>) => async () => {
 		const [, setEntityConfiguration] = useStore(name, moduleConfigStore);
 
