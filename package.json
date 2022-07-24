@@ -1,63 +1,7 @@
 {
-	"name": "@skulpture/serve",
-	"version": "6.0.1",
-	"description": "A lightweight starting point for API applications",
-	"main": "dist/index.js",
-	"types": "dist/types/index.d.ts",
-	"type": "commonjs",
-	"bin": "./dist/scripts/scripts.js",
-	"keywords": [
-		"h3",
-		"backend",
-		"framework",
-		"lightweight",
-		"extensible",
-		"api",
-		"node",
-		"application",
-		"http2",
-		"spdy"
-	],
-	"scripts": {
-		"build": "tsc",
-		"lint": "eslint --ext .ts --ignore-path .gitignore . --fix",
-		"format": "prettier .  --write",
-		"test": "",
-		"test.watch": "",
-		"prepare": "husky install"
-	},
-	"author": "Naveen Mathew",
-	"license": "MIT",
-	"devDependencies": {
-		"@parcel/config-default": "^2.6.2",
-		"@parcel/core": "^2.6.2",
-		"@types/cors": "^2.8.12",
-		"@types/csurf": "^1.11.2",
-		"@types/node": "^18.0.5",
-		"@typescript-eslint/eslint-plugin": "^5.30.6",
-		"@typescript-eslint/parser": "^5.30.6",
-		"eslint": "^8.19.0",
-		"eslint-config-prettier": "^8.5.0",
-		"eslint-plugin-prettier": "^4.2.1",
-		"husky": "^8.0.1",
-		"prettier": "^2.7.1",
-		"typescript": "^4.7.4"
-	},
-	"dependencies": {
-		"@graphql-tools/delegate": "^8.8.0",
-		"@graphql-tools/schema": "^8.5.0",
-		"@graphql-tools/stitch": "^8.7.0",
-		"@graphql-tools/wrap": "^8.5.0",
-		"@parcel/plugin": "^2.6.2",
-		"@sentry/node": "^7.7.0",
-		"c12": "^0.2.8",
-		"consola": "^2.15.3",
-		"cors": "^2.8.5",
-		"csurf": "^1.11.0",
-		"graphql": "^16.5.0",
-		"graphql-sse": "^1.2.4",
-		"h3": "^0.7.10",
-		"helmet": "^5.1.0",
-		"hookable": "^5.1.1"
-	}
+  "name": "root",
+  "private": true,
+  "devDependencies": {
+    "lerna": "^4.0.0"
+  }
 }

@@ -23,7 +23,7 @@ export { defineServeConfig } from "./serve/serve";
 export { sendSuccess, sendError, gql } from "./route/utilities";
 export { defineEntity, defineEntityConfig } from "./entity/entity";
 
-const [getApp] = useStore("app");
+const [, getApp] = useStore("app");
 export { getApp };
 
 // Adapters
