@@ -1,4 +1,3 @@
-import type { Transform } from "@graphql-tools/delegate";
 import type { SubschemaConfig } from "@graphql-tools/delegate";
 import type { GraphQLSchema } from "graphql";
 import type { IncomingMessage, ServerResponse } from "h3";
@@ -15,6 +14,7 @@ import { introspectSchema } from "@graphql-tools/wrap";
 import { stitchSchemas } from "@graphql-tools/stitch";
 import { randomBytes, createHash } from "crypto";
 
+import type { GraphQLSubgraph } from "../../../serve/serve";
 import { Logger } from "../../../adapter/internal/logger/logger";
 import { useStore } from "../../../utilities/store";
 import { defineRoute } from "../../route";
@@ -43,14 +43,18 @@ export default defineRoute({
 	enabled: true,
 	async setup(config) {
 		{
-			if (config?.routes?.api?.protected)
-				this.protected = !!config.routes.api.protected;
-			if (config?.routes?.api?.enabled)
-				this.enabled = !!config.routes.api.enabled;
-			if (config?.routes?.api?.middleware)
-				if (Array.isArray(config.routes.api.middleware))
+			const hasProtectedConfig = config?.routes?.api?.protected ?? false;
+			const hasEnabledConfig = config?.routes?.api?.enabled ?? false;
+			const hasMiddlewareConfig = config?.routes?.api?.middleware ?? false;
+
+			if (hasProtectedConfig)
+				this.protected = !!hasProtectedConfig;
+			if (hasEnabledConfig)
+				this.enabled = !!hasEnabledConfig;
+			if (hasMiddlewareConfig)
+				if (Array.isArray(config?.routes?.api?.middleware))
 					if (
-						config.routes.api.middleware.every(
+						config?.routes?.api?.middleware.every(
 							(f: any) => typeof f === "function",
 						)
 					)
@@ -59,7 +63,7 @@ export default defineRoute({
 
 		const [, setSchema] = useStore("schema");
 
-		let subgraphs = [];
+		let subgraphs: any[] = [];
 		if (config?.routes?.api?.subgraphs) {
 			if (Array.isArray(config.routes.api.subgraphs)) {
 				const createRemoteExecuter =
@@ -133,18 +137,6 @@ export default defineRoute({
 		}
 	},
 });
-
-export interface GraphQLSubgraph {
-	/**
-	 * The remote location of the subgraph
-	 */
-	location: string;
-	/**
-	 * A record of the headers if any are required for authorization
-	 */
-	headers?: Record<string, any>;
-	transforms?: Transform[];
-}
 
 const registerSchema = (schema: GraphQLSchema) => {
 	// Implementation of schema reporting from

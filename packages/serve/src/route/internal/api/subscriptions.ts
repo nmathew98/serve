@@ -13,15 +13,20 @@ export default defineRoute({
 	enabled: true,
 	async setup(config) {
 		{
-			if (config?.routes?.api?.protected)
-				this.protected = !!config.routes.api.protected;
-			if (config?.routes?.api?.subscriptions)
+			const hasProtectedConfig = config?.routes?.api?.protected ?? false;
+			const hasEnabledConfig = config?.routes?.api?.enabled ?? false;
+			const hasSubscriptionsConfig = config?.routes?.api?.subscriptions ?? false;
+			const hasMiddlewareConfig = config?.routes?.api?.middleware ?? false;
+
+			if (hasProtectedConfig)
+				this.protected = !!hasProtectedConfig;
+			if (hasSubscriptionsConfig)
 				this.enabled =
-					!!config?.routes?.api?.enabled && !!config.routes.api.subscriptions;
-			if (config?.routes?.api?.middleware)
-				if (Array.isArray(config.routes.api.middleware))
+					!!hasEnabledConfig && !!hasSubscriptionsConfig;
+			if (hasMiddlewareConfig)
+				if (Array.isArray(config?.routes?.api?.middleware))
 					if (
-						config.routes.api.middleware.every(
+						config?.routes?.api?.middleware.every(
 							(f: any) => typeof f === "function",
 						)
 					)

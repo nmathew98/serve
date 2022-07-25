@@ -4,6 +4,8 @@ import type { Server } from "http";
 import type { CorsOptions } from "cors";
 import type { HelmetOptions } from "helmet";
 import type { Hookable } from "hookable";
+import type { Transform } from "@graphql-tools/delegate";
+import type { CompatibilityEventHandler } from "h3";
 import { createApp, createRouter } from "h3";
 import { createHooks } from "hookable";
 import { createSecureServer } from "http2";
@@ -32,6 +34,13 @@ export interface ServeConfig {
 		[key: string]: any;
 	};
 	routes?: {
+		api?: {
+			protected?: boolean;
+			enabled?: boolean;
+			middleware?: CompatibilityEventHandler[];
+			subgraphs?: GraphQLSubgraph[]
+			subscriptions?: boolean
+		}
 		[key: string]: any;
 	};
 	adapters?: {
@@ -41,6 +50,21 @@ export interface ServeConfig {
 	alias?: {
 		[key: string]: string;
 	};
+}
+
+export interface GraphQLSubgraph {
+	/**
+	 * The remote location of the subgraph
+	 */
+	location: string;
+	/**
+	 * A record of the headers if any are required for authorization
+	 */
+	headers?: Record<string, any>;
+	/**
+	 * Transforms for the subgraph
+	 */
+	transforms?: Transform[];
 }
 
 export const createServe = (config: Partial<ServeConfig>) => {
