@@ -1,4 +1,4 @@
-import type { ServeConfig, Serve } from "./serve/serve";
+import type { ServeConfig } from "./serve/serve";
 // @ts-expect-error: This is a virtual module
 import * as servePlugins from "#plugins";
 // @ts-expect-error: This is a virtual module
@@ -13,10 +13,6 @@ import { createServe } from "./serve/serve";
 import { config } from "./utilities/config";
 import { defineAdapter } from "./adapter/adapter";
 import { defineEntity } from "./entity/entity";
-
-export const start = () => {
-	initialize().then(listen);
-};
 
 const initialize = async () => {
 	const c = (await config()) as ServeConfig;
@@ -54,6 +50,20 @@ const initialize = async () => {
 	return serve;
 };
 
-const listen = (serve: Serve) => {
-	serve.listen();
+export const serve = await initialize();
+
+// This is for Node
+export const start = () => {
+	serve.listen()
 };
+
+// This is for Bun, in `app.ts`
+/*export default {
+	port: process.env.PORT || 3000,
+	fetch: (event: CompatibilityEvent) => serve.listen(event),
+};*/
+
+// This is for CloudFlare Workers, in `app.ts`
+/*if (navigator.serviceWorker && !process) {
+	addEventListener('fetch', (event: any) => serve.listen(event))
+}*/

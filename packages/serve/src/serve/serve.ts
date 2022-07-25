@@ -5,7 +5,7 @@ import type { CorsOptions } from "cors";
 import type { HelmetOptions } from "helmet";
 import type { Hookable } from "hookable";
 import type { Transform } from "@graphql-tools/delegate";
-import type { CompatibilityEventHandler } from "h3";
+import type { CompatibilityEvent, CompatibilityEventHandler } from "h3";
 import { createApp, createRouter } from "h3";
 import { createHooks } from "hookable";
 import { createSecureServer } from "http2";
@@ -17,7 +17,7 @@ import { readFile } from "fs/promises";
 export interface Serve {
 	hooks: Hookable;
 	initialize: () => Promise<void>;
-	listen: () => void;
+	listen: (event?: CompatibilityEvent) => Promise<any>;
 }
 
 export interface ServeConfig {
@@ -38,9 +38,9 @@ export interface ServeConfig {
 			protected?: boolean;
 			enabled?: boolean;
 			middleware?: CompatibilityEventHandler[];
-			subgraphs?: GraphQLSubgraph[]
-			subscriptions?: boolean
-		}
+			subgraphs?: GraphQLSubgraph[];
+			subscriptions?: boolean;
+		};
 		[key: string]: any;
 	};
 	adapters?: {
@@ -67,7 +67,7 @@ export interface GraphQLSubgraph {
 	transforms?: Transform[];
 }
 
-export const createServe = (config: Partial<ServeConfig>) => {
+export const createServe = (config: Partial<ServeConfig>): Serve => {
 	const router = createRouter();
 	const app = createApp().use(router);
 	const useModule = (key: string | symbol) => useStore(key, moduleStore);
@@ -93,21 +93,26 @@ export const createServe = (config: Partial<ServeConfig>) => {
 			await hooks.callHookParallel("middleware:protected", ...handlerArguments);
 			await hooks.callHookParallel("routes:protected", ...handlerArguments);
 		},
-		listen: async () => {
-			let server: Http2SecureServer | Server;
-			if (config?.server?.ssl) {
-				server = createSecureServer(
-					{
-						key: await readFile(config.server.ssl.key),
-						cert: await readFile(config.server.ssl.cert),
-					},
-					app as any,
-				);
-			} else server = createLegacyServer(app);
+		listen: async (event?: CompatibilityEvent) => {
+			const isRunningInNode = () => process?.release?.name === "node";
 
-			server.listen(process.env.PORT);
+			if (!isRunningInNode() && event) return app.handler(event);
+			else {
+				let server: Http2SecureServer | Server;
+				if (config?.server?.ssl) {
+					server = createSecureServer(
+						{
+							key: await readFile(config.server.ssl.key),
+							cert: await readFile(config.server.ssl.cert),
+						},
+						app as any,
+					);
+				} else server = createLegacyServer(app);
+
+				server.listen(process.env.PORT);
+			}
 		},
-	});
+	} as Serve);
 };
 
 export const defineServeConfig = (config: Partial<ServeConfig>) =>
