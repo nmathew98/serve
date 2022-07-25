@@ -26,7 +26,6 @@ specifiers:
   h3: ^0.7.10
   helmet: ^5.1.0
   hookable: ^5.1.1
-  husky: ^8.0.1
   prettier: ^2.7.1
   typescript: ^4.7.4
   vitest: ^0.19.0
@@ -59,7 +58,6 @@ devDependencies:
   eslint: 8.19.0
   eslint-config-prettier: 8.5.0_eslint@8.19.0
   eslint-plugin-prettier: 4.2.1_7uxdfn2xinezdgvmbammh6ev5i
-  husky: 8.0.1
   prettier: 2.7.1
   typescript: 4.7.4
   vitest: 0.19.0
@@ -2373,12 +2371,6 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: false
-
-  /husky/8.0.1:
-    resolution: {integrity: sha512-xs7/chUH/CKdOCs7Zy0Aev9e/dKOMZf3K1Az1nar3tzlv0jfqnYtu235bstsWTmXOR0EfINrPa97yy4Lz6RiKw==}
-    engines: {node: '>=14'}
-    hasBin: true
-    dev: true
 
   /ignore/5.2.0:
     resolution: {integrity: sha512-CmxgYGiEPCLhfLnpPp1MoRmifwEIOgjcHXxOBjv7mY96c+eWScsOP9c112ZyLdWHi0FxHjI+4uVhKYp/gcdRmQ==}
