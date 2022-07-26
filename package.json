@@ -1,69 +1,7 @@
 {
-	"name": "@skulpture/serve",
-	"version": "6.0.1",
-	"description": "A lightweight starting point for API applications",
-	"main": "dist/index.js",
-	"types": "dist/types/index.d.ts",
-	"type": "commonjs",
-	"bin": "./dist/scripts/scripts.js",
-	"keywords": [
-		"h3",
-		"backend",
-		"framework",
-		"lightweight",
-		"extensible",
-		"api",
-		"node",
-		"application",
-		"http2",
-		"spdy"
-	],
-	"scripts": {
-		"build": "swc ./src -d dist --delete-dir-on-start && tsc --emitDeclarationOnly --declaration --outDir dist/types",
-		"lint": "eslint --ext .ts --ignore-path .gitignore . --fix",
-		"format": "prettier .  --write",
-		"test": "jest src/ --coverage --verbose",
-		"test.watch": "jest src/ --watch --coverage --verbose",
-		"prepare": "husky install"
-	},
-	"author": "Naveen Mathew",
-	"license": "MIT",
-	"devDependencies": {
-		"@swc/jest": "^0.2.21",
-		"@types/cors": "^2.8.12",
-		"@types/jest": "^28.1.4",
-		"@types/module-alias": "^2.0.1",
-		"@types/node": "^18.0.3",
-		"@types/spdy": "^3.4.5",
-		"@types/uuid": "^8.3.4",
-		"@typescript-eslint/eslint-plugin": "^5.30.5",
-		"@typescript-eslint/parser": "^5.30.5",
-		"eslint": "^8.19.0",
-		"eslint-config-prettier": "^8.5.0",
-		"eslint-plugin-prettier": "^4.2.1",
-		"husky": "^8.0.1",
-		"jest": "^28.1.2",
-		"prettier": "^2.7.1"
-	},
-	"dependencies": {
-		"@graphql-tools/delegate": "^8.8.0",
-		"@graphql-tools/schema": "^8.5.0",
-		"@graphql-tools/stitch": "^8.7.0",
-		"@graphql-tools/wrap": "^8.5.0",
-		"@swc/cli": "^0.1.57",
-		"@swc/core": "^1.2.210",
-		"c12": "^0.2.8",
-		"consola": "^2.15.3",
-		"cors": "^2.8.5",
-		"cross-undici-fetch": "^0.4.11",
-		"graphql": "^16.5.0",
-		"graphql-sse": "^1.2.4",
-		"h3": "^0.7.10",
-		"helmet": "^5.1.0",
-		"module-alias": "^2.2.2",
-		"scule": "^0.2.1",
-		"spdy": "^4.0.2",
-		"typescript": "^4.7.4",
-		"uuid": "^8.3.2"
-	}
+  "name": "root",
+  "private": true,
+  "devDependencies": {
+    "lerna": "^4.0.0"
+  }
 }

@@ -1,0 +1,6 @@
+{
+	"watch": ["src"],
+	"ext": "ts,json",
+	"ignore": ["src/**/*.spec.ts", "src/serve/**/*"],
+	"exec": "npx @skulpture/serve build && node ./dist/index.js"
+}
